@@ -1,0 +1,140 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block page %}
+    <h2>Sighting {{ sighting.id }} </h2>
+    
+    <div class="controls">
+        <a href="{% url 'sighting' sightingid=sighting.previous %}">Previous</a>
+        <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">Admin</a>
+        <a href="{% url 'sighting' sightingid=sighting.next %}">Next</a>
+    </div>
+
+    <span>
+    {% if sighting.meteor.id %}
+        Meteor <a href="{% url 'meteor' meteorid=sighting.meteor.id %}">{{ sighting.meteor }}</a>
+        as seen from {{ sighting.location.name|default:"(unknown)" }} by {{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }} at {{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}
+    {% else %}
+        <span class="unknown">Unidentified meteor</span>
+    {% endif %}
+    </span>
+    
+    
+    <div class="inner">
+        <div class="info">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="group" colspan="3">Observed trajectory</th>
+                    </tr>
+                    <tr>
+                        <th class="subgroup" colspan="3">Trail</th>
+                    </tr>
+                </thead>
+
+                <tr>
+                    <td rowspan="3">Trail beginning</td>
+                    <td>Time</td>
+                    <td class="right">{{ sighting.beginningTime|date:"Y-m-d H:i:s.u" }}</td>
+                </tr>
+                <tr>
+                    <td>Azimuth</td>
+                    <td class="right">{{ sighting.beginningAzimuth|floatformat:2 }}°</td>
+                </tr>
+                <tr>
+                    <td>Elevation</td>
+                    <td class="right">{{ sighting.beginningElevation|floatformat:2 }}°</td>
+                </tr>
+                
+                <tr>
+                    <td rowspan="3">Maximum brightness</td>
+                    <td>Time</td>
+                    <td class="right">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</td>
+                </tr>
+                <tr>
+                    <td>Azimuth</td>
+                    <td class="right">{{ sighting.lightmaxAzimuth|floatformat:2 }}°</td>
+                </tr>
+                <tr>
+                    <td>Elevation</td>
+                    <td class="right">{{ sighting.lightmaxElevation|floatformat:2 }}°</td>
+                </tr>
+
+                <tr>
+                    <td rowspan="3">Trail end</td>
+                    <td>Time</td>
+                    <td class="right">{{ sighting.endTime|date:"Y-m-d H:i:s.u" }}</td>
+                </tr>
+                <tr>
+                    <td>Azimuth</td>
+                    <td class="right">{{ sighting.endAzimuth|floatformat:2 }}°</td>
+                </tr>
+                <tr>
+                    <td>Elevation</td>
+                    <td class="right">{{ sighting.endElevation|floatformat:2 }}°</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Duration</td>
+                    <td class="right">{{ sighting.duration.total_seconds|floatformat:3|default:"&mdash;" }} s</td>
+                </tr>
+                <tr>
+                    <td colspan="2">Length of arc</td>
+                    <td class="right">{{ sighting.arcLength|floatformat:2 }}°</td>
+                </tr>
+
+                <tr>
+                    <th colspan="3" class="subgroup">Photometry</th>
+                </tr>
+                <tr>
+                    <td colspan="2">Apparent magnitude</td>
+                    <td class="right">{{ sighting.magnitude|floatformat:2 }}<sup>m</sup></td>
+                </tr>
+                <tr>
+                    <td colspan="2">Distance to meteor centre</td>
+                    <td class="right">{{ sighting.distance|default:"&mdash;" }}</td>
+                </tr>
+
+                <thead>
+                    <tr>
+                        <th class="group" colspan="3">Sky</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td rowspan="3">Sun</td>
+                        <td>Azimuth</td>
+                        <td class="right">{{ sun.coord.az.degree|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
+                        <td>Elevation</td>
+                        <td class="right">{{ sun.coord.alt.degree|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
+                        <td>Elongation</td>
+                        <td class="right">{{ sun.elong.degree|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
+                        <td rowspan="3">Moon</td>
+                        <td>Azimuth</td>
+                        <td class="right">{{ moon.coord.az.degree|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
+                        <td>Elevation</td>
+                        <td class="right">{{ moon.coord.alt.degree|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
+                        <td>Elongation</td>
+                        <td class="right">{{ moon.elong.degree|floatformat:2 }}°</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <div class="preview">
+            <a href="{% get_static_prefix %}data/{{ sighting.image }}">
+                <img class="full-size-preview" src="{% get_static_prefix %}data/{{ sighting.image }}" alt="{{ sighting.id }}" />
+            </a>
+        </div>
+         <div style="clear: both;"></div>
+    </div>
+
+    
+{% endblock %}

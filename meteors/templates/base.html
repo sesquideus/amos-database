@@ -1,0 +1,57 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta name="description" content="ASMODEUS" />
+        <meta name="keywords" content="meteor, orbit, simulator" />
+        <meta name="author" content="Kvík" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>
+            ASMODEUS
+        </title>
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/reset.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/main.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/page.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/bar.css" %}" />
+        <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
+    </head>
+    <body>
+        <div class="entire">
+            <div class="header">
+                <h1>
+                    AMOS
+                </h1>
+                <ul>
+                    <li>
+                        <a href="{% url 'list-meteors' %}">All meteors</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'list-sightings' %}">All sightings</a>
+                    </li>
+                    <li>
+                        <a href="{% url 'admin:index' %}">Admin</a>
+                    </li>
+                </ul>
+            </div>
+            <div class="page">
+                {% block pagetitle %}{% endblock %}
+                {% block page %}{% endblock %}
+            </div>
+            <div class="bar" id="footer">
+                <ul>
+                    <li>&copy; Martin Baláž</li>
+                    <li>2011&ndash;{% now "Y" %}</li>
+                    <li>HTML5</li>
+                    <li>CSS3</li>
+                    <li>PostgreSQL</li>
+                    <li>nginx + uWSGI</li>
+                </ul>
+                <a class="badge" href="http://www.djangoproject.com/">
+                    <img src="https://www.djangoproject.com/m/img/badges/djangomade124x25.gif" border="0" alt="Made with Django." title="Made with Django." />
+                </a>
+            </div>
+        </div>
+    </body>
+</html>

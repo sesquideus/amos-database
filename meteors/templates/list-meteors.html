@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block pagetitle %}
+    <h2>Meteors</h2>
+{% endblock %}
+{% block page %}
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Magnitude</th>
+            <th>Trail start</th>
+            <th>Trail end</th>
+            <th>Velocity</th>
+        </tr>
+        {% for meteor in meteors %}
+        <tr>
+            <td><a href="{% url 'meteor' meteorid=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
+            <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{% if meteor.magnitude > 0 %}+{% endif %}{{ meteor.magnitude|floatformat:1 }}</td>
+            <td>{{ meteor.trailStartX }}</td>
+            <td>{{ meteor.trailEndX }}</td>
+            <td>{{ meteor.velocity|floatformat:0|default:"-" }} m/s</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}

@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kml xmlns="http://www.opengis.net/kml/2.2">
+    <Document>
+        <name>Meteor {{ meteor.timestamp|date:"Ymd-His" }} </name>
+            <description>ID: {{ meteor.id }}<br />{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</description>
+            <Style id="yellowLineGreenPoly">
+                <LineStyle>
+                    <color>ff00ffff</color>
+                    <width>3</width>
+                </LineStyle>
+                <PolyStyle>
+                    <color>7f000000</color>
+                </PolyStyle>
+            </Style>
+        <Placemark>
+            <name>Meteor {{ meteor.id }}</name>
+            <description>Meteor path</description>
+            <styleUrl>#yellowLineGreenPoly</styleUrl>
+            <LineString>
+                <extrude>1</extrude>
+                <tessellate>1</tessellate>
+                <altitudeMode>absolute</altitudeMode>
+                <coordinates>
+                    {{ meteor.beginningLongitude }},{{ meteor.beginningLatitude }},{{ meteor.beginningAltitude }}
+                    {{ meteor.lightmaxLongitude }},{{ meteor.lightmaxLatitude }},{{ meteor.lightmaxAltitude }}
+                    {{ meteor.endLongitude }},{{ meteor.endLatitude }},{{ meteor.endAltitude }}
+                </coordinates>
+            </LineString>
+        </Placemark>
+    </Document>
+</kml>

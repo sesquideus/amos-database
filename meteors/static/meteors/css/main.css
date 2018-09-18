@@ -1,0 +1,88 @@
+html {
+	width: 100%;
+    height: 100%;
+	padding: 0;
+	margin: 0;
+	background-color: black;
+	font-family: "Segoe UI", sans-serif;
+}
+
+body {
+    width: 100%;
+    min-height: 100%;
+    overflow-y: scroll;
+}
+
+div.entire {
+    width: 100%;
+    min-height: 100vh;
+    margin: 0 auto;
+    border: 1px solid black;
+}
+
+div.header {
+	font-size: 12pt;
+	height: 50px;
+    background-color: #0A2A50;
+	padding: 10px;
+	color: #F8F8F8;
+}
+
+div.header h1 {
+    font-size: 22pt;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    display: block;
+    float: left;
+}
+
+div.header ul {
+    display: block;
+    width: auto;
+    height: 100%;
+    float: left;
+    list-style-type: none;
+    list-style-position: outside;
+    padding: 0px 10px;
+}
+
+div.header ul li {
+    display: block;
+    width: auto;
+    height: 100%;
+    float: left;
+}
+
+div.header ul li a, div.header ul li a:visited {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-weight: bold;
+    white-space: nowrap;
+    color: #F0F0E4;
+    height: 100%;
+    padding: 7px 10px;
+
+    transition: 0.3s all ease-out;
+    -o-transition: 0.3s all ease-out;
+    -moz-transition: 0.3s all ease-out;
+    -webkit-transition: 0.3s all ease-out;
+}
+
+
+div.main {
+	padding: 0;
+}
+
+b {
+    font-weight: bold;
+}
+
+i {
+    font-style: italic;
+}
+
+sup {
+    font-size: smaller;
+    vertical-align: super;
+}

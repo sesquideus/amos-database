@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+{% block pagetitle %}
+    <h2>Sightings</h2>
+{% endblock %}
+{% block page %}
+    <table>
+        <tr>
+            <th>Timestamp</th>
+            <th>Magnitude</th>
+            <th>Elevation</th>
+            <th>Azimuth</th>
+            <th>Meteor</th>
+        </tr>
+        {% for sighting in sightings %}
+        <tr>
+            <td><a href="{% url 'sighting' sightingid=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s" }}</a></td>
+            <td style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">{% if sighting.magnitude > 0 %}+{% endif %}{{ sighting.magnitude|floatformat:1 }}<sup>m</sup></td>
+            <td>{{ sighting.lightmaxElevation|floatformat:1 }}°</td>
+            <td>{{ sighting.lightmaxAzimuth|floatformat:1 }}°</td>
+            <td>{% if sighting.meteor %}<a href="{% url 'meteor' meteorid=sighting.meteor.id %}">{{ sighting.meteor }}</a>{% endif %}</td>
+        </tr>
+        {% endfor %}
+    </table>
+{% endblock %}
