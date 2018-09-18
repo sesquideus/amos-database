@@ -90,10 +90,20 @@ class Meteor(models.Model):
                                         verbose_name        = "timestamp of trail end",
                                     )
 
-    velocity                        = models.FloatField(
+    velocityX                       = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "geocentric speed at infinity"
+                                        verbose_name        = "geocentric velocity at infinity, x"
+                                    )
+    velocityY                       = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "geocentric velocity at infinity, y"
+                                    )
+    velocityZ                       = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "geocentric velocity at infinity, z"
                                     )
 
     def __str__(self):
@@ -189,16 +199,19 @@ class Sighting(models.Model):
                                         null                = True,
                                         blank               = True,
                                         related_name        = 'sightings',
+                                        on_delete           = models.SET_NULL,
                                     )
     location                        = models.ForeignKey(
                                         'celestial.Location',
                                         null                = True,
                                         verbose_name        = "observer location",
+                                        on_delete           = models.SET_NULL,
                                     )
     observer                        = models.ForeignKey(
                                         'celestial.Observer',
                                         null                = True,
                                         verbose_name        = "observer",
+                                        on_delete           = models.SET_NULL,
                                     )
 
     solarElongation                 = models.FloatField(
@@ -292,5 +305,6 @@ class VideoFrame(models.Model):
     sighting                        = models.ForeignKey(
                                         'meteors.Sighting',
                                         null                = True,
+                                        on_delete           = models.SET_NULL,
                                     )
 

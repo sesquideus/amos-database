@@ -35,6 +35,7 @@ class Location(models.Model):
 
     country                         = models.ForeignKey(
                                         'Country',
+                                        on_delete           = models.CASCADE,
                                     )
 
     latitude                        = models.FloatField(

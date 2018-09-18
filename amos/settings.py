@@ -25,7 +25,7 @@ SECRET_KEY = '@9_87*noo9dbu$rqr1i^0l^nz+hrw&my*kok7)_wekpi))k_(7'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['192.168.153.128', '127.0.0.1']
+ALLOWED_HOSTS = ['192.168.153.128', '127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -79,8 +79,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
         'NAME': 'amos',
-        'USER': 'kvik',
-        'PASSWORD': 'Your quaternions are still very busy, sir!',
+        'USER': 'amos',
+        'PASSWORD': 'meteorujeme',
         'HOST': 'localhost',
         'ATOMIC_REQUESTS': True,
         'CONN_MAX_AGE': 600,
