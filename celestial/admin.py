@@ -9,8 +9,8 @@ class CountryAdmin(admin.ModelAdmin):
 @admin.register(Location)
 class LocationAdmin(admin.ModelAdmin):
     fieldsets = (
-        (None, {
-                'fields': ('name', 'country'),
+        ('Properties', {
+                'fields': ('name', 'code', 'country'),
             }
         ),
         ('Geographics coordinates', {

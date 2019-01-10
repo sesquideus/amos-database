@@ -28,9 +28,16 @@ class Location(models.Model):
                                         verbose_name        = "ID",
                                     )
 
+    code                            = models.CharField(
+                                        max_length          = 8,
+                                        unique              = True,
+                                        help_text           = "A simple code, composed of 2-4 letters",
+                                    )
+
     name                            = models.CharField(
-                                        max_length = 64,
-                                        unique = True,
+                                        max_length          = 64,
+                                        unique              = True,
+                                        help_text           = "Printable, user-friendly name of the station",
                                     )
 
     country                         = models.ForeignKey(
@@ -79,7 +86,7 @@ class Observer(models.Model):
                                     )
     
     name                            = models.CharField(
-                                        max_length = 64,
+                                        max_length          = 64,
                                     )
 
     def __str__(self):

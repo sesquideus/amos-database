@@ -1,6 +1,0 @@
-django>=2.0
-astropy>=2.0
-numpy>=1.15
-colorama
-psycopg2-binary>=2.7
-pyyaml
