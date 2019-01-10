@@ -4,13 +4,12 @@ html {
 	padding: 0;
 	margin: 0;
 	background-color: black;
-	font-family: "Segoe UI", sans-serif;
+	font-family: "Helvetica", sans-serif;
 }
 
 body {
     width: 100%;
     min-height: 100%;
-    overflow-y: scroll;
 }
 
 div.entire {

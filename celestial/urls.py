@@ -4,7 +4,7 @@ from django.conf.urls.static import static
 from . import views
 
 urlpatterns = [
-    url(r'^astro/?',                views.astro),
+    url(r'^$',                views.astro),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
 
 

@@ -16,10 +16,13 @@ Including another URLconf
 from django.conf.urls import url, include
 from django.contrib import admin
 from meteors import urls as meteorURLs
-from celestial import urls as celestialURLs
+
+import celestial.urls
 
 urlpatterns = [
     url(r'^admin/', admin.site.urls),
-    url(r'^astro/', include(celestialURLs)),
+    url(r'^astro/', include(celestial.urls)),
     url(r'^', include(meteorURLs)),
 ]
+
+handler404 = 'celestial.views.404'

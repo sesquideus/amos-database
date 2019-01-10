@@ -6,14 +6,18 @@
     <table>
         <tr>
             <th>Timestamp</th>
+            <th>Meteor</th>
+            <th>Station</th>
             <th>Magnitude</th>
             <th>Elevation</th>
             <th>Azimuth</th>
-            <th>Meteor</th>
         </tr>
         {% for sighting in sightings %}
         <tr>
-            <td><a href="{% url 'sighting' sightingid=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s" }}</a></td>
+            <td id="{{ sighting.id }}-timestamp">
+                <a href="{% url 'sighting' sightingid=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s" }}</a>
+            </td>
+            <td style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">{% if sighting.magnitude > 0 %}+{% endif %}{{ sighting.magnitude|floatformat:1 }}<sup>m</sup></td>
             <td style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">{% if sighting.magnitude > 0 %}+{% endif %}{{ sighting.magnitude|floatformat:1 }}<sup>m</sup></td>
             <td>{{ sighting.lightmaxElevation|floatformat:1 }}°</td>
             <td>{{ sighting.lightmaxAzimuth|floatformat:1 }}°</td>

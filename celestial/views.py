@@ -9,4 +9,7 @@ def astro(request):
     }
     return render(request, 'astro.html', context)
 
+def error404(request):
+    return render(request, '404.html')
+
 # Create your views here.
