@@ -1,13 +1,11 @@
-from django.conf.urls import url
+from django.urls import include, path
 from . import views
 
 urlpatterns = [
-    url(r'^$',                              views.listMeteors,          name = 'list-meteors'),
-    url(r'^list-meteors/?',                 views.listMeteors,          name = 'list-meteors'),
-    url(r'^list-sightings/?',               views.listSightings,        name = 'list-sightings'),
-    url(r'^sighting/(?P<sightingid>\w+)',   views.sighting,             name = 'sighting'),
-    url(r'^meteor/(?P<meteorid>\w+)/path',  views.meteorKML,            name = 'meteorKML'),
-    url(r'^meteor/(?P<meteorid>\w+)',       views.meteor,               name = 'meteor'),
+    path('',                            views.listMeteors,          name = 'list-meteors'),
+    path('meteors',                     views.listMeteors,          name = 'list-meteors'),
+    path('sightings',                   views.listSightings,        name = 'list-sightings'),
+    path('sighting/<slug:sightingid>',  views.sighting,             name = 'sighting'),
+    #path('meteor/<slug:meteorid>',      views.meteorKML,            name = 'meteorKML'),
+    path('meteor/<slug:meteorid>/path', views.meteor,               name = 'meteor'),
 ]
-
-

@@ -1,6 +1,5 @@
 from astropy.coordinates import EarthLocation
 from django.db import models
-from meteors.models import Meteor
 
 class Country(models.Model):
     class Meta:
@@ -19,9 +18,29 @@ class Country(models.Model):
     def __str__(self):
         return self.name
 
-class Location(models.Model):
+class Subnetwork(models.Model):
     class Meta:
-        verbose_name                = 'location'
+        verbose_name                = 'subnetwork'
+
+    id                              = models.AutoField(
+                                        primary_key         = True,
+                                        verbose_name        = "ID",
+                                    )
+    name                            = models.CharField(
+                                        max_length          = 16,
+                                        unique              = True,
+                                    )
+
+    def __str__(self):
+        return self.name
+
+    def count(self):
+        return Station.objects.filter(subnetwork = self.id).count()
+    count.short_description = 'Station count'
+
+class Station(models.Model):
+    class Meta:
+        verbose_name                = 'station'
 
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -40,6 +59,12 @@ class Location(models.Model):
                                         help_text           = "Printable, user-friendly name of the station",
                                     )
 
+    subnetwork                      = models.ForeignKey(
+                                        'Subnetwork',
+                                        null                = True,
+                                        blank               = True,
+                                        on_delete           = models.CASCADE, 
+                                    )
     country                         = models.ForeignKey(
                                         'Country',
                                         on_delete           = models.CASCADE,
@@ -65,9 +90,9 @@ class Location(models.Model):
                                     )   
 
     def __str__(self):
-        return "{name} ({country})".format(
-            name = self.name,
-            country = self.country
+        return "{name} ({subnetwork})".format(
+            name        = self.name,
+            subnetwork  = self.subnetwork,
         )
 
     def earthLocation(self):

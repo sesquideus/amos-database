@@ -1,16 +1,20 @@
 from django.contrib import admin
 from django.db import models
-from .models import Country, Location, Observer
+from .models import Country, Subnetwork, Station, Observer
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
     pass
 
-@admin.register(Location)
-class LocationAdmin(admin.ModelAdmin):
+@admin.register(Subnetwork)
+class SubnetworkAdmin(admin.ModelAdmin):
+    list_display = ['name', 'count']
+
+@admin.register(Station)
+class StationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Properties', {
-                'fields': ('name', 'code', 'country'),
+                'fields': ('name', 'code', 'subnetwork', 'country'),
             }
         ),
         ('Geographics coordinates', {

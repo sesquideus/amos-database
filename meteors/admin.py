@@ -36,7 +36,7 @@ class MeteorAdmin(admin.ModelAdmin):
             }
         ),
     )    
-    list_display = ['formatTimestamp', 'magnitude']
+    list_display = ['formatTimestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude']
     
     def formatTimestamp(self, obj):
         return obj.timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -56,4 +56,3 @@ class SightingAdmin(admin.ModelAdmin):
         return obj.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
     formatTimestamp.admin_order_field  = 'lightmaxTime'
     formatTimestamp.short_description = 'Timestamp of maximum brightness'
-

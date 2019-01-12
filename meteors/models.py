@@ -202,13 +202,13 @@ class Sighting(models.Model):
                                         on_delete           = models.SET_NULL,
                                     )
     location                        = models.ForeignKey(
-                                        'celestial.Location',
+                                        'stations.Station',
                                         null                = True,
                                         verbose_name        = "observer location",
                                         on_delete           = models.SET_NULL,
                                     )
     observer                        = models.ForeignKey(
-                                        'celestial.Observer',
+                                        'stations.Observer',
                                         null                = True,
                                         verbose_name        = "observer",
                                         on_delete           = models.SET_NULL,
@@ -307,4 +307,3 @@ class VideoFrame(models.Model):
                                         null                = True,
                                         on_delete           = models.SET_NULL,
                                     )
-

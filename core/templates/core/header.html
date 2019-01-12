@@ -1,0 +1,10 @@
+<div class="header">
+    <h1>AMOS</h1>
+    <ul>
+        {% for item in core.menu %}
+            <li>
+                <a href="{% url item.url %}">{{ item.caption }}</a>
+            </li>
+        {% endfor %}
+    </ul>
+</div>

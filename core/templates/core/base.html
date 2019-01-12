@@ -1,0 +1,34 @@
+{% load static %}
+<!DOCTYPE html>
+
+<html>
+    <head>
+        <meta name="description" content="AMOS control centre" />
+        <meta name="keywords" content="meteor, orbit, system, dashboard" />
+        <meta name="author" content="Kvík" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=1" />
+        <meta http-equiv="content-type" content="text/html; charset=UTF-8" />
+        <title>
+            AMOS control centre
+        </title>
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/reset.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/main.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/page.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/bar.css" %}" />
+        <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
+    </head>
+    <body>
+        <div class="entire">
+            {% include 'core/header.html' %}
+            <div class="page">
+                {% block pagetitle %}{% endblock %}
+                {% block page %}
+                    <div class="default">
+                        Place page content here
+                    </div>
+                {% endblock page %}
+            </div>
+            {% include 'core/footer.html' %}
+        </div>            
+    </body>
+</html>

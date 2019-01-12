@@ -1,9 +1,8 @@
 from django.shortcuts import render
-from django.http import HttpResponse, HttpResponseRedirect
-from astropy.coordinates import EarthLocation, AltAz, get_sun, get_moon
-from astropy.time import Time
-from datetime import datetime
-from .models import Sighting, Meteor
+
+from .models import Meteor, Sighting
+
+# Create your views here.
 
 def listMeteors(request):
     context = {
@@ -35,12 +34,3 @@ def sighting(request, sightingid):
         }
     }
     return render(request, 'sighting.html', context)
-
-def meteorKML(request, meteorid):
-    meteor = Meteor.objects.get(id = meteorid)
-    context = {
-        'meteor': meteor,
-    }
-    response = HttpResponse(render(request, 'meteorKML.kml', context), content_type = "application/vnd.google-earth.kml+xml")
-    response['Content-Disposition'] = 'attachment; filename="{id}.kml"'.format(id = meteor.id)
-    return response
