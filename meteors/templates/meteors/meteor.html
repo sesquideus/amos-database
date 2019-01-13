@@ -1,11 +1,12 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
+
 {% block page %}
     <h2>Meteor {{ meteor.timestamp|date:"Ymd-His" }}</h2>
    
     <div class="controls">
-        <a href="{% url 'meteor' meteorid=meteor.previous %}">Previous</a>
+        <a href="{% url 'meteor' id=meteor.previous %}">Previous</a>
         <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">Admin</a>
-        <a href="{% url 'meteor' meteorid=meteor.next %}">Next</a>
+        <a href="{% url 'meteor' id=meteor.next %}">Next</a>
     </div>
     
     <h3>Properties</h3>
@@ -19,11 +20,11 @@
         </tr>
         <tr>
             <td colspan="2">Absolute magnitude</td>
-            <td class="right">{{ meteor.magnitude }}</td>
+            <td class="right">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
         </tr>
         <tr>
             <td colspan="2">Geocentric velocity</td>
-            <td class="right">{{ meteor.velocity|default:"&mdash;" }}</td>
+            <td class="right">{{ meteor.velocity|default:"&mdash;" }} m/s</td>
         </tr>
     </table>
 
@@ -35,14 +36,14 @@
         </tr>
         {% for sighting in meteor.sightings.all %}
             <tr>
-                <td>{{ sighting.location.name }}</td>
-                <td>{{ sighting.location.country }}</td>
-                <td><a href="{% url 'sighting' sightingid=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
+                <td>{{ sighting.station.name }}</td>
+                <td>{{ sighting.station.country }}</td>
+                <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
             </tr>
         {% endfor %}
     </table>
 
     <h3>Miscellanea</h3>
-    <a href="{% url 'meteorKML' meteorid=meteor.id %}" target="_blank">KML visualisation</a>
+    <a href="{% url 'meteor' id=meteor.id %}" target="_blank">KML visualisation</a>
     
 {% endblock %}

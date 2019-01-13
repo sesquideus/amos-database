@@ -1,9 +1,13 @@
 from django.db import models
 from django.db.models import Max, Min
 from django.contrib import admin
+
 from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
 from astropy.time import Time
 from astropy import units
+
+import core.models
+
 import math
 import numpy as np
 
@@ -25,6 +29,13 @@ class Meteor(models.Model):
                                         blank               = True,
                                         verbose_name        = "absolute magnitude",
                                     )
+    source                          = models.ForeignKey(
+                                        'Shower',
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "meteor shower",
+                                        on_delete           = models.SET_NULL,
+                                    )    
 
     beginningLatitude               = models.FloatField(
                                         null                = True,
@@ -201,16 +212,10 @@ class Sighting(models.Model):
                                         related_name        = 'sightings',
                                         on_delete           = models.SET_NULL,
                                     )
-    location                        = models.ForeignKey(
+    station                         = models.ForeignKey(
                                         'stations.Station',
                                         null                = True,
                                         verbose_name        = "observer location",
-                                        on_delete           = models.SET_NULL,
-                                    )
-    observer                        = models.ForeignKey(
-                                        'stations.Observer',
-                                        null                = True,
-                                        verbose_name        = "observer",
                                         on_delete           = models.SET_NULL,
                                     )
 
@@ -248,21 +253,24 @@ class Sighting(models.Model):
 
     def distance(self):
         try:
-            obsLoc = self.location.earthLocation()
+            obsLoc = self.station.earthLocation()
             metLoc = self.meteor.earthLocation()
             return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
         except AttributeError:
             return None
 
     def skyCoord(self):
-        return AltAz(alt = self.lightmaxElevation * units.degree, az = self.lightmaxAzimuth * units.degree, location = self.location.earthLocation(), obstime = Time(self.lightmaxTime))
+        return AltAz(alt = self.lightmaxElevation * units.degree, az = self.lightmaxAzimuth * units.degree, location = self.station.earthLocation(), obstime = Time(self.lightmaxTime))
 
     def arcLength(self):
-        phi1 = math.radians(self.beginningElevation)
-        phi2 = math.radians(self.endElevation)
-        lambda1 = math.radians(self.beginningAzimuth)
-        lambda2 = math.radians(self.endAzimuth)
-        return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
+        try:
+            phi1 = math.radians(self.beginningElevation)
+            phi2 = math.radians(self.endElevation)
+            lambda1 = math.radians(self.beginningAzimuth)
+            lambda2 = math.radians(self.endAzimuth)
+            return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
+        except TypeError as e:
+            return None
 
     def previous(self):
         try:
@@ -279,13 +287,13 @@ class Sighting(models.Model):
         return result
 
     def getSolarElongation(self):
-        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.location.earthLocation())
+        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
         sun = get_sun(Time(self.lightmaxTime)).transform_to(loc)
         return sun.separation(self.skyCoord())
     
     def getLunarElongation(self):
-        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.location.earthLocation())
-        moon = get_moon(Time(self.lightmaxTime), self.location.earthLocation())
+        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
+        moon = get_moon(Time(self.lightmaxTime)).transform_to(loc)
         return moon.separation(self.skyCoord())
 
     def save(self, *args, **kwargs):
@@ -307,3 +315,9 @@ class VideoFrame(models.Model):
                                         null                = True,
                                         on_delete           = models.SET_NULL,
                                     )
+
+class Shower(core.models.NamedModel):
+    class Meta:
+        verbose_name                = 'meteor shower'
+
+    

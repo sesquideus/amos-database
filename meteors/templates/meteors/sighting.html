@@ -1,17 +1,18 @@
-{% extends 'base.html' %}
+{% extends 'core/base.html' %}
 {% load static %}
+
 {% block page %}
     <h2>Sighting {{ sighting.id }} </h2>
     
     <div class="controls">
-        <a href="{% url 'sighting' sightingid=sighting.previous %}">Previous</a>
+        <a href="{% url 'sighting' id=sighting.previous %}">Previous</a>
         <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">Admin</a>
-        <a href="{% url 'sighting' sightingid=sighting.next %}">Next</a>
+        <a href="{% url 'sighting' id=sighting.next %}">Next</a>
     </div>
 
     <div>
     {% if sighting.meteor.id %}
-        Meteor <a href="{% url 'meteor' meteorid=sighting.meteor.id %}">{{ sighting.meteor }}</a>
+        Meteor <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
         as seen from <span id="location-name">{{ sighting.location.name|default:"(unknown)" }}</span>
         by <span id="observer-name">{{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }}</span>
         at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
@@ -36,51 +37,51 @@
                 <tr>
                     <td rowspan="3">Trail beginning</td>
                     <td>Time</td>
-                    <td class="right">{{ sighting.beginningTime|date:"Y-m-d H:i:s.u" }}</td>
+                    <td class="r">{{ sighting.beginningTime|date:"Y-m-d H:i:s.u" }}</td>
                 </tr>
                 <tr>
                     <td>Azimuth</td>
-                    <td class="right">{{ sighting.beginningAzimuth|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.beginningAzimuth|floatformat:2 }}°</td>
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="right">{{ sighting.beginningElevation|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.beginningElevation|floatformat:2 }}°</td>
                 </tr>
                 
                 <tr>
                     <td rowspan="3">Maximum brightness</td>
                     <td>Time</td>
-                    <td class="right">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</td>
+                    <td class="r">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</td>
                 </tr>
                 <tr>
                     <td>Azimuth</td>
-                    <td class="right">{{ sighting.lightmaxAzimuth|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.lightmaxAzimuth|floatformat:2 }}°</td>
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="right">{{ sighting.lightmaxElevation|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.lightmaxElevation|floatformat:2 }}°</td>
                 </tr>
 
                 <tr>
                     <td rowspan="3">Trail end</td>
                     <td>Time</td>
-                    <td class="right">{{ sighting.endTime|date:"Y-m-d H:i:s.u" }}</td>
+                    <td class="r">{{ sighting.endTime|date:"Y-m-d H:i:s.u"|default:"&mdash;" }}</td>
                 </tr>
                 <tr>
                     <td>Azimuth</td>
-                    <td class="right">{{ sighting.endAzimuth|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.endAzimuth|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="right">{{ sighting.endElevation|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.endElevation|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
                 <tr>
                     <td colspan="2">Duration</td>
-                    <td class="right">{{ sighting.duration.total_seconds|floatformat:3|default:"&mdash;" }} s</td>
+                    <td class="r">{{ sighting.duration.total_seconds|floatformat:3|default:"&mdash; " }} s</td>
                 </tr>
                 <tr>
-                    <td colspan="2">Length of arc</td>
-                    <td class="right">{{ sighting.arcLength|floatformat:2 }}°</td>
+                    <td colspan="2">Arc length</td>
+                    <td class="r">{{ sighting.arcLength|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
 
                 <tr>
@@ -88,11 +89,11 @@
                 </tr>
                 <tr>
                     <td colspan="2">Apparent magnitude</td>
-                    <td class="right">{{ sighting.magnitude|floatformat:2 }}<sup>m</sup></td>
+                    <td class="r">{{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 </tr>
                 <tr>
                     <td colspan="2">Distance to meteor centre</td>
-                    <td class="right">{{ sighting.distance|default:"&mdash;" }}</td>
+                    <td class="r">{{ sighting.distance|default:"&mdash;" }} m</td>
                 </tr>
 
                 <thead>
@@ -104,28 +105,28 @@
                     <tr>
                         <td rowspan="3">Sun</td>
                         <td>Azimuth</td>
-                        <td class="right">{{ sun.coord.az.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ sun.coord.az.degree|floatformat:2 }}°</td>
                     </tr>
                     <tr>
                         <td>Elevation</td>
-                        <td class="right">{{ sun.coord.alt.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ sun.coord.alt.degree|floatformat:2 }}°</td>
                     </tr>
                     <tr>
                         <td>Elongation</td>
-                        <td class="right">{{ sun.elong.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ sun.elong.degree|floatformat:2 }}°</td>
                     </tr>
                     <tr>
                         <td rowspan="3">Moon</td>
                         <td>Azimuth</td>
-                        <td class="right">{{ moon.coord.az.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ moon.coord.az.degree|floatformat:2 }}°</td>
                     </tr>
                     <tr>
                         <td>Elevation</td>
-                        <td class="right">{{ moon.coord.alt.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ moon.coord.alt.degree|floatformat:2 }}°</td>
                     </tr>
                     <tr>
                         <td>Elongation</td>
-                        <td class="right">{{ moon.elong.degree|floatformat:2 }}°</td>
+                        <td class="r">{{ moon.elong.degree|floatformat:2 }}°</td>
                     </tr>
                 </tbody>
             </table>

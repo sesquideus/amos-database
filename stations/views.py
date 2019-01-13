@@ -12,6 +12,7 @@ def status(request):
 
 def station(request, code):
     context = {
+        'station': models.Station.objects.get(code = code)
     }
     return render(request, 'stations/station.html', context)
 

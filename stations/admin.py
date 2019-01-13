@@ -1,6 +1,6 @@
 from django.contrib import admin
 from django.db import models
-from .models import Country, Subnetwork, Station, Observer
+from .models import Country, Subnetwork, Station, LogEntry
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
@@ -24,6 +24,6 @@ class StationAdmin(admin.ModelAdmin):
     )
     list_display = ['name', 'country', 'latitude', 'longitude', 'altitude']
 
-@admin.register(Observer)
-class ObserverAdmin(admin.ModelAdmin):
-    list_display = ['name']
+@admin.register(LogEntry)
+class LogEntryAdmin(admin.ModelAdmin):
+    readonly_fields = ['created', 'updated']

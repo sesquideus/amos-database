@@ -1,7 +1,6 @@
-{% extends 'base.html' %}
-{% block pagetitle %}
-    <h2>Meteors</h2>
-{% endblock %}
+{% extends 'core/base.html' %}
+
+{% block pagetitle %}Meteors{% endblock %}
 {% block page %}
     <table>
         <tr>
@@ -13,11 +12,11 @@
         </tr>
         {% for meteor in meteors %}
         <tr>
-            <td><a href="{% url 'meteor' meteorid=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
-            <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{% if meteor.magnitude > 0 %}+{% endif %}{{ meteor.magnitude|floatformat:1 }}</td>
+            <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
+            <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
             <td>{{ meteor.trailStartX }}</td>
             <td>{{ meteor.trailEndX }}</td>
-            <td>{{ meteor.velocity|floatformat:0|default:"-" }} m/s</td>
+            <td>{{ meteor.velocity|floatformat:0|default:"?" }} m/s</td>
         </tr>
         {% endfor %}
     </table>

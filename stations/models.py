@@ -1,62 +1,32 @@
+import textwrap
 from astropy.coordinates import EarthLocation
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 
-class Country(models.Model):
+import core.models
+from meteors.models import Sighting
+
+class Country(core.models.NamedModel):
     class Meta:
         verbose_name                = 'country'
         verbose_name_plural         = 'countries'
 
-    id                              = models.AutoField(
-                                        primary_key         = True,
-                                        verbose_name        = "ID",
-                                    )
-    name                            = models.CharField(
-                                        max_length = 64,
-                                        unique = True,
-                                    )
-
-    def __str__(self):
-        return self.name
-
-class Subnetwork(models.Model):
+class Subnetwork(core.models.NamedModel):
     class Meta:
         verbose_name                = 'subnetwork'
-
-    id                              = models.AutoField(
-                                        primary_key         = True,
-                                        verbose_name        = "ID",
-                                    )
-    name                            = models.CharField(
-                                        max_length          = 16,
-                                        unique              = True,
-                                    )
-
-    def __str__(self):
-        return self.name
-
+    
     def count(self):
         return Station.objects.filter(subnetwork = self.id).count()
     count.short_description = 'Station count'
 
-class Station(models.Model):
+class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
-
-    id                              = models.AutoField(
-                                        primary_key         = True,
-                                        verbose_name        = "ID",
-                                    )
 
     code                            = models.CharField(
                                         max_length          = 8,
                                         unique              = True,
                                         help_text           = "A simple code, composed of 2-4 letters",
-                                    )
-
-    name                            = models.CharField(
-                                        max_length          = 64,
-                                        unique              = True,
-                                        help_text           = "Printable, user-friendly name of the station",
                                     )
 
     subnetwork                      = models.ForeignKey(
@@ -87,7 +57,18 @@ class Station(models.Model):
                                         blank               = True,
                                         verbose_name        = "altitude",
                                         help_text           = "metres above mean sea level",
-                                    )   
+                                    )
+
+    address                         = models.CharField(
+                                        max_length          = 256,
+                                        help_text           = "Printable full address",
+                                    )    
+    founded                         = models.DateField(
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "founding date",
+                                        help_text           = "date when the station was founded",
+                                    ) 
 
     def __str__(self):
         return "{name} ({subnetwork})".format(
@@ -97,23 +78,44 @@ class Station(models.Model):
 
     def earthLocation(self):
         return EarthLocation.from_geodetic(self.longitude, self.latitude, self.altitude)
+
+    def lastSighting(self):
+        try:
+            last = Sighting.objects.filter(station__id = self.id).latest('lightmaxTime')
+            return last
+        except ObjectDoesNotExist:
+            return None
+
+    def last10(self):
+        last10 = Sighting.objects.filter(station_id = self.id).order_by('-lightmaxTime')[0:10]
+        return last10
     
     def register(self, meteor):
         return meteor.earthLocation() - self.earthLocation()
 
-class Observer(models.Model):
+class LogEntry(models.Model):
     class Meta:
-        verbose_name                = 'observer'
-   
-    id                              = models.AutoField(
-                                        primary_key         = True,
-                                        verbose_name        = "ID",
+        verbose_name                = 'log entry'
+        verbose_name_plural         = 'log entries'
+        ordering                    = ['created']
+
+    station                         = models.ForeignKey(
+                                        'Station',
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "station",
+                                        help_text           = "the station in question",
+                                        on_delete           = models.CASCADE,
                                     )
-    
-    name                            = models.CharField(
-                                        max_length          = 64,
+    text                            = models.TextField(
+                                        help_text           = "text of the log entry",
+                                    )
+    created                         = models.DateTimeField(
+                                        auto_now_add        = True,
+                                    )
+    updated                         = models.DateTimeField(
+                                        auto_now            = True,
                                     )
 
     def __str__(self):
-        return self.name
-   
+        return textwrap.shorten(self.text, 50, placeholder = '...')

@@ -1,0 +1,44 @@
+{% extends 'core/base.html' %}
+
+{% block pagetitle %}Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>){% endblock pagetitle %}
+{% block page %}
+    <h3>Sightings</h3>
+    <table>
+        <tr>
+            <th>Sighting</th>
+            <th>Magnitude</th>
+        </tr>
+        {% for sighting in station.last10 %}
+            <tr>
+                <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
+                <td>{{ sighting.magnitude }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="empty">
+                    There are no recorded sightings for this station.
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+
+    <h3>Device log</h3>
+    <table>
+        <tr>
+            <th>Date</th>
+            <th>Entry</th>
+        </tr>
+        {% for entry in station.logentry_set.all %}
+            <tr>
+                <td>{{ entry.created|date:"Y-m-d" }}</td>
+                <td>{{ entry.text }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="empty">
+                    There are no log entries for this station.
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+{% endblock page %}

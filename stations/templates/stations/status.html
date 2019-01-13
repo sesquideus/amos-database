@@ -3,20 +3,30 @@
 {% block pagetitle %}Network status{% endblock pagetitle %}
 {% block page %}
     <table>
-        <tr>
+        <tr class="legend">
+            <th>Subnetwork</th>
+            <th>Code</th>
             <th>Name</th>
             <th>Status</th>
+            <th colspan="2">Last sighting</th>
             <th>Admin</th>
         </tr>
         {% for subnetwork in subnetworks %}
-            <tr class="sub">
-                <th colspan="3">{{ subnetwork.name }}</th>
-            </tr>
             {% for station in subnetwork.station_set.all %}
                 <tr>
-                    <td>{{ station.name }}</td>
-                    <td>a</td>
-                    <td><a href="{% url 'station' code=station.code %}">View</a></td>
+                    {% if forloop.first %}
+                        <td rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.name }}</td>
+                    {% endif %}
+                    <td>{{ station.code }}</td>
+                    <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
+                    <td class="c">unknown</td>
+                    <td class="c">
+                        {{ station.lastSighting.lightmaxTime|default_if_none:"none" }}
+                    </td>
+                    <td class="c">
+                        {{ station.lastSighting.lightmaxTime|default_if_none:"never"|timesince }}
+                    </td>
+                    <td class="c"><a href="{% url 'admin:stations_station_change' station.id %}">Edit</a></td>
                 </tr>
             {% endfor %}
         {% endfor %}

@@ -11,17 +11,16 @@
         <title>
             AMOS control centre
         </title>
-        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/reset.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/main.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/page.css" %}" />
-        <link rel="stylesheet" type="text/css" href="{% static "/meteors/css/bar.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "core/css/reset.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "core/css/main.css" %}" />
+        <link rel="stylesheet" type="text/css" href="{% static "core/css/bar.css" %}" />
         <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
     </head>
     <body>
         <div class="entire">
             {% include 'core/header.html' %}
             <div class="page">
-                {% block pagetitle %}{% endblock %}
+                <h2>{% block pagetitle %}{% endblock %}</h2>
                 {% block page %}
                     <div class="default">
                         Place page content here

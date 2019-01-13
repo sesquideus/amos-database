@@ -50,7 +50,7 @@ class SightingAdmin(admin.ModelAdmin):
     }
     readonly_fields = ['solarElongation', 'lunarElongation']
 
-    list_display = ['formatTimestamp', 'location', 'magnitude', 'lightmaxAzimuth', 'lightmaxElevation', 'meteor']
+    list_display = ['formatTimestamp', 'station', 'magnitude', 'lightmaxAzimuth', 'lightmaxElevation', 'meteor']
 
     def formatTimestamp(self, obj):
         return obj.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
