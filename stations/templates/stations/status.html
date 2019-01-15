@@ -21,12 +21,19 @@
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
                     <td class="c">unknown</td>
                     <td class="c">
-                        {{ station.lastSighting.lightmaxTime|default_if_none:"none" }}
+                        {% if station.lastSighting %}
+                            {{ station.lastSighting.lightmaxTime }}
+                        {% else %}never{% endif %}
                     </td>
                     <td class="c">
                         {{ station.lastSighting.lightmaxTime|default_if_none:"never"|timesince }}
                     </td>
                     <td class="c"><a href="{% url 'admin:stations_station_change' station.id %}">Edit</a></td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td>{{ subnetwork.name }}</td>
+                    <td colspan="6" class="empty">No stations defined for this subnetwork.</td>
                 </tr>
             {% endfor %}
         {% endfor %}

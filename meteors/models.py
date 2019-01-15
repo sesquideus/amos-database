@@ -143,6 +143,12 @@ class Meteor(models.Model):
             result = Meteor.objects.order_by('lightmaxTime').first().id
         return result
 
+    def speed(self):
+        try:
+            return np.sqrt(self.velocityX**2 + self.velocityY**2 + self.velocityZ**2)
+        except TypeError:
+            return None
+
 class Sighting(models.Model):
     class Meta:
         verbose_name                = "meteor sighting"

@@ -3,14 +3,19 @@ from django.db import models
 from django import forms
 from .models import Meteor, Sighting
 
+class MicrosecondDateTimeWidget(forms.DateTimeInput):
+    def __init__(self, **kwargs):
+        super().__init__(**kwargs)
+        self.supports_microseconds = True
+
 @admin.register(Meteor)
 class MeteorAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
-            'widget': forms.SplitDateTimeWidget(
-                date_format='%Y-%m-%d',
-                time_format='%H:%M:%S.%f'
-            )
+           # 'widget': MicrosecondDateTimeWidget(
+#                date_format='%Y-%m-%d',
+#                time_format='%H:%M:%S.%f'
+         #   )
         },
     }
     fieldsets = (

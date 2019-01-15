@@ -11,13 +11,17 @@
             <th>Velocity</th>
         </tr>
         {% for meteor in meteors %}
-        <tr>
-            <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
-            <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
-            <td>{{ meteor.trailStartX }}</td>
-            <td>{{ meteor.trailEndX }}</td>
-            <td>{{ meteor.velocity|floatformat:0|default:"?" }} m/s</td>
-        </tr>
+            <tr>
+                <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
+                <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
+                <td>{{ meteor.trailStartX }}</td>
+                <td>{{ meteor.trailEndX }}</td>
+                <td>{{ meteor.velocity|floatformat:0|default:"?" }} m/s</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td class="empty" colspan="5">There are no recorded meteors in the database.</td>
+            </tr>
         {% endfor %}
     </table>
 {% endblock %}

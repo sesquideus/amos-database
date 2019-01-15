@@ -14,7 +14,15 @@ class Country(core.models.NamedModel):
 class Subnetwork(core.models.NamedModel):
     class Meta:
         verbose_name                = 'subnetwork'
+        ordering                    = ['id']
     
+    founded                         = models.DateField(
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "founding date",
+                                        help_text           = "date when the station was founded",
+                                    ) 
+
     def count(self):
         return Station.objects.filter(subnetwork = self.id).count()
     count.short_description = 'Station count'
@@ -22,6 +30,7 @@ class Subnetwork(core.models.NamedModel):
 class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
+        ordering                    = ['name']
 
     code                            = models.CharField(
                                         max_length          = 8,
@@ -60,6 +69,8 @@ class Station(core.models.NamedModel):
                                     )
 
     address                         = models.CharField(
+                                        null                = True,
+                                        blank               = True,
                                         max_length          = 256,
                                         help_text           = "Printable full address",
                                     )    
