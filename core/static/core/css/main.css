@@ -17,19 +17,36 @@ body {
     min-height: 100vh;
 }
 
-div.header h1 {
-    font-size: 24px;
-}
-
 sup {
     font-size: smaller;
     vertical-align: super;
 }
 
+div.page div.controls {
+    float: right;
+    position: fixed;
+    right: 10px;
+    top: 60px;
+}
+
+div.page div.controls a {
+    text-decoration: none;
+}
+
+div.page div.controls img {
+    width: 32px;
+    height: 32px;
+}
+
 div.page {
     padding: 10px;
     background-color: white;
-    min-height: calc(100vh - 62px);
+    min-height: calc(100vh - 85px);
+}
+
+div.page div.map {
+    width: 500px;
+    height: 500px;
 }
 
 div.page span.bold {

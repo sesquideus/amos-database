@@ -25,6 +25,12 @@ def meteor(request, id):
     }        
     return render(request, 'meteors/meteor.html', context)
 
+def meteorKML(request, id):
+    context = {
+        'meteor': Meteor.objects.get(id = id)
+    }
+    return render(request, 'meteors/meteor.kml', context)
+
 def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
     loc = AltAz(obstime = Time(sighting.lightmaxTime), location = sighting.station.earthLocation())

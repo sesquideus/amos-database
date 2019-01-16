@@ -1,7 +1,7 @@
 {% load static %}
 <!DOCTYPE html>
 
-<html>
+<html lang="en">
     <head>
         <meta name="description" content="AMOS control centre" />
         <meta name="keywords" content="meteor, orbit, system, dashboard" />
@@ -14,13 +14,17 @@
         <link rel="stylesheet" type="text/css" href="{% static "core/css/reset.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "core/css/main.css" %}" />
         <link rel="stylesheet" type="text/css" href="{% static "core/css/bar.css" %}" />
+        <link rel="icon" type="image/png" href="{% static "icon.png" %}" />
         <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
     </head>
     <body>
         <div class="entire">
             {% include 'core/header.html' %}
             <div class="page">
-                <h2>{% block pagetitle %}{% endblock %}</h2>
+                <div class="titlebar">
+                    {% block pagetitle %}
+                    {% endblock %}
+                </div>
                 {% block page %}
                     <div class="default">
                         Place page content here

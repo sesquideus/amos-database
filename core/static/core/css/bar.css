@@ -1,10 +1,10 @@
 div.bar {
     width: 100%;
-    height: 35px;
+    height: 26px;
     position: relative;
     bottom: 0px;
     border: 0px none;
-    color: #203060;
+    color: white;
     font-size: 10pt;
     font-family: "Roboto", sans-serif;
     font-weight: bold;
@@ -17,6 +17,15 @@ div.bar {
         inset 0 -15px 30px rgba(0, 0, 0, 0.2);*/
 }
 
+div.bar h1 {
+    font-size: 22pt;
+    margin-bottom: 10px;
+    margin-right: 20px;
+    display: block;
+    padding: 2px 10px;
+    float: left;
+}
+
 div.bar ul {
     display: block;
     width: auto;
@@ -25,7 +34,7 @@ div.bar ul {
     float: left;
     list-style-type: none;
     list-style-position: outside;
-    padding: 8px 10px;
+    padding: 9px 10px;
 }
 
 div.bar ul li {
@@ -36,7 +45,7 @@ div.bar ul li {
 }
 
 div.bar#main-menu ul li {
-    padding: 6px 20px;
+    padding: 8px 20px;
 }
 
 div.bar#footer ul li {
@@ -54,17 +63,32 @@ div.bar ul li a, div.bar ul li a:visited {
 
 div.bar#main-menu ul li a, div.bar#main-menu ul li a:visited {
     display: block;
-    font-size: 13pt;
     color: #F8F8F8;
+    font-size: 14pt;
     text-decoration: none;
 }
 
 div.bar ul li a:hover, div.bar#main-menu ul li a:hover {
     color: white;
-    text-shadow: 0px 0px 4px white, 0px 0px 4px gray;
+    text-shadow: 0px 0px 2px white, 0px 0px 2px gray;
 }
 
 div.bar a.badge {
-    padding: 5px 5px;
+    padding: 2px 3px;
     float: right;
 }
+
+div#main-menu {
+    height: 54px;
+}
+
+div#main-menu h1 {
+    font-size: 24px;
+}
+
+div#main-menu img#logo {
+    float: left;
+    margin: 3px;
+    height: 48px;
+}
+

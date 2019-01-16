@@ -1,14 +1,23 @@
 {% extends 'core/base.html' %}
+{% load static %}
 
-{% block pagetitle %}Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>){% endblock pagetitle %}
+{% block pagetitle %}
+    <h2>Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>)<h2>
+    <div class="controls">
+        <a href="{% url 'admin:stations_station_change' station.id %}">
+            <img class="" src="{% static 'pictures/edit.png' %}" />
+        </a>
+    </div>
+{% endblock pagetitle %}
+
 {% block page %}
     <h3>Sightings</h3>
     <table>
         <tr>
-            <th>Sighting</th>
+            <th>Timestamp</th>
             <th>Magnitude</th>
         </tr>
-        {% for sighting in station.last10 %}
+        {% for sighting in lastDay %}
             <tr>
                 <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
                 <td>{{ sighting.magnitude }}</td>
@@ -16,7 +25,7 @@
         {% empty %}
             <tr>
                 <td colspan="2" class="empty">
-                    There are no recorded sightings for this station.
+                    There are no recorded sightings for this station within last 24 hours.
                 </td>
             </tr>
         {% endfor %}

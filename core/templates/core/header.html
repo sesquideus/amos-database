@@ -1,5 +1,9 @@
-<div class="header">
-    <h1>AMOS</h1>
+{% load static %}
+
+<div class="bar" id="main-menu">
+    <a href="{% url 'status' %}">
+        <img id="logo" src="{% static 'amos.jpg' %}" alt="AMOS" />
+    </a>
     <ul>
         {% for item in core.menu %}
             <li>

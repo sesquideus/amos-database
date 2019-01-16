@@ -66,6 +66,7 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
+                'core.context_processors.mainMenu',
             ],
         },
     },
@@ -115,6 +116,7 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 DATETIME_FORMAT = 'Y-m-d H:i:s.u'
+DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S.%f']
 DATE_FORMAT = 'Y-m-d'
 TIME_ZONE = 'UTC'
 USE_I18N = False

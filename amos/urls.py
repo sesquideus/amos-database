@@ -18,9 +18,13 @@ from django.urls import include, path
 
 import meteors.urls
 import stations.urls
+import stations.views
+import core.urls
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('meteors/', include(meteors.urls)),
-    path('stations/', include(stations.urls)),
+    path('admin/',      admin.site.urls),
+    path('about/',      include(core.urls)),
+    path('',            stations.views.status),
+    path('meteors/',    include(meteors.urls)),
+    path('stations/',   include(stations.urls)),
 ]

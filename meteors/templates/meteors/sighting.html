@@ -1,8 +1,8 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
+{% block pagetitle %}Sighting {{ sighting.id }}{% endblock %}
 {% block page %}
-    <h2>Sighting {{ sighting.id }} </h2>
     
     <div class="controls">
         <a href="{% url 'sighting' id=sighting.previous %}">Previous</a>

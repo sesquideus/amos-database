@@ -3,7 +3,7 @@ from django.db import models
 from django import forms
 from .models import Meteor, Sighting
 
-class MicrosecondDateTimeWidget(forms.DateTimeInput):
+class MicrosecondDateTimeWidget(forms.SplitDateTimeWidget):
     def __init__(self, **kwargs):
         super().__init__(**kwargs)
         self.supports_microseconds = True
@@ -12,10 +12,10 @@ class MicrosecondDateTimeWidget(forms.DateTimeInput):
 class MeteorAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
-           # 'widget': MicrosecondDateTimeWidget(
-#                date_format='%Y-%m-%d',
-#                time_format='%H:%M:%S.%f'
-         #   )
+            'widget': MicrosecondDateTimeWidget(
+                date_format='%Y-%m-%d',
+                time_format='%H:%M:%S.%f',
+            )
         },
     }
     fieldsets = (
@@ -32,7 +32,9 @@ class MeteorAdmin(admin.ModelAdmin):
                     ('lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude'),
                     'lightmaxTime',
                     ('endLatitude', 'endLongitude', 'endAltitude'),
-                    'endTime'),
+                    'endTime',
+                    ('velocityX', 'velocityY', 'velocityZ'),
+                ),
             }
         ),
         ('Photometry',
@@ -42,6 +44,7 @@ class MeteorAdmin(admin.ModelAdmin):
         ),
     )    
     list_display = ['formatTimestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude']
+    save_as = True
     
     def formatTimestamp(self, obj):
         return obj.timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
@@ -51,11 +54,17 @@ class MeteorAdmin(admin.ModelAdmin):
 @admin.register(Sighting)
 class SightingAdmin(admin.ModelAdmin):
     formfield_overrides = {
-        models.DateTimeField: {'widget': forms.SplitDateTimeWidget(date_format='%Y-%m-%d', time_format='%H:%M:%S.%f')},
+        models.DateTimeField: {
+            'widget': MicrosecondDateTimeWidget(
+                date_format='%Y-%m-%d',
+                time_format='%H:%M:%S.%f',
+            )
+        },
     }
     readonly_fields = ['solarElongation', 'lunarElongation']
 
     list_display = ['formatTimestamp', 'station', 'magnitude', 'lightmaxAzimuth', 'lightmaxElevation', 'meteor']
+    save_as = True
 
     def formatTimestamp(self, obj):
         return obj.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
