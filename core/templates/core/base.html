@@ -16,6 +16,7 @@
         <link rel="stylesheet" type="text/css" href="{% static "core/css/bar.css" %}" />
         <link rel="icon" type="image/png" href="{% static "icon.png" %}" />
         <script type="text/javascript" src="{% static "js/jquery.js" %}"></script>
+        {% block headextra %}{% endblock %}
     </head>
     <body>
         <div class="entire">

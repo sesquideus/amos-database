@@ -1,6 +1,11 @@
 {% extends 'core/base.html' %}
 {% load staticfiles %}
 
+{% block headextra %}
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="{% static 'meteors/js/map.js' %}"></script>
+{% endblock headextra %}
+
 {% block pagetitle %}
     <h2>Meteor {{ meteor.timestamp|date:"Ymd-His" }}</h2>
     <div class="controls">
@@ -20,7 +25,6 @@
 {% endblock pagetitle %}
 
 {% block page %}
-        
     <h3>Properties</h3>
         <table>
             <tr>
@@ -56,28 +60,5 @@
         </table>
 
     <h3>Map</h3>
-        <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
         <div id="map" class="map" style="width: 100%; height: 500px"> </div>
-
-        <script>
-            map = new OpenLayers.Map("map");
-            map.addLayer(new OpenLayers.Layer.OSM());
-
-            var lonLat = new OpenLayers.LonLat({{ meteor.lightmaxLongitude }}, {{ meteor.lightmaxLatitude }})
-                  .transform(
-                    new OpenLayers.Projection("EPSG:4326"), // transform from WGS 1984
-                    map.getProjectionObject() // to Spherical Mercator Projection
-                  );
-                  
-            var zoom=10;
-
-            var markers = new OpenLayers.Layer.Markers( "Markers" );
-            map.addLayer(markers);
-            
-            markers.addMarker(new OpenLayers.Marker(lonLat));
-    
-            map.setCenter (lonLat, zoom);
-        </script>    
-
-    <div>
 {% endblock %}
