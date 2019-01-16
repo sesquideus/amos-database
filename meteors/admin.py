@@ -13,8 +13,8 @@ class MeteorAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
             'widget': MicrosecondDateTimeWidget(
-                date_format='%Y-%m-%d',
-                time_format='%H:%M:%S.%f',
+                date_format = '%Y-%m-%d',
+                time_format = '%H:%M:%S.%f',
             )
         },
     }
@@ -56,17 +56,12 @@ class SightingAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
             'widget': MicrosecondDateTimeWidget(
-                date_format='%Y-%m-%d',
-                time_format='%H:%M:%S.%f',
+                date_format = '%Y-%m-%d',
+                time_format = '%H:%M:%S.%f',
             )
         },
     }
     readonly_fields = ['solarElongation', 'lunarElongation']
 
-    list_display = ['formatTimestamp', 'station', 'magnitude', 'lightmaxAzimuth', 'lightmaxElevation', 'meteor']
+    list_display = ['lightmaxTime', 'station', 'magnitude', 'lightmaxAzimuth', 'lightmaxElevation', 'meteor']
     save_as = True
-
-    def formatTimestamp(self, obj):
-        return obj.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
-    formatTimestamp.admin_order_field  = 'lightmaxTime'
-    formatTimestamp.short_description = 'Timestamp of maximum brightness'

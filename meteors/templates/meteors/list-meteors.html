@@ -1,7 +1,15 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block pagetitle %}Meteors{% endblock %}
+{% block headextra %}
+    <script src="http://www.openlayers.org/api/OpenLayers.js"></script>
+    <script src="{% static 'meteors/js/map.js' %}"></script>
+{% endblock headextra %}
+
+{% block pagetitle %}
+    <h2>Meteors</h2>
+{% endblock %}
+
 {% block page %}
     <table>
         <tr>
@@ -17,7 +25,7 @@
                 <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 <td>{{ meteor.trailStartX }}</td>
                 <td>{{ meteor.trailEndX }}</td>
-                <td>{{ meteor.velocity|floatformat:0|default:"?" }} m/s</td>
+                <td>{{ meteor.speed|floatformat:0|default:"?" }} m/s</td>
             </tr>
         {% empty %}
             <tr>
@@ -25,4 +33,7 @@
             </tr>
         {% endfor %}
     </table>
+
+    <h3>Map</h3>
+        <div id="map" class="map" style="width: 100%; height: 500px"> </div>
 {% endblock %}

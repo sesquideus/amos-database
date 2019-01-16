@@ -44,7 +44,7 @@ div.page {
     min-height: calc(100vh - 85px);
 }
 
-div.page div.map {
+div.page div#map {
     width: 500px;
     height: 500px;
 }

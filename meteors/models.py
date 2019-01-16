@@ -122,6 +122,14 @@ class Meteor(models.Model):
             time = self.timestamp.strftime("%Y%m%d-%H%M%S"),
         )
 
+    def asDict(self):
+        return {
+            'latitude': self.lightmaxLatitude,
+            'longitude': self.lightmaxLongitude,
+            'altitude': self.lightmaxAltitude,
+            'magnitude': self.magnitude,
+        }
+
     def earthLocation(self):
         try:
             result = EarthLocation.from_geodetic(self.lightmaxLongitude * units.deg, self.lightmaxLatitude * units.deg, self.lightmaxAltitude * units.m)

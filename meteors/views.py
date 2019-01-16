@@ -1,4 +1,6 @@
 from django.shortcuts import render
+from django.core import serializers
+from django.http import JsonResponse
 
 from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon
@@ -13,6 +15,13 @@ def listMeteors(request):
     }
     return render(request, 'meteors/list-meteors.html', context)
 
+def listMeteorsJSON(request):
+    meteors = {}
+    for meteor in Meteor.objects.all():
+        meteors[meteor.id] = meteor.asDict()
+
+    return JsonResponse(meteors)
+
 def listSightings(request):
     context = {
         'sightings': Sighting.objects.all(),
@@ -24,6 +33,11 @@ def meteor(request, id):
         'meteor': Meteor.objects.get(id = id)
     }        
     return render(request, 'meteors/meteor.html', context)
+
+def meteorJSON(request, id):
+    meteor = Meteor.objects.get(id = id)
+    data = serializers.serialize('json', meteor)
+    return JsonResponse(data, safe = False)
 
 def meteorKML(request, id):
     context = {
