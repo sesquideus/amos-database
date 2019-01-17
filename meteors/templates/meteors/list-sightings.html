@@ -26,8 +26,8 @@
             <td>{{ sighting.lightmaxAzimuth|floatformat:1 }}°</td>
         </tr>
         {% empty %}
-            <tr>
-                <td class="empty" colspan="6">There are no recorded sightings in the database.</td>
+            <tr class="empty">
+                <td colspan="6">There are no recorded sightings in the database.</td>
             </tr>
         {% endfor %}
     </table>

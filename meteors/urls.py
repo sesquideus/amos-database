@@ -9,4 +9,6 @@ urlpatterns = [
     path('meteor/<slug:id>/path',       views.meteorKML,            name = 'meteorKML'),
     path('sightings',                   views.listSightings,        name = 'listSightings'),
     path('sighting/<slug:id>',          views.sighting,             name = 'sighting'),
+
+    path('create',                      views.createRandom,         name = 'createRandom'),
 ]

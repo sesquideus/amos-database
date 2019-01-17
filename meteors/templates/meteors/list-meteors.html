@@ -18,18 +18,24 @@
             <th>Trail start</th>
             <th>Trail end</th>
             <th>Velocity</th>
+            <th>Seen by</th>
         </tr>
         {% for meteor in meteors %}
             <tr>
                 <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
-                <td style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
-                <td>{{ meteor.trailStartX }}</td>
-                <td>{{ meteor.trailEndX }}</td>
-                <td>{{ meteor.speed|floatformat:0|default:"?" }} m/s</td>
+                <td  class="r" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
+                <td class="r">{{ meteor.trailStartX }}</td>
+                <td class="r">{{ meteor.trailEndX }}</td>
+                <td class="r">{{ meteor.speed|floatformat:0|default:"?" }} m/s</td>
+                <td>
+                    {% for sighting in meteor.sightings.all %}
+                        <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.station.code }}</a>
+                    {% endfor %}
+                </td>
             </tr>
         {% empty %}
             <tr>
-                <td class="empty" colspan="5">There are no recorded meteors in the database.</td>
+                <td class="empty" colspan="6">There are no recorded meteors in the database.</td>
             </tr>
         {% endfor %}
     </table>

@@ -45,8 +45,8 @@ div.page {
 }
 
 div.page div#map {
-    width: 500px;
-    height: 500px;
+    width: 100%;
+    height: 800px;
 }
 
 div.page span.bold {
@@ -91,18 +91,18 @@ div.page table tr td {
 
 div.page table tr th {
     font-size: 100%;
-    background-color: hsla(100, 40%, 50%, 0.2);
+    background-color: hsla(180, 40%, 50%, 0.2);
 }
 
 div.page table tr.legend th {
-    background-color: hsla(100, 40%, 50%, 0.5);
+    background-color: hsla(180, 40%, 50%, 0.5);
 }
 
 div.page table td a {
     text-decoration: none;
 }
 
-div.page table td.empty {
+tr.empty td, td.empty {
     color: grey;
     text-align: center;
 }

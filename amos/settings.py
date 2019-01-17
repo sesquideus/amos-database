@@ -36,7 +36,8 @@ INSTALLED_APPS = [
     'django.contrib.contenttypes',
     'django.contrib.sessions',
     'django.contrib.messages',
-    'django.contrib.staticfiles'
+    'django.contrib.staticfiles',
+    'django_celery_beat',
 ] + [
     'core',
     'stations',
@@ -121,7 +122,7 @@ DATE_FORMAT = 'Y-m-d'
 TIME_ZONE = 'UTC'
 USE_I18N = False
 USE_L10N = False
-USE_TZ = False
+USE_TZ = True
 
 string_if_invalid = 'DEBUG WARNING: undefined template variable [%s] not found'
 

@@ -29,6 +29,7 @@ def listSightings(request):
     return render(request, 'meteors/list-sightings.html', context)
 
 def meteor(request, id):
+    print("OK")
     context = {
         'meteor': Meteor.objects.get(id = id)
     }        
@@ -57,3 +58,8 @@ def sighting(request, id):
         }
     }
     return render(request, 'meteors/sighting.html', context)
+
+def createRandom(request):
+    meteor = Meteor.objects.createRandom()
+    meteor.save()
+    return render(request, 'meteors/meteor.kml', {}) 

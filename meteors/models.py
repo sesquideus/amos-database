@@ -8,13 +8,32 @@ from astropy import units
 
 import core.models
 
+import datetime
 import math
 import numpy as np
+
+class MeteorManager(models.Manager):
+    def createRandom(self):
+        timestamp = datetime.datetime.now()
+        meteor = self.create(
+            timestamp           = timestamp,
+            lightmaxTime        = timestamp,
+            magnitude           = -2.5 * np.log(np.random.pareto(2) * 10),
+            lightmaxLatitude    = np.random.uniform(20, 60),
+            lightmaxLongitude   = np.random.uniform(-20, 30),
+            lightmaxAltitude    = np.random.normal(80000, 15000),
+            velocityX           = np.random.normal(0, 20000),
+            velocityY           = np.random.normal(0, 20000),
+            velocityZ           = np.random.normal(0, 20000),
+        )
+        return meteor
 
 class Meteor(models.Model):
     class Meta:
         verbose_name                = "meteor"
         ordering                    = ['timestamp']
+
+    objects                         = MeteorManager()
         
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -169,7 +188,7 @@ class Sighting(models.Model):
     magnitude                       = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "absolute magnitude",
+                                        verbose_name        = "apparent magnitude",
                                     )
     
     beginningElevation              = models.FloatField(
@@ -229,7 +248,7 @@ class Sighting(models.Model):
     station                         = models.ForeignKey(
                                         'stations.Station',
                                         null                = True,
-                                        verbose_name        = "observer location",
+                                        verbose_name        = "station",
                                         on_delete           = models.SET_NULL,
                                     )
 
