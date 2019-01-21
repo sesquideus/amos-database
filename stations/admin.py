@@ -21,7 +21,7 @@ class SubnetworkAdmin(admin.ModelAdmin):
 class StationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Properties', {
-                'fields': ('name', 'code', 'subnetwork', 'country'),
+                'fields': ('name', 'code', 'subnetwork', 'address', 'country'),
             }
         ),
         ('Geographics coordinates', {

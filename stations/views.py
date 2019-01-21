@@ -1,5 +1,6 @@
 import datetime
 from django.shortcuts import render
+from django.http import JsonResponse
 
 from . import models
 
@@ -19,4 +20,11 @@ def station(request, code):
         'lastDay': station.sighting_set.filter(lightmaxTime__gte = datetime.datetime.now() - datetime.timedelta(days = 1))
     }
     return render(request, 'stations/station.html', context)
+
+def stationsJSON(request):
+    stations = {}
+    for station in models.Station.objects.all():
+        stations[station.id] = station.asDict()
+
+    return JsonResponse(stations)
 

@@ -1,24 +1,34 @@
 {% extends 'core/base.html' %}
 {% load static %}
 
-{% block pagetitle %}Sighting {{ sighting.id }}{% endblock %}
-{% block page %}
-    
+{% block pagetitle %}
+    <h2>Sighting {{ sighting.id }}</h2>
     <div class="controls">
-        <a href="{% url 'sighting' id=sighting.previous %}">Previous</a>
-        <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">Admin</a>
-        <a href="{% url 'sighting' id=sighting.next %}">Next</a>
+        <a href="{% url 'sighting' id=sighting.previous %}">
+            <img src="{% static "pictures/previous.png" %}" alt="Previous" />
+        </a>
+        <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
+            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
+        </a>
+        <a href="{% url 'sighting' id=sighting.id %}" target="_blank">
+            <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
+        </a>
+        <a href="{% url 'sighting' id=sighting.next %}">
+            <img src="{% static "pictures/next.png" %}" alt="Next" />
+        </a>
     </div>
+{% endblock pagetitle %}
 
+{% block page %}
     <div>
-    {% if sighting.meteor.id %}
-        Meteor <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
-        as seen from <span id="location-name">{{ sighting.station.name|default:"(unknown)" }}</span>
-        by <span id="observer-name">{{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }}</span>
-        at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
-    {% else %}
-        <span class="unknown">Unidentified meteor</span>
-    {% endif %}
+        {% if sighting.meteor.id %}
+            Meteor <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
+            as seen from <span id="location-name">{{ sighting.station.name|default:"(unknown)" }}</span>
+            by <span id="observer-name">{{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }}</span>
+            at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
+        {% else %}
+            <span class="unknown">Unidentified meteor</span>
+        {% endif %}
     </div>
     
     

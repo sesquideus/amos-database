@@ -87,6 +87,15 @@ class Station(core.models.NamedModel):
             subnetwork  = self.subnetwork,
         )
 
+    def asDict(self):
+        return {
+            'latitude':     self.latitude,
+            'longitude':    self.longitude,
+            'altitude':     self.altitude,
+            'founded':      self.founded,
+            'address':      self.address,
+        }
+
     def earthLocation(self):
         return EarthLocation.from_geodetic(self.longitude, self.latitude, self.altitude)
 
