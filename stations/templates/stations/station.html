@@ -2,7 +2,8 @@
 {% load static %}
 
 {% block pagetitle %}
-    <h2>Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>)<h2>
+    <h2>Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>)</h2>
+    <span id="location">{{ station.location }}</span>
     <div class="controls">
         <a href="{% url 'admin:stations_station_change' station.id %}">
             <img class="" src="{% static 'pictures/edit.png' %}" />

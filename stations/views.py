@@ -1,11 +1,13 @@
 import datetime
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.contrib.auth.decorators import login_required
 
 from . import models
 
 # Create your views here.
 
+@login_required
 def status(request):
     context = {
         'subnetworks': models.Subnetwork.objects.all(),

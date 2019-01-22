@@ -7,7 +7,6 @@ div.bar {
     color: white;
     font-size: 10pt;
     font-family: "Roboto", sans-serif;
-    font-weight: bold;
 
     background-color: #101010;
 /*    box-shadow: 0 2px 2px -1px rgba(0, 0, 128, 0.3),
@@ -29,6 +28,7 @@ div.bar h1 {
 div.bar ul {
     display: block;
     width: auto;
+    font-weight: bold;
     height: 100%;
     margin: 0;
     float: left;
@@ -76,6 +76,10 @@ div.bar ul li a:hover, div.bar#main-menu ul li a:hover {
 div.bar a.badge {
     padding: 2px 3px;
     float: right;
+}
+
+div.bar span.username {
+    font-weight: bold;
 }
 
 div#main-menu {

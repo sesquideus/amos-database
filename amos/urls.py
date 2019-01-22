@@ -15,6 +15,7 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
+from django.contrib.auth import views as authViews
 
 import meteors.urls
 import stations.urls
@@ -27,4 +28,6 @@ urlpatterns = [
     path('',            stations.views.status),
     path('meteors/',    include(meteors.urls)),
     path('stations/',   include(stations.urls)),
+
+    path('account/',    include('django.contrib.auth.urls')),
 ]

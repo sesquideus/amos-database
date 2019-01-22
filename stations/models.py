@@ -20,12 +20,19 @@ class Subnetwork(core.models.NamedModel):
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "founding date",
-                                        help_text           = "date when the station was founded",
+                                        help_text           = "date when the subnetwork was founded",
                                     ) 
 
     def count(self):
         return Station.objects.filter(subnetwork = self.id).count()
     count.short_description = 'Station count'
+
+    def centre(self):
+        stations = self.station_set.all()
+        return {
+            'latitude':     sum([station.latitude for station in stations]),
+            'longitude':    sum([station.longitude for station in stations]),
+        }
 
 class Station(core.models.NamedModel):
     class Meta:
@@ -35,7 +42,7 @@ class Station(core.models.NamedModel):
     code                            = models.CharField(
                                         max_length          = 8,
                                         unique              = True,
-                                        help_text           = "A simple code, composed of 2-4 letters",
+                                        help_text           = "a simple unique code (2-4 uppercase letters)",
                                     )
 
     subnetwork                      = models.ForeignKey(
@@ -72,7 +79,7 @@ class Station(core.models.NamedModel):
                                         null                = True,
                                         blank               = True,
                                         max_length          = 256,
-                                        help_text           = "Printable full address",
+                                        help_text           = "printable full address",
                                     )    
     founded                         = models.DateField(
                                         null                = True,
@@ -112,6 +119,15 @@ class Station(core.models.NamedModel):
     
     def register(self, meteor):
         return meteor.earthLocation() - self.earthLocation()
+
+    def location(self):
+        return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.1f} m".format(
+            latitude    = self.latitude,
+            latNS       = 'N' if self.latitude >= 0 else 'S',
+            longitude   = self.longitude,
+            lonEW       = 'E' if self.longitude >= 0 else 'W',
+            altitude    = self.altitude,
+        )
 
 class LogEntry(models.Model):
     class Meta:

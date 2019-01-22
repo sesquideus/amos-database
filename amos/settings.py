@@ -124,7 +124,9 @@ USE_I18N = False
 USE_L10N = False
 USE_TZ = True
 
-string_if_invalid = 'DEBUG WARNING: undefined template variable [%s] not found'
+LOGIN_URL = '/account/login/'
+LOGIN_REDIRECT_URL = '/'
+LOGOUT_REDIRECT_URL = '/about/'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/

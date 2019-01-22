@@ -1,5 +1,63 @@
-createMap = function() {
+createLayer = function(colour) {
+    return new ol.layer.Vector({
+        style: new ol.style.Style({
+            image: new ol.style.Circle({
+                radius: 6,
+                fill: new ol.style.Fill({color: colour}),
+            }),
+        }),
+    });
+}
 
+createMeteorLayer = function(meteors) {
+    var layer = createLayer('red');
+    var source = new ol.source.Vector();
+
+    for (var m in meteors) {
+        meteor = meteors[m];
+        console.log(meteor);
+        source.addFeature(
+            new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.transform([meteor.longitude, meteor.latitude], 'EPSG:4326', 'EPSG:3857')),
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 5 - meteor.magnitude,
+                    }),
+                }),
+            })
+        );
+    }
+
+    layer.setSource(source);
+    return layer;
+}
+
+createStationLayer = function(stations) {
+    var layer = createLayer('blue');
+    var source = new ol.source.Vector();
+
+    for (var s in stations) {
+        station = stations[s];
+        source.addFeature(
+            new ol.Feature({
+                geometry: new ol.geom.Point(ol.proj.transform([station.longitude, station.latitude], 'EPSG:4326', 'EPSG:3857')),
+                style: new ol.style.Style({
+                    image: new ol.style.Circle({
+                        radius: 3,
+                        opacity: 0.5,
+                        fill: new ol.style.Fill({
+                            color: 'green',
+                        }),
+                    }),
+                }),
+            })
+        );
+    }
+    layer.setSource(source);
+    return layer;
+}
+
+createBasicMap = function() {
     var map = new ol.Map({
         target: 'map',
         layers: [
@@ -9,95 +67,34 @@ createMap = function() {
         ],
         view: new ol.View({
             center: ol.proj.fromLonLat([17.071388, 48.15091917]),
-            zoom: 4,
+            zoom: 9,
         })
     });
 
-    var marker = new ol.Feature({
-        geometry: new ol.geom.Point(ol.proj.transform([17.071388, 48.1501917], 'EPSG:4326', 'EPSG:3857')),
-    });
+    return map;
+}
 
-
-    $.getJSON("/meteors/json").done(function(meteors) {
-        var meteorLayer = new ol.layer.Vector({
-            source: new ol.source.Vector(),
-            style: new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 6,
-                    fill: new ol.style.Fill({color: 'red'}),
-                    stroke: new ol.style.Stroke({
-                        color: [255, 0, 0],
-                        width: 2
-                    }),
-                }),
-            }),
-        });
-        map.addLayer(meteorLayer);
-
-        var markers = [];
-        for (var m in meteors) {
-            meteor = meteors[m];
-            console.log(meteor);
-            meteorLayer.getSource().addFeature(
-                new ol.Feature({
-                    geometry: new ol.geom.Point(ol.proj.transform([meteor.longitude, meteor.latitude], 'EPSG:4326', 'EPSG:3857')),
-                    style: new ol.style.Style({
-                        image: new ol.style.Circle({
-                            radius: 5 - meteor.magnitude,
-                        }),
-                    }),
-                })
-            );
-        }
-    }).fail(function() {
-        console.log("Could not get JSON data");
-    });
-/*
-    var layer = createStationsLayer();
-    if (layer !== null) {
-        map.addLayer(layer);
-    } else {
-        throw "Could not load stations layer";
-    } */
-
-    $.getJSON("/stations/json").done(function(stations) {
-        var stationLayer = new ol.layer.Vector({
-            source: new ol.source.Vector(),
-            style: new ol.style.Style({
-                image: new ol.style.Circle({
-                    radius: 6,
-                    fill: new ol.style.Fill({color: 'blue'}),
-                    stroke: new ol.style.Stroke({
-                        color: [0, 255, 0],
-                        width: 2
-                    }),
-                }),
-            }),
+loadMeteors = function(map) {
+    $.getJSON("/meteors/json")
+        .done(function(meteors) {
+            map.addLayer(createMeteorLayer(meteors));
+        })
+        .fail(function() {
+            console.log("Could not get JSON data");
         });
 
-        var markers = [];
-        for (var s in stations) {
-            station = stations[s];
-            console.log(station);
-            stationLayer.getSource().addFeature(
-                new ol.Feature({
-                    geometry: new ol.geom.Point(ol.proj.transform([station.longitude, station.latitude], 'EPSG:4326', 'EPSG:3857')),
-                    style: new ol.style.Style({
-                        image: new ol.style.Circle({
-                            radius: 5,
-                        }),
-                    }),
-                })
-            );
-        }
-        map.addLayer(stationLayer);
-    }).fail(function() {
-        console.log("Could not get JSON data");
-    });
+    $.getJSON("/stations/json")
+        .done(function(stations) {
+            map.addLayer(createStationLayer(stations));
+        })
+        .fail(function() {
+            console.log("Could not get JSON data");
+        });
 }
 
 initMap = function() {
-    createMap();
+    map = createBasicMap();
+    loadMeteors(map);
 }
 
 $(document).ready(initMap);

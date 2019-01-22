@@ -10,6 +10,7 @@ name = "pypi"
 celery = "*"
 redis = "*"
 pipfile = "*"
+django = "*"
 
 [requires]
 python_version = "3.5"

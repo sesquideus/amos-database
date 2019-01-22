@@ -1,6 +1,7 @@
 from django.shortcuts import render
 from django.core import serializers
 from django.http import JsonResponse
+from django.contrib.auth.decorators import login_required
 
 from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon
@@ -9,6 +10,7 @@ from .models import Meteor, Sighting
 
 # Create your views here.
 
+@login_required
 def listMeteors(request):
     context = {
         'meteors': Meteor.objects.all(),

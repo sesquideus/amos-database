@@ -22,18 +22,29 @@ sup {
     vertical-align: super;
 }
 
-div.page div.controls {
-    float: right;
-    position: fixed;
-    right: 10px;
-    top: 60px;
+div.page div.titlebar {
+    width: 100%;
+    margin-bottom: 10px;
+    height: auto;
 }
 
-div.page div.controls a {
+div.page div.titlebar h2 {
+    display: inline;
+}
+
+div.page div.titlebar span#location {
+    font-size: 10pt;
+}
+
+div.page div.titlebar div.controls {
+    float: right;
+}
+
+div.page div.titlebar div.controls a {
     text-decoration: none;
 }
 
-div.page div.controls img {
+div.page div.titlebar div.controls img {
     width: 32px;
     height: 32px;
 }
@@ -55,7 +66,6 @@ div.page span.bold {
 
 div.page h2 {
     font-size: 24pt;
-    margin-bottom: 10px;
 }
 
 div.page h3 {

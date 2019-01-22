@@ -138,7 +138,7 @@ class Meteor(models.Model):
 
     def __str__(self):
         return "{time}".format(
-            time = self.timestamp.strftime("%Y%m%d-%H%M%S"),
+            time = self.timestamp.strftime("%Y%m%d-%H%M%S-%f"),
         )
 
     def asDict(self):
