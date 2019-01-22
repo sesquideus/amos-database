@@ -17,6 +17,7 @@ def listMeteors(request):
     }
     return render(request, 'meteors/list-meteors.html', context)
 
+@login_required
 def listMeteorsJSON(request):
     meteors = {}
     for meteor in Meteor.objects.all():
@@ -24,12 +25,14 @@ def listMeteorsJSON(request):
 
     return JsonResponse(meteors)
 
+@login_required
 def listSightings(request):
     context = {
         'sightings': Sighting.objects.all(),
     }
     return render(request, 'meteors/list-sightings.html', context)
 
+@login_required
 def meteor(request, id):
     print("OK")
     context = {
@@ -37,17 +40,20 @@ def meteor(request, id):
     }        
     return render(request, 'meteors/meteor.html', context)
 
+@login_required
 def meteorJSON(request, id):
     meteor = Meteor.objects.get(id = id)
     data = serializers.serialize('json', meteor)
     return JsonResponse(data, safe = False)
 
+@login_required
 def meteorKML(request, id):
     context = {
         'meteor': Meteor.objects.get(id = id)
     }
     return render(request, 'meteors/meteor.kml', context)
 
+@login_required
 def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
     loc = AltAz(obstime = Time(sighting.lightmaxTime), location = sighting.station.earthLocation())
@@ -61,6 +67,7 @@ def sighting(request, id):
     }
     return render(request, 'meteors/sighting.html', context)
 
+@login_required
 def createRandom(request):
     meteor = Meteor.objects.createRandom()
     meteor.save()
