@@ -28,7 +28,7 @@
                 <td class="r">{{ meteor.trailStartX }}</td>
                 <td class="r">{{ meteor.trailEndX }}</td>
                 <td class="r">{{ meteor.speed|floatformat:0|default:"?" }} m/s</td>
-                <td>
+                <td class="c">
                     {% for sighting in meteor.sightings.all %}
                         <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.station.code }}</a>
                     {% endfor %}
