@@ -14,7 +14,7 @@ import numpy as np
 
 class MeteorManager(models.Manager):
     def createRandom(self):
-        timestamp = datetime.datetime.now()
+        timestamp = datetime.datetime.utcnow()
         meteor = self.create(
             timestamp           = timestamp,
             lightmaxTime        = timestamp,
@@ -264,8 +264,8 @@ class Sighting(models.Model):
                                     )
 
     def colour(self):
-        ex = int((self.magnitude - 5) * -30)
-        return '#{0:02X}{0:02X}{0:02X}'.format(max(64, min(ex, 255)))
+        ex = int((-self.magnitude + 5) * 10)
+        return 'hsl(0, 0%, {:02d}%)'.format(max(0, min(ex, 100)))
 
     def colourText(self):
         ex = int((self.magnitude - 5) * 30)

@@ -2,6 +2,9 @@
 
 {% block page %}
     <h2>Login</h2>
+    <p>
+        Login is required to access this part of the website.
+    </p>
     <form method="post">
       {% csrf_token %}
       {{ form.as_p }}

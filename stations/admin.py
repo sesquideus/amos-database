@@ -29,9 +29,12 @@ class StationAdmin(admin.ModelAdmin):
             }
         ),
     )
-    list_display = ['name', 'country', 'latitude', 'longitude', 'altitude']
+    list_display = ['name', 'address', 'country', 'latitude', 'longitude', 'altitude']
     inlines = [LogEntryInline]
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
+    def has_module_permission(self, request):
+        return False
+
     readonly_fields = ['created', 'updated']

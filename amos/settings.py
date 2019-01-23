@@ -117,12 +117,16 @@ AUTH_PASSWORD_VALIDATORS = [
 LANGUAGE_CODE = 'en-us'
 
 DATETIME_FORMAT = 'Y-m-d H:i:s.u'
-DATETIME_INPUT_FORMATS = ['%Y-%m-%d %H:%M:%S.%f']
+DATETIME_INPUT_FORMATS = [
+    '%Y-%m-%d %H:%M:%S.%f',
+    '%Y-%m-%d %H:%M:%S',
+]
 DATE_FORMAT = 'Y-m-d'
+
 TIME_ZONE = 'UTC'
 USE_I18N = False
 USE_L10N = False
-USE_TZ = True
+USE_TZ = False
 
 LOGIN_URL = '/account/login/'
 LOGIN_REDIRECT_URL = '/'
@@ -147,3 +151,5 @@ CELERY_ACCEPT_CONTENT = ['application/json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
+
+DJANGO_CELERY_BEAT_TZ_AWARE = False

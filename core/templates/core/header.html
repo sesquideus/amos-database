@@ -1,22 +1,27 @@
 {% load static %}
 
-<div class="bar" id="main-menu">
-    <a href="{% url 'status' %}">
-        <img id="logo" src="{% static 'amos.jpg' %}" alt="AMOS" />
-    </a>
-    <ul>
-        {% for item in core.menu %}
-            <li>
-                <a href="{% url item.url %}">{{ item.caption }}</a>
-            </li>
-        {% endfor %}
-    </ul>
-    <div class="login-status">
+<div class="bar" id="bar-top">
+    <div id="bar-logo">
+        <a href="{% url 'status' %}">
+            <img id="logo" src="{% static 'amos.jpg' %}" alt="AMOS" />
+        </a>
+    </div>
+    <div id="main-menu">
+        <ul>
+            {% for item in core.menu %}
+                <li>
+                    <a href="{% url item.url %}">{{ item.caption }}</a>
+                </li>
+            {% endfor %}
+        </ul>
+    </div>
+    <div id="login-status">
         {% if request.user.is_authenticated %}
-            Logged in as <span class="username">{{ request.user.username }}</span>
-            (<a href="{% url 'logout' %}">log out</a>)
+            <span class="username logged">{{ request.user.username }}</span>
+            <a href="{% url 'logout' %}">log out</a>
         {% else %}
-            Not logged in (<a href="{% url 'login' %}">login</a>)
+            <span class="username not-logged">not logged in</span>
+            <a href="{% url 'login' %}">log in</a>
         {% endif %}
     </div>
 </div>

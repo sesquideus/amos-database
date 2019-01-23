@@ -22,6 +22,10 @@ sup {
     vertical-align: super;
 }
 
+div.page p {
+    margin: 15px 0;
+}
+
 div.page div.titlebar {
     width: 100%;
     margin-bottom: 10px;
@@ -88,6 +92,12 @@ div.page table .r {
 
 div.page table tr {
     padding: 0px 8px;
+    border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
+    border-collapse: collapse;
+}
+
+div.page table tr:last-child {
+    border-bottom: 1px solid black;
 }
 
 div.page table tr td, div.page table tr th {
@@ -96,16 +106,13 @@ div.page table tr td, div.page table tr th {
 }
 
 div.page table tr td {
-    border: 1px dotted hsla(0, 0%, 0%, 0.1);
+    border-collapse: collapse;
 }
 
 div.page table tr th {
     font-size: 100%;
-    background-color: hsla(180, 40%, 50%, 0.2);
-}
-
-div.page table tr.legend th {
-    background-color: hsla(180, 40%, 50%, 0.5);
+    background-color: hsla(180, 40%, 10%, 1);
+    color: white;
 }
 
 div.page table td a {
@@ -115,4 +122,18 @@ div.page table td a {
 tr.empty td, td.empty {
     color: grey;
     text-align: center;
+}
+
+div.page form {
+    border: 1px solid grey;
+    background-color: hsla(120, 0%, 95%, 1);
+    padding: 30px;
+}
+
+div.page form label {
+    font-size: 9pt;
+}
+
+div.page form input {
+    font-size: 14pt;
 }
