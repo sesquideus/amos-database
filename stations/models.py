@@ -1,7 +1,11 @@
 import textwrap
-from astropy.coordinates import EarthLocation
+import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+
+from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
+from astropy.time import Time
+from astropy import units
 
 import core.models
 from meteors.models import Sighting
@@ -105,6 +109,15 @@ class Station(core.models.NamedModel):
 
     def earthLocation(self):
         return EarthLocation.from_geodetic(self.longitude, self.latitude, self.altitude)
+
+    def sunPosition(self, time = None):
+        if time is None:
+            time = datetime.datetime.now()
+
+        loc = AltAz(obstime = Time(time), location = self.earthLocation())
+        sun = get_sun(Time(time)).transform_to(loc)
+
+        return sun.altaz.alt.degree
 
     def lastSighting(self):
         try:

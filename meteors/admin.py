@@ -1,6 +1,9 @@
+from admin_decorators import short_description, order_field
+
 from django.contrib import admin
 from django.db import models
 from django import forms
+
 from .models import Meteor, Sighting
 
 class MicrosecondDateTimeWidget(forms.SplitDateTimeWidget):
@@ -46,10 +49,10 @@ class MeteorAdmin(admin.ModelAdmin):
     list_display = ['formatTimestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude']
     save_as = True
     
+    @order_field('timestamp')
+    @short_description('timestamp')
     def formatTimestamp(self, obj):
         return obj.timestamp.strftime("%Y-%m-%d %H:%M:%S.%f")
-    formatTimestamp.admin_order_field  = 'timestamp'
-    formatTimestamp.short_description = 'Timestamp'
 
 @admin.register(Sighting)
 class SightingAdmin(admin.ModelAdmin):

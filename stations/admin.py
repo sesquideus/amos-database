@@ -1,5 +1,6 @@
 from django.contrib import admin
 from django.db import models
+from django.forms import Textarea
 from .models import Country, Subnetwork, Station, LogEntry
 
 class StationInline(admin.TabularInline):
@@ -7,6 +8,14 @@ class StationInline(admin.TabularInline):
 
 class LogEntryInline(admin.TabularInline):
     model = LogEntry
+    formfield_overrides = {
+        models.TextField: {
+            'widget': Textarea(attrs = {
+                'rows': 2,
+                'cols': 50,
+            }),
+        },
+    }
 
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):

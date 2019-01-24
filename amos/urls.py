@@ -15,12 +15,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import include, path
-from django.contrib.auth import views as authViews
 
 import meteors.urls
 import stations.urls
 import stations.views
 import core.urls
+import accounts.urls
 
 urlpatterns = [
     path('admin/',      admin.site.urls),
@@ -29,5 +29,5 @@ urlpatterns = [
     path('meteors/',    include(meteors.urls)),
     path('stations/',   include(stations.urls)),
 
-    path('account/',    include('django.contrib.auth.urls')),
+    path('accounts/',   include(accounts.urls)),
 ]

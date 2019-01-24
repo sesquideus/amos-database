@@ -39,6 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'django_celery_beat',
 ] + [
+    'accounts',
     'core',
     'stations',
     'meteors',
@@ -128,9 +129,9 @@ USE_I18N = False
 USE_L10N = False
 USE_TZ = False
 
-LOGIN_URL = '/account/login/'
+LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/'
-LOGOUT_REDIRECT_URL = '/about/'
+LOGOUT_REDIRECT_URL = '/about'
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/2.1/howto/static-files/
@@ -144,7 +145,7 @@ STATICFILES_FINDERS = (
     'django.contrib.staticfiles.finders.AppDirectoriesFinder',
 )
 
-# CELERY STUFF
+# CELERY
 BROKER_URL = 'redis://localhost:6379'
 CELERY_RESULT_BACKEND = 'redis://localhost:6379'
 CELERY_ACCEPT_CONTENT = ['application/json']

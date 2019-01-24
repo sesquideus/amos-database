@@ -66,7 +66,7 @@ createBasicMap = function() {
             }),
         ],
         view: new ol.View({
-            center: ol.proj.fromLonLat([17.071388, 48.15091917]),
+            center: ol.proj.fromLonLat([17.2738, 48.3729]),
             zoom: 9,
         })
     });

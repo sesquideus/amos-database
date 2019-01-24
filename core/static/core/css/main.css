@@ -54,7 +54,7 @@ div.page div.titlebar div.controls img {
 }
 
 div.page {
-    padding: 10px;
+    padding: 20px;
     background-color: white;
     min-height: calc(100vh - 85px);
 }
@@ -113,6 +113,8 @@ div.page table tr th {
     font-size: 100%;
     background-color: hsla(180, 40%, 10%, 1);
     color: white;
+    padding-left: 20px;
+    padding-right: 20px;
 }
 
 div.page table td a {

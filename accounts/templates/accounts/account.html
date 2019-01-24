@@ -1,0 +1,14 @@
+{% extends 'core/base.html' %}
+
+{% block pagetitle %}
+    <h2>User <span class="username">{{ request.user.username }}</span></h2>
+{% endblock pagetitle %}
+
+{% block page %}
+    <p>
+        Welcome, <span class="username">{{ request.user.first_name }} {{request.user.last_name }}</span>!
+    </p>
+    <p>
+        Your location is <em>{{ request.user.profile.formatLocation }}</em>.
+    </p>
+{% endblock page %}

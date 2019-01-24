@@ -17,10 +17,10 @@
     </div>
     <div id="login-status">
         {% if request.user.is_authenticated %}
-            <span class="username logged">{{ request.user.username }}</span>
+            <a href="{% url 'account' username=request.user.username %}" class="username logged">{{ request.user.username }}</a>
             <a href="{% url 'logout' %}">log out</a>
         {% else %}
-            <span class="username not-logged">not logged in</span>
+            <a class="username not-logged">not logged in</a>
             <a href="{% url 'login' %}">log in</a>
         {% endif %}
     </div>

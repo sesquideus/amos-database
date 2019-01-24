@@ -11,6 +11,7 @@
             <th>Code</th>
             <th>Name</th>
             <th>Status</th>
+            <th>Sun</th>
             <th colspan="2">Last sighting</th>
             <th>Admin</th>
         </tr>
@@ -23,6 +24,7 @@
                     <td>{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
                     <td class="c">unknown</td>
+                    <td class="r">{{ station.sunPosition|floatformat:1 }}°</td>
                     <td class="c">
                         {% if station.lastSighting %}
                             {{ station.lastSighting.lightmaxTime }}
@@ -36,7 +38,7 @@
             {% empty %}
                 <tr>
                     <td>{{ subnetwork.name }}</td>
-                    <td colspan="6" class="empty">No stations are defined for this subnetwork.</td>
+                    <td colspan="7" class="empty">No stations are defined for this subnetwork.</td>
                 </tr>
             {% endfor %}
         {% endfor %}
