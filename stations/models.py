@@ -105,6 +105,7 @@ class Station(core.models.NamedModel):
             'altitude':     self.altitude,
             'founded':      self.founded,
             'address':      self.address,
+            'sun':          self.sunPosition(),
         }
 
     def earthLocation(self):
@@ -117,7 +118,10 @@ class Station(core.models.NamedModel):
         loc = AltAz(obstime = Time(time), location = self.earthLocation())
         sun = get_sun(Time(time)).transform_to(loc)
 
-        return sun.altaz.alt.degree
+        return {
+            'alt':  sun.altaz.alt.degree,
+            'az':   sun.altaz.az.degree,
+        }
 
     def lastSighting(self):
         try:

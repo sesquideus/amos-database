@@ -1,9 +1,9 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load station_tags %}
 
 {% block pagetitle %}
     <h2>Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>)</h2>
-    <span id="location">{{ station.location }}</span>
     <div class="controls">
         <a href="{% url 'admin:stations_station_change' station.id %}">
             <img class="" src="{% static 'pictures/edit.png' %}" />
@@ -12,43 +12,54 @@
 {% endblock pagetitle %}
 
 {% block page %}
+    <h3>Station info</h3>
+        <p>{{ station.address }}</p>
+
+        <span id="location">{{ station.location }}</span>
+
+    <h3>Sun</h3>
+        <span class="suninfo altitude" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
+        <span class="suninfo altitude" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg); color: {{ station.sunPosition.alt|altitudeColour }}">&#8594;</span>
+        <span class="suninfo azimuth">{{ station.sunPosition.az|floatformat:1 }}°</span>
+        <span class="suninfo azimuth" style="transform: rotate({{ station.sunPosition.az }}deg);">&#8593;</span>
+
     <h3>Sightings</h3>
-    <table>
-        <tr>
-            <th>Timestamp</th>
-            <th>Magnitude</th>
-        </tr>
-        {% for sighting in lastDay %}
+        <table>
             <tr>
-                <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
-                <td>{{ sighting.magnitude }}</td>
+                <th>timestamp</th>
+                <th>magnitude</th>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2" class="empty">
-                    There are no recorded sightings for this station within last 24 hours.
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+            {% for sighting in lastDay %}
+                <tr>
+                    <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
+                    <td>{{ sighting.magnitude }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="empty">
+                        There are no recorded sightings for this station within last 24 hours.
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
 
     <h3>Device log</h3>
-    <table>
-        <tr>
-            <th>Date</th>
-            <th>Entry</th>
-        </tr>
-        {% for entry in station.logentry_set.all %}
+        <table>
             <tr>
-                <td>{{ entry.created|date:"Y-m-d" }}</td>
-                <td>{{ entry.text }}</td>
+                <th>date</th>
+                <th>entry</th>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="2" class="empty">
-                    There are no log entries for this station.
-                </td>
-            </tr>
-        {% endfor %}
-    </table>
+            {% for entry in station.logentry_set.all %}
+                <tr>
+                    <td>{{ entry.created|date:"Y-m-d" }}</td>
+                    <td>{{ entry.text }}</td>
+                </tr>
+            {% empty %}
+                <tr>
+                    <td colspan="2" class="empty">
+                        There are no log entries for this station.
+                    </td>
+                </tr>
+            {% endfor %}
+        </table>
 {% endblock page %}

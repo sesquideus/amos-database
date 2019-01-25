@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load station_tags %}
 
 {% block pagetitle %}
 <h2>Network status</h2>
@@ -7,13 +8,13 @@
 {% block page %}
     <table>
         <tr>
-            <th>Subnetwork</th>
-            <th>Code</th>
-            <th>Name</th>
-            <th>Status</th>
-            <th>Sun</th>
-            <th colspan="2">Last sighting</th>
-            <th>Admin</th>
+            <th>subnetwork</th>
+            <th>code</th>
+            <th>name</th>
+            <th>status</th>
+            <th colspan="2">&#x2600;</th>
+            <th colspan="2">last sighting</th>
+            <th>admin</th>
         </tr>
         {% for subnetwork in subnetworks %}
             {% for station in subnetwork.station_set.all %}
@@ -24,7 +25,14 @@
                     <td>{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
                     <td class="c">unknown</td>
-                    <td class="r">{{ station.sunPosition|floatformat:1 }}°</td>
+                    <td id="{{ station.code }}-sunalt" class="r">
+                        {{ station.sunPosition.alt|floatformat:1 }}°
+                        <span style="display: inline-block; transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
+                    </td>
+                    <td id="{{ station.code }}-sunaz" class="r">
+                        {{ station.sunPosition.az|floatformat:1 }}°
+                        <span style="display: inline-block; transform: rotate({{ station.sunPosition.az }}deg);">&#8594;</span>
+                    </td>
                     <td class="c">
                         {% if station.lastSighting %}
                             {{ station.lastSighting.lightmaxTime }}
@@ -38,7 +46,7 @@
             {% empty %}
                 <tr>
                     <td>{{ subnetwork.name }}</td>
-                    <td colspan="7" class="empty">No stations are defined for this subnetwork.</td>
+                    <td colspan="8" class="empty">No stations are defined for this subnetwork.</td>
                 </tr>
             {% endfor %}
         {% endfor %}

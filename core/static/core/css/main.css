@@ -4,7 +4,7 @@ html {
     padding: 0;
     margin: 0;
     font-family: "Roboto", sans-serif;
-    font-size: 12pt;
+    font-size: 11pt;
     min-height: 100vh;
     background-color: black;
 }
@@ -91,7 +91,7 @@ div.page table .r {
 }
 
 div.page table tr {
-    padding: 0px 8px;
+    padding: 0px 12px;
     border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
     border-collapse: collapse;
 }
@@ -138,4 +138,10 @@ div.page form label {
 
 div.page form input {
     font-size: 14pt;
+}
+
+div.page .suninfo {
+    display: inline-block;
+    padding: 0 5px;
+    font-size: 20pt;
 }
