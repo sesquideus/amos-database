@@ -13,6 +13,7 @@
             <th>name</th>
             <th>status</th>
             <th colspan="2">&#x2600;</th>
+            <th>local time</th>
             <th colspan="2">last sighting</th>
             <th>admin</th>
         </tr>
@@ -25,13 +26,16 @@
                     <td>{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
                     <td class="c">unknown</td>
-                    <td id="{{ station.code }}-sunalt" class="r">
+                    <td id="{{ station.code }}-sunalt" class="r" style="color: {{ station.sunPosition.alt|altitudeColour }};">
                         {{ station.sunPosition.alt|floatformat:1 }}°
                         <span style="display: inline-block; transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
                     </td>
                     <td id="{{ station.code }}-sunaz" class="r">
                         {{ station.sunPosition.az|floatformat:1 }}°
-                        <span style="display: inline-block; transform: rotate({{ station.sunPosition.az }}deg);">&#8594;</span>
+                        <span style="display: inline-block; transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
+                    </td>
+                    <td id="{{ station.code }}-localtime" class="c">
+                        {{ station.localTime|date:"H:i" }}
                     </td>
                     <td class="c">
                         {% if station.lastSighting %}

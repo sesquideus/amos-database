@@ -2,6 +2,7 @@ import textwrap
 import datetime
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
+from django.core.validators import MinValueValidator, MaxValueValidator
 
 from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
 from astropy.time import Time
@@ -91,6 +92,14 @@ class Station(core.models.NamedModel):
                                         verbose_name        = "founding date",
                                         help_text           = "date when the station was founded",
                                     ) 
+    timezone                        = models.FloatField(
+                                        null                = False,
+                                        blank               = False,
+                                        default             = 0,
+                                        verbose_name        = "time zone",
+                                        help_text           = "time zone at the station",
+                                        validators          = [MinValueValidator(-12), MaxValueValidator(12)],
+                                    )
 
     def __str__(self):
         return "{name} ({subnetwork})".format(
@@ -145,6 +154,9 @@ class Station(core.models.NamedModel):
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
         )
+
+    def localTime(self):
+        return datetime.datetime.utcnow() + datetime.timedelta(hours = self.timezone)
 
 class LogEntry(models.Model):
     class Meta:

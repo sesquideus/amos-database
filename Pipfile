@@ -11,6 +11,7 @@ celery = "*"
 redis = "*"
 pipfile = "*"
 django = "*"
+django-admin-decorators = "*"
 
 [requires]
 python_version = "3.5"

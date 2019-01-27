@@ -21,7 +21,7 @@
         <span class="suninfo altitude" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
         <span class="suninfo altitude" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg); color: {{ station.sunPosition.alt|altitudeColour }}">&#8594;</span>
         <span class="suninfo azimuth">{{ station.sunPosition.az|floatformat:1 }}°</span>
-        <span class="suninfo azimuth" style="transform: rotate({{ station.sunPosition.az }}deg);">&#8593;</span>
+        <span class="suninfo azimuth" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
 
     <h3>Sightings</h3>
         <table>

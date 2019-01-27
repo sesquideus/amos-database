@@ -34,7 +34,7 @@ class StationAdmin(admin.ModelAdmin):
             }
         ),
         ('Geographics coordinates', {
-                'fields': ('latitude', 'longitude', 'altitude'),
+                'fields': ('latitude', 'longitude', 'altitude', 'timezone'),
             }
         ),
     )
