@@ -1,5 +1,6 @@
 import textwrap
 import datetime
+import pytz
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -92,13 +93,12 @@ class Station(core.models.NamedModel):
                                         verbose_name        = "founding date",
                                         help_text           = "date when the station was founded",
                                     ) 
-    timezone                        = models.FloatField(
+    timezone                        = models.CharField(
                                         null                = False,
                                         blank               = False,
-                                        default             = 0,
-                                        verbose_name        = "time zone",
-                                        help_text           = "time zone at the station",
-                                        validators          = [MinValueValidator(-12), MaxValueValidator(12)],
+                                        default             = 'UTC',
+                                        max_length          = 32,
+                                        choices             = zip(pytz.all_timezones, pytz.all_timezones_set),
                                     )
 
     def __str__(self):
@@ -156,7 +156,7 @@ class Station(core.models.NamedModel):
         )
 
     def localTime(self):
-        return datetime.datetime.utcnow() + datetime.timedelta(hours = self.timezone)
+        return datetime.datetime.now(pytz.timezone(self.timezone))
 
 class LogEntry(models.Model):
     class Meta:

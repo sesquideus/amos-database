@@ -127,7 +127,7 @@ DATE_FORMAT = 'Y-m-d'
 TIME_ZONE = 'UTC'
 USE_I18N = False
 USE_L10N = False
-USE_TZ = False
+USE_TZ = True
 
 LOGIN_URL = '/accounts/login'
 LOGIN_REDIRECT_URL = '/'
