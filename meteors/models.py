@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import Max, Min
 from django.contrib import admin
+from django.urls import reverse
 
 from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
 from astropy.time import Time
@@ -80,22 +81,22 @@ class Meteor(models.Model):
     lightmaxLatitude                = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "latitude of point of maximum brightness",
+                                        verbose_name        = "latitude at max light",
                                     )
     lightmaxLongitude               = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "longitude of point of maximum brightness",
+                                        verbose_name        = "longitude at maxlight",
                                     )
     lightmaxAltitude                = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "altitude of point of maximum brightness",
+                                        verbose_name        = "altitude at maxlight",
                                     )   
     lightmaxTime                    = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "timestamp of point of maximum brightness",
+                                        verbose_name        = "timestamp at maxlight",
                                     )
 
 
@@ -191,13 +192,15 @@ class Sighting(models.Model):
                                         verbose_name        = "apparent magnitude",
                                     )
     
-    beginningElevation              = models.FloatField(
+    beginningAltitude               = models.FloatField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "altitude at beginning",
                                     )
     beginningAzimuth                = models.FloatField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "azimuth at beginning",
                                     )
     beginningTime                   = models.DateTimeField(
                                         null                = True,
@@ -205,38 +208,43 @@ class Sighting(models.Model):
                                         verbose_name        = "time of beginning",
                                     )
 
-    lightmaxElevation               = models.FloatField(
+    lightmaxAltitude                = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "elevation of point of maximum brightness",
+                                        verbose_name        = "altitude at max light",
                                     )
     lightmaxAzimuth                 = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "azimuth of point of maximum brightness",
+                                        verbose_name        = "azimuth at max light",
                                     )
     lightmaxTime                    = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "timestamp at max light",
                                     )
 
-    endElevation                    = models.FloatField(
+    endAltitude                     = models.FloatField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "altitude at end",
                                     )
     endAzimuth                      = models.FloatField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "azimuth at end",
                                     )
     endTime                         = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "timestamp at end",
                                     )
                                         
 
     angularSpeed                    = models.FloatField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "observed angular speed",
                                     )
     meteor                          = models.ForeignKey(
                                         'Meteor',
@@ -272,11 +280,15 @@ class Sighting(models.Model):
         return '#{0:02X}{0:02X}{0:02X}'.format(min(64 + ex, 255))
 
     def __str__(self):
-        return '{time} at ({az:.1f}°, {elev:.1f}°)'.format(
-            time = self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f"),
-            az = self.lightmaxAzimuth,
-            elev = self.lightmaxElevation,
+        return '{time} at ({az}, {elev})'.format(
+            time    = '<unknown time>' if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f"),
+            az      = '???' if self.lightmaxAzimuth is None else "{:.1f}°".format(self.lightmaxAzimuth),
+            elev    = '???' if self.lightmaxAltitude is None else "{:.1f}°".format(self.lightmaxAltitude),
         )
+
+    def get_absolute_url(self):
+        return "/abc/"
+        return reverse('stations.sighting', args = str(self.id))
 
     def image(self):
         return "M{}_AMOS5_P.jpg".format(self.lightmaxTime.strftime("%Y%m%d_%H%M%S")) if self.lightmaxTime else None
@@ -293,7 +305,7 @@ class Sighting(models.Model):
             return None
 
     def skyCoord(self):
-        return AltAz(alt = self.lightmaxElevation * units.degree, az = self.lightmaxAzimuth * units.degree, location = self.station.earthLocation(), obstime = Time(self.lightmaxTime))
+        return AltAz(alt = self.lightmaxAltitude * units.degree, az = self.lightmaxAzimuth * units.degree, location = self.station.earthLocation(), obstime = Time(self.lightmaxTime))
 
     def arcLength(self):
         try:
@@ -319,14 +331,15 @@ class Sighting(models.Model):
             result = Sighting.objects.order_by('lightmaxTime').first().id
         return result
 
+    def coordAltAz(self):
+        return AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation()) 
+
     def getSolarElongation(self):
-        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
-        sun = get_sun(Time(self.lightmaxTime)).transform_to(loc)
+        sun = get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         return sun.separation(self.skyCoord())
     
     def getLunarElongation(self):
-        loc = AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
-        moon = get_moon(Time(self.lightmaxTime)).transform_to(loc)
+        moon = get_moon(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         return moon.separation(self.skyCoord())
 
     def save(self, *args, **kwargs):

@@ -4,7 +4,7 @@ from django.http import JsonResponse
 from django.contrib.auth.decorators import login_required
 
 from astropy.time import Time
-from astropy.coordinates import AltAz, get_moon
+from astropy.coordinates import AltAz, get_moon, get_sun
 
 from .models import Meteor, Sighting
 
@@ -58,12 +58,17 @@ def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
     loc = AltAz(obstime = Time(sighting.lightmaxTime), location = sighting.station.earthLocation())
     moon = get_moon(Time(sighting.lightmaxTime), sighting.station.earthLocation()).transform_to(loc)
+    sun = get_sun(Time(sighting.lightmaxTime)).transform_to(loc)
     context = {
         'sighting': Sighting.objects.get(id = id),
         'moon': {
             'coord': moon,
             'elong': moon.separation(sighting.skyCoord()),
-        }
+        },
+        'sun': {
+            'coord': sun,
+            'elong': sun.separation(sighting.skyCoord()),
+        },
     }
     return render(request, 'meteors/sighting.html', context)
 

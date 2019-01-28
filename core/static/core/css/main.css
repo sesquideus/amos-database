@@ -143,5 +143,8 @@ div.page form input {
 div.page .suninfo {
     display: inline-block;
     padding: 0 5px;
+}
+
+div.page .suninfo.standalone {
     font-size: 20pt;
 }

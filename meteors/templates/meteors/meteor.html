@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load staticfiles %}
+{% load station_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -29,19 +30,35 @@
     <h3>Properties</h3>
         <table>
             <tr>
-                <th class="group" colspan="3">Generic attributes</th>
+                <th class="group" colspan="3">generic attributes</th>
             </tr>
             <tr>
-                <td colspan="2">Timestamp</td>
-                <td class="right">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
+                <td colspan="2">timestamp</td>
+                <td class="r">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
             </tr>
             <tr>
-                <td colspan="2">Absolute magnitude</td>
-                <td class="right">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
+                <td colspan="2">absolute magnitude</td>
+                <td class="r">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
             </tr>
             <tr>
-                <td colspan="2">Geocentric velocity</td>
-                <td class="right">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
+                <td colspan="2">geocentric velocity</td>
+                <td class="r">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
+            </tr>
+            
+            <tr>
+                <th class="group" colspan="3">position</th>
+            </tr>
+            <tr>
+                <td colspan="2">latitude</td>
+                <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">longitude</td>
+                <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">altitude</td>
+                <td class="r">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
             </tr>
         </table>
 
@@ -53,7 +70,9 @@
             </tr>
             {% for sighting in meteor.sightings.all %}
                 <tr>
-                    <td>{{ sighting.station.name }}</td>
+                    <td>
+                        <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.name }}</a>
+                    </td>
                     <td>{{ sighting.station.country }}</td>
                     <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
                 </tr>

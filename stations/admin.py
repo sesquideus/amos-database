@@ -38,7 +38,7 @@ class StationAdmin(admin.ModelAdmin):
             }
         ),
     )
-    list_display = ['name', 'address', 'country', 'latitude', 'longitude', 'altitude']
+    list_display = ['name', 'address', 'country', 'latitude', 'longitude', 'altitude', 'timezone']
     inlines = [LogEntryInline]
 
 @admin.register(LogEntry)

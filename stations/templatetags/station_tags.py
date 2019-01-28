@@ -1,4 +1,5 @@
 import math
+import pytz
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -24,3 +25,17 @@ def altitudeColour(altitude: float):
 @register.filter
 def multiply(value: float, factor: float):
     return value * factor
+
+@register.filter
+def latitude(value: float):
+    return "{lat}° {ns}".format(
+        lat     = abs(value),
+        ns      = 'N' if value > 0 else 'S',
+    )
+
+@register.filter
+def longitude(value: float):
+    return "{lon}° {ew}".format(
+        lon     = abs(value),
+        ew      = 'E' if value > 0 else 'W',
+    )

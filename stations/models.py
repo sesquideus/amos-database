@@ -17,6 +17,7 @@ class Country(core.models.NamedModel):
         verbose_name                = 'country'
         verbose_name_plural         = 'countries'
 
+
 class Subnetwork(core.models.NamedModel):
     class Meta:
         verbose_name                = 'subnetwork'
@@ -39,6 +40,7 @@ class Subnetwork(core.models.NamedModel):
             'latitude':     sum([station.latitude for station in stations]),
             'longitude':    sum([station.longitude for station in stations]),
         }
+
 
 class Station(core.models.NamedModel):
     class Meta:
@@ -96,10 +98,11 @@ class Station(core.models.NamedModel):
     timezone                        = models.CharField(
                                         null                = False,
                                         blank               = False,
-                                        default             = 'UTC',
-                                        max_length          = 32,
-                                        choices             = zip(pytz.all_timezones, pytz.all_timezones_set),
+                                        max_length          = 64,
+                                        choices             = zip(pytz.common_timezones, pytz.common_timezones),
+                                        help_text           = 'official timezone name',
                                     )
+
 
     def __str__(self):
         return "{name} ({subnetwork})".format(
@@ -114,6 +117,10 @@ class Station(core.models.NamedModel):
             'altitude':     self.altitude,
             'founded':      self.founded,
             'address':      self.address,
+        }
+
+    def dynamicDict(self):
+        return {
             'sun':          self.sunPosition(),
         }
 
@@ -139,10 +146,6 @@ class Station(core.models.NamedModel):
         except ObjectDoesNotExist:
             return None
 
-    def last10(self):
-        last10 = Sighting.objects.filter(station_id = self.id).order_by('-lightmaxTime')[0:10]
-        return last10
-    
     def register(self, meteor):
         return meteor.earthLocation() - self.earthLocation()
 
@@ -154,9 +157,6 @@ class Station(core.models.NamedModel):
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
         )
-
-    def localTime(self):
-        return datetime.datetime.now(pytz.timezone(self.timezone))
 
 class LogEntry(models.Model):
     class Meta:
