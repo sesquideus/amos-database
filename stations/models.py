@@ -2,6 +2,7 @@ import textwrap
 import datetime
 import pytz
 from django.db import models
+from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 
@@ -109,6 +110,9 @@ class Station(core.models.NamedModel):
             name        = self.name,
             subnetwork  = self.subnetwork,
         )
+
+    def get_absolute_url(self):
+        return reverse('station', kwargs = {'code': self.code})
 
     def asDict(self):
         return {

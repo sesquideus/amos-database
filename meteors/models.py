@@ -142,6 +142,9 @@ class Meteor(models.Model):
             time = self.timestamp.strftime("%Y%m%d-%H%M%S-%f"),
         )
 
+    def get_absolute_url(self):
+        return reverse('meteor', kwargs = {'id': self.id})
+
     def asDict(self):
         return {
             'latitude': self.lightmaxLatitude,
@@ -270,15 +273,7 @@ class Sighting(models.Model):
                                         blank               = True,
                                         verbose_name        = "lunar elongation",
                                     )
-
-    def colour(self):
-        ex = int((-self.magnitude + 5) * 10)
-        return 'hsl(0, 0%, {:02d}%)'.format(max(0, min(ex, 100)))
-
-    def colourText(self):
-        ex = int((self.magnitude - 5) * 30)
-        return '#{0:02X}{0:02X}{0:02X}'.format(min(64 + ex, 255))
-
+    
     def __str__(self):
         return '{time} at ({az}, {elev})'.format(
             time    = '<unknown time>' if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f"),
@@ -287,8 +282,15 @@ class Sighting(models.Model):
         )
 
     def get_absolute_url(self):
-        return "/abc/"
-        return reverse('stations.sighting', args = str(self.id))
+        return reverse('sighting', kwargs = {'id': self.id})
+
+    def colour(self):
+        ex = int((-self.magnitude + 5) * 10)
+        return 'hsl(0, 0%, {:02d}%)'.format(max(0, min(ex, 100)))
+
+    def colourText(self):
+        ex = int((self.magnitude - 5) * 30)
+        return '#{0:02X}{0:02X}{0:02X}'.format(min(64 + ex, 255))
 
     def image(self):
         return "M{}_AMOS5_P.jpg".format(self.lightmaxTime.strftime("%Y%m%d_%H%M%S")) if self.lightmaxTime else None
@@ -305,16 +307,24 @@ class Sighting(models.Model):
             return None
 
     def skyCoord(self):
-        return AltAz(alt = self.lightmaxAltitude * units.degree, az = self.lightmaxAzimuth * units.degree, location = self.station.earthLocation(), obstime = Time(self.lightmaxTime))
+        try:
+            return AltAz(
+                alt         = self.lightmaxAltitude * units.degree,
+                az          = self.lightmaxAzimuth * units.degree,
+                location    = self.station.earthLocation(),
+                obstime     = Time(self.lightmaxTime)
+            )
+        except TypeError:
+            return None
 
     def arcLength(self):
         try:
-            phi1 = math.radians(self.beginningElevation)
-            phi2 = math.radians(self.endElevation)
+            phi1 = math.radians(self.beginningAltitude)
+            phi2 = math.radians(self.endAltitude)
             lambda1 = math.radians(self.beginningAzimuth)
             lambda2 = math.radians(self.endAzimuth)
             return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
-        except TypeError as e:
+        except TypeError:
             return None
 
     def previous(self):
@@ -332,19 +342,57 @@ class Sighting(models.Model):
         return result
 
     def coordAltAz(self):
-        return AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation()) 
+        return AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
+
+    def getSun(self):
+        try:
+            return get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
+        except TypeError:
+            return None
+
+    def getMoon(self):
+        try:
+            return get_moon(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
+        except TypeError:
+            return None
 
     def getSolarElongation(self):
-        sun = get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
-        return sun.separation(self.skyCoord())
+        try:
+            return self.getSun().separation(self.skyCoord())
+        except TypeError:
+            return None
     
     def getLunarElongation(self):
-        moon = get_moon(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
-        return moon.separation(self.skyCoord())
+        try:
+            return self.getMoon().separation(self.skyCoord())
+        except TypeError:
+            return None
+
+    def getSunInfo(self):
+        sun = self.getSun()
+        return {
+            'coord': sun,
+            'elong': self.getSolarElongation(),
+        }
+
+    def getMoonInfo(self):
+        moon = self.getMoon()
+        return {
+            'coord': moon,
+            'elong': self.getLunarElongation(),
+        }
+
 
     def save(self, *args, **kwargs):
-        self.solarElongation = self.getSolarElongation().degree
-        self.lunarElongation = self.getLunarElongation().degree
+        try:
+            self.solarElongation = self.getSolarElongation().degree
+        except TypeError:
+            self.solarElongation = None
+        
+        try:
+            self.lunarElongation = self.getLunarElongation().degree
+        except TypeError:
+            self.lunarElongation = None
         super(Sighting, self).save(*args, **kwargs)
 
 class VideoFrame(models.Model):

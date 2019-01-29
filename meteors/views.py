@@ -61,14 +61,8 @@ def sighting(request, id):
     sun = get_sun(Time(sighting.lightmaxTime)).transform_to(loc)
     context = {
         'sighting': Sighting.objects.get(id = id),
-        'moon': {
-            'coord': moon,
-            'elong': moon.separation(sighting.skyCoord()),
-        },
-        'sun': {
-            'coord': sun,
-            'elong': sun.separation(sighting.skyCoord()),
-        },
+        'moon': sighting.getMoonInfo(),
+        'sun': sighting.getSunInfo(),
     }
     return render(request, 'meteors/sighting.html', context)
 

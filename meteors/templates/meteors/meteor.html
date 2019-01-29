@@ -17,7 +17,7 @@
         <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">
             <img src="{% static "pictures/edit.png" %}" alt="Edit" />
         </a>
-        <a href="{% url 'meteor' id=meteor.id %}" target="_blank">
+        <a href="{{ meteor.get_absolute_url }}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
         <a href="{% url 'meteor' id=meteor.next %}">
@@ -71,10 +71,10 @@
             {% for sighting in meteor.sightings.all %}
                 <tr>
                     <td>
-                        <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.name }}</a>
+                        <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.name }}</a>
                     </td>
                     <td>{{ sighting.station.country }}</td>
-                    <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
+                    <td><a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
                 </tr>
             {% empty %}
                 <tr class="empty">

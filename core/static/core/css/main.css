@@ -121,7 +121,7 @@ div.page table td a {
     text-decoration: none;
 }
 
-tr.empty td, td.empty {
+div.page .empty {
     color: grey;
     text-align: center;
 }
