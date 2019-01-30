@@ -65,20 +65,33 @@
     <h3>Recorded sightings</h3>
         <table>
             <tr>
-                <th class="group" colspan="2">Sighted from</th>
-                <th class="group">Timestamp</th>
+                <th colspan="2">observed from</th>
+                <th>timestamp</th>
+                <th colspan="2">position</th>
+                <th>arc</th>
+                <th>magnitude</th>
+                <th>distance</th>
             </tr>
             {% for sighting in meteor.sightings.all %}
                 <tr>
                     <td>
                         <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.name }}</a>
                     </td>
-                    <td>{{ sighting.station.country }}</td>
-                    <td><a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
+                    <td>
+                        {{ sighting.station.country }}
+                    </td>
+                    <td>
+                        <a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a>
+                    </td>
+                    <td class="r">{{ sighting.lightmaxAltitude|floatformat:2|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.lightmaxAzimuth|floatformat:2|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.arcLength|floatformat:1|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.magnitude|floatformat:2 }}<sup>m</sup></td>
+                    <td class="r">{{ sighting.distance }}</td>
                 </tr>
             {% empty %}
                 <tr class="empty">
-                    <td colspan="3">There are no recorded sightings of this meteor. (How do we know it occurred?)</td>
+                    <td colspan="8">There are no recorded sightings of this meteor.</td>
                 </tr>
             {% endfor %}
         </table>

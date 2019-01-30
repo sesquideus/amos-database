@@ -86,17 +86,17 @@ class Meteor(models.Model):
     lightmaxLongitude               = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "longitude at maxlight",
+                                        verbose_name        = "longitude at max light",
                                     )
     lightmaxAltitude                = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "altitude at maxlight",
+                                        verbose_name        = "altitude at max light",
                                     )   
     lightmaxTime                    = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "timestamp at maxlight",
+                                        verbose_name        = "timestamp at max light",
                                     )
 
 
@@ -247,7 +247,7 @@ class Sighting(models.Model):
     angularSpeed                    = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "observed angular speed",
+                                        verbose_name        = "observed angular speed [°/s]",
                                     )
     meteor                          = models.ForeignKey(
                                         'Meteor',
@@ -275,10 +275,9 @@ class Sighting(models.Model):
                                     )
     
     def __str__(self):
-        return '{time} at ({az}, {elev})'.format(
+        return '{time} from {station}'.format(
             time    = '<unknown time>' if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f"),
-            az      = '???' if self.lightmaxAzimuth is None else "{:.1f}°".format(self.lightmaxAzimuth),
-            elev    = '???' if self.lightmaxAltitude is None else "{:.1f}°".format(self.lightmaxAltitude),
+            station = self.station,
         )
 
     def get_absolute_url(self):

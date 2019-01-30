@@ -29,9 +29,15 @@
             <td class="c">
                 <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
             </td>
-            <td class="r" style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">{% if sighting.magnitude > 0 %}+{% endif %}{{ sighting.magnitude|floatformat:1 }}<sup>m</sup></td>
-            <td class="r">{{ sighting.lightmaxElevation|floatformat:1 }}°</td>
-            <td class="r">{{ sighting.lightmaxAzimuth|floatformat:1 }}°</td>
+            <td class="r" style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">
+                {{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup>
+            </td>
+            <td class="r">
+                {{ sighting.lightmaxAltitude|floatformat:1|default:"&mdash; " }}°
+                </td>
+            <td class="r">
+                {{ sighting.lightmaxAzimuth|floatformat:1|default:"&mdash; " }}°
+            </td>
         </tr>
         {% empty %}
             <tr class="empty">

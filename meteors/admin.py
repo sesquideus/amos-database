@@ -3,7 +3,7 @@ from admin_decorators import short_description, order_field
 from django.contrib import admin
 from django.db import models
 from django import forms
-from django.forms.widgets import NumberInput
+from django.forms.widgets import NumberInput, TextInput
 
 from .models import Meteor, Sighting
 
@@ -14,6 +14,10 @@ class MicrosecondDateTimeWidget(forms.SplitDateTimeWidget):
 
 class SightingInline(admin.TabularInline):
     model = Sighting
+    show_change_link = True
+
+    fields = ['station', 'angularSpeed', 'magnitude', 'lightmaxAltitude', 'lightmaxAzimuth']
+    readonly_fields = ['station', 'angularSpeed', 'magnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'distance', 'arcLength']
 
 @admin.register(Meteor)
 class MeteorAdmin(admin.ModelAdmin):
@@ -24,6 +28,11 @@ class MeteorAdmin(admin.ModelAdmin):
                 time_format = '%H:%M:%S.%f',
             )
         },
+        models.FloatField: {
+            'widget': TextInput(attrs = {
+                'style': 'width: 70px;',
+            })
+        }
     }
     fieldsets = (
         ('Identity',
@@ -34,12 +43,9 @@ class MeteorAdmin(admin.ModelAdmin):
         ('Trajectory',
             {
                 'fields': (
-                    ('beginningLatitude', 'beginningLongitude', 'beginningAltitude'),
-                    'beginningTime',
-                    ('lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude'),
-                    'lightmaxTime',
-                    ('endLatitude', 'endLongitude', 'endAltitude'),
-                    'endTime',
+                    ('beginningTime', 'beginningLatitude', 'beginningLongitude', 'beginningAltitude'),
+                    ('lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude'),
+                    ('endTime', 'endLatitude', 'endLongitude', 'endAltitude'),
                     ('velocityX', 'velocityY', 'velocityZ'),
                 ),
             }

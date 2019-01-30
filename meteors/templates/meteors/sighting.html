@@ -64,11 +64,11 @@
                 </tr>
                 <tr>
                     <td>Azimuth</td>
-                    <td class="r">{{ sighting.lightmaxAzimuth|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.lightmaxAzimuth|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="r">{{ sighting.lightmaxElevation|floatformat:2 }}°</td>
+                    <td class="r">{{ sighting.lightmaxElevation|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
 
                 <tr>
