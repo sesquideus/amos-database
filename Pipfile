@@ -12,6 +12,8 @@ redis = "*"
 pipfile = "*"
 django = "*"
 django-admin-decorators = "*"
+astropy = "*"
+pyyaml = "*"
 
 [requires]
 python_version = "3.5"

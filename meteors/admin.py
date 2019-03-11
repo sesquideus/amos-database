@@ -30,7 +30,8 @@ class MeteorAdmin(admin.ModelAdmin):
         },
         models.FloatField: {
             'widget': TextInput(attrs = {
-                'style': 'width: 70px;',
+                'style': 'width: 80px;',
+                'class': 'narrow',
             })
         }
     }

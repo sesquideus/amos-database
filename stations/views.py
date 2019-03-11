@@ -1,4 +1,5 @@
 import datetime
+import pytz
 from django.shortcuts import render
 from django.http import JsonResponse, HttpResponse
 from django.contrib.auth.decorators import login_required
@@ -19,7 +20,7 @@ def station(request, code):
 
     context = {
         'station': station,
-        'lastDay': station.sighting_set.filter(lightmaxTime__gte = datetime.datetime.now() - datetime.timedelta(days = 1))
+        'lastDay': station.sighting_set.filter(lightmaxTime__gte = datetime.datetime.now(pytz.utc) - datetime.timedelta(days = 1))
     }
     return render(request, 'stations/station.html', context)
 

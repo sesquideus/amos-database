@@ -23,7 +23,7 @@
                 {% if sighting.meteor %}
                     <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
                 {% else %}
-                    (none)
+                    (not identified)
                 {% endif %}
             </td>
             <td class="c">
