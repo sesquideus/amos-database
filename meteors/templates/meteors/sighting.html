@@ -22,6 +22,13 @@
 {% block page %}
     <div>
         <p>
+            {% if sighting.lightmaxTime %}
+                {{ sighting.lightmaxTime|date:"Y-m-d, l" }}
+            {% else %}
+                <span class="unknown">unknown date</span>
+            {% endif %}
+        </p>
+        <p>
             {% if sighting.meteor.id %}
                 Meteor <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
                 as seen from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default:"(unknown)" }}</a>
@@ -54,7 +61,7 @@
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="r">{{ sighting.beginningElevation|floatformat:2|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.beginningAltitude|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
                 
                 <tr>
@@ -68,7 +75,7 @@
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="r">{{ sighting.lightmaxElevation|floatformat:2|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.lightmaxAltitude|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
 
                 <tr>
@@ -82,7 +89,7 @@
                 </tr>
                 <tr>
                     <td>Elevation</td>
-                    <td class="r">{{ sighting.endElevation|floatformat:2|default:"&mdash; " }}°</td>
+                    <td class="r">{{ sighting.endAltitude|floatformat:2|default:"&mdash; " }}°</td>
                 </tr>
                 <tr>
                     <td colspan="2">Duration</td>
@@ -141,8 +148,8 @@
             </table>
         </div>
         <div class="preview">
-            <a href="{% get_static_prefix %}data/{{ sighting.image }}">
-                <img class="full-size-preview" src="{% get_static_prefix %}data/{{ sighting.image }}" alt="{{ sighting.id }}" />
+            <a href="{% get_static_prefix %}data/{{ sighting.imageFile }}">
+                <img class="sighting" src="{% get_static_prefix %}data/{{ sighting.imageFile }}" alt="Image for sighting {{ sighting.id }} is missing" />
             </a>
         </div>
          <div style="clear: both;"></div>

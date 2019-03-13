@@ -291,8 +291,11 @@ class Sighting(models.Model):
         ex = int((self.magnitude - 5) * 30)
         return '#{0:02X}{0:02X}{0:02X}'.format(min(64 + ex, 255))
 
-    def image(self):
-        return "M{}_AMOS5_P.jpg".format(self.lightmaxTime.strftime("%Y%m%d_%H%M%S")) if self.lightmaxTime else None
+    def imageFile(self):
+        return "M-{station}-{timestamp}P.jpg".format(
+            station     = self.station.code,
+            timestamp   = self.lightmaxTime.strftime("%Y-%m-%dT%H-%M-%S")
+        ) if self.lightmaxTime else None
 
     def duration(self):
         return self.endTime - self.beginningTime if self.endTime != None and self.beginningTime != None else None

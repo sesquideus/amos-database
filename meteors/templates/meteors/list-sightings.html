@@ -5,6 +5,12 @@
     <h2>Sightings</h2>
 {% endblock pagetitle %}
 {% block page %}
+    <h3>
+        Station {{ station.code }}
+    </h3>
+    <p>
+        Night of {{ date|date:"Y-m-d" }} ({{ timeFrom|date:"Y-m-d H:i:s" }} &ndash; {{ timeTo|date:"Y-m-d H:i:s" }})
+    </p>
     <table>
         <tr>
             <th>timestamp</th>

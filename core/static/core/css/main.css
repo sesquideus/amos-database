@@ -148,3 +148,20 @@ div.page .suninfo {
 div.page .suninfo.standalone {
     font-size: 20pt;
 }
+
+div.page div.info {
+    min-width: 400px;
+    float: left;
+    width: 30%;
+}
+
+div.page div.preview {
+    margin-left: 30%;
+    width: 70%;
+    height: 100%;
+}
+
+div.page img.sighting {
+    float: right;
+    max-width: 80%;
+}

@@ -16,7 +16,7 @@
     <h3>Station info</h3>
         <p>{{ station.address }}</p>
         <p id="location">{{ station.location }}</p>
-        <p id="localtime">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</p>
+        <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
 
     <h3>Sun</h3>
         <span class="suninfo standalone" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
