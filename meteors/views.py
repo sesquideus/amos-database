@@ -1,8 +1,10 @@
 import datetime
+import pytz
 
 from django.shortcuts import render
 from django.core import serializers
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
+from django.urls import reverse
 from django.contrib.auth.decorators import login_required
 from django.utils.dateparse import parse_datetime, parse_date
 
@@ -17,11 +19,32 @@ def parseDatetime(string, default = datetime.datetime.now()):
 
 # Create your views here.
 
+class DateParser():
+    def __init__(self, request):
+        self.date       = parse_date(request.GET.get('date', datetime.date.today().isoformat()))
+        if not isinstance(self.date, datetime.date):
+            self.date  = datetime.date.today()
+        self.midnight   = datetime.datetime.combine(self.date, datetime.time()).replace(tzinfo = pytz.UTC)
+
+        self.timeFrom   = self.midnight + datetime.timedelta(days = -0.5)
+        self.timeTo     = self.midnight + datetime.timedelta(days = 0.5)
+
+    def context(self):
+        return {
+            'date':         self.date,
+            'currentDate':  (datetime.datetime.now() + datetime.timedelta(days = 0.5)).date(),
+            'midnight':     self.midnight,
+            'timeFrom':     self.timeFrom,
+            'timeTo':       self.timeTo,
+        }
+
 @login_required
 def listMeteors(request):
+    time = DateParser(request)   
     context = {
-        'meteors': Meteor.objects.all(),
+        'meteors': Meteor.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
     }
+    context.update(time.context())
     return render(request, 'meteors/list-meteors.html', context)
 
 @login_required
@@ -34,43 +57,27 @@ def listMeteorsJSON(request):
 
 @login_required
 def listSightings(request):
-    timeFrom = parseDatetime(request.GET.get('from'), datetime.datetime(1970, 1, 1))
-    timeTo = parseDatetime(request.GET.get('to'), datetime.datetime.now())
-
+    time = DateParser(request)   
     context = {
-        'sightings': Sighting.objects.filter(lightmaxTime__gte = timeFrom, lightmaxTime__lte = timeTo),
+        'sightings': Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
+        'navigation': reverse('listSightings')
     }
-    return render(request, 'meteors/list-sightings.html', context)
-
-@login_required
-def listSightingsNight(request, date):
-    midnight = parse_date(date)
-    timeFrom = midnight + datetime.timedelta(days = -0.5)
-    timeTo   = midnight + datetime.timedelta(days = 0.5)
-    context = {
-        'sightings': Sighting.objects.filter(lightmaxTime__gte = timeFrom, lightmaxTime__lte = timeTo),
-    }
+    context.update(time.context())
     return render(request, 'meteors/list-sightings.html', context)
 
 @login_required
 def listSightingsStation(request, stationCode):
-    midnight = datetime.datetime.combine(parse_date(request.GET.get('date', datetime.date.today().isoformat())), datetime.time())
-    timeFrom = midnight + datetime.timedelta(days = -0.5)
-    timeTo   = midnight + datetime.timedelta(days = 0.5)
-
+    time = DateParser(request)   
     context = {
-        'date': midnight,
-        'timeFrom': timeFrom,
-        'timeTo': timeTo,
         'station': Station.objects.get(code = stationCode),
-        'sightings': Sighting.objects.filter(lightmaxTime__gte = timeFrom, lightmaxTime__lte = timeTo, station__code = stationCode),
+        'sightings': Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo, station__code = stationCode),
     }
-    return render(request, 'meteors/list-sightings.html', context)
+    context.update(time.context())
+    return render(request, 'meteors/list-sightings-station.html', context)
     
 
 @login_required
 def meteor(request, id):
-    print("OK")
     context = {
         'meteor': Meteor.objects.get(id = id)
     }        
@@ -106,4 +113,5 @@ def sighting(request, id):
 def createRandom(request):
     meteor = Meteor.objects.createRandom()
     meteor.save()
-    return render(request, 'meteors/meteor.kml', {}) 
+    print("Meteor created")
+    return HttpResponse(status = 200)

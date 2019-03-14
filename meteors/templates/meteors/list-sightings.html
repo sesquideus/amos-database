@@ -1,16 +1,21 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load meteor_tags %}
 
 {% block pagetitle %}
     <h2>Sightings</h2>
 {% endblock pagetitle %}
 {% block page %}
     <h3>
-        Station {{ station.code }}
+        {% block stationName %}All stations{% endblock %}
     </h3>
     <p>
-        Night of {{ date|date:"Y-m-d" }} ({{ timeFrom|date:"Y-m-d H:i:s" }} &ndash; {{ timeTo|date:"Y-m-d H:i:s" }})
+        Night of <abbr title="{{ timeFrom|date:"Y-m-d H:i:s" }} &ndash; {{ timeTo|date:"Y-m-d H:i:s" }}">{{ date|date:"Y-m-d" }}</abbr>
+        <a href="{{ navigation }}?date={{ date|previousDay|date:"Y-m-d" }}">previous night</a>
+        <a href="{{ navigation }}?date={{ date|nextDay|date:"Y-m-d" }}">next night</a>
     </p>
+
+    <p>{{ sightings|length }} recorded sighting{{ sightings|length|pluralize:",s" }}</p>
     <table>
         <tr>
             <th>timestamp</th>

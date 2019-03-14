@@ -11,23 +11,55 @@ import core.models
 
 import datetime
 import math
+import pytz
 import numpy as np
 
 class MeteorManager(models.Manager):
     def createRandom(self):
-        timestamp = datetime.datetime.utcnow()
+        timestamp = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
+        beginningLatitude   = np.random.uniform(20, 60)
+        beginningLongitude  = np.random.uniform(-20, 30)
+        beginningAltitude   = np.random.normal(100000, 10000)
+        beginningTime       = timestamp
+        velocityX           = np.random.normal(0, 20000)
+        velocityY           = np.random.normal(0, 20000)
+        velocityZ           = np.random.normal(0, 20000)
+
+        timeToLightmax      = np.random.uniform(0.1, 0.5)
+        lightmaxLatitude    = beginningLatitude + velocityX * timeToLightmax / 100000
+        lightmaxLongitude   = beginningLongitude + velocityY * timeToLightmax / 100000
+        lightmaxAltitude    = beginningAltitude + velocityZ * timeToLightmax
+
+        timeToEnd           = np.random.uniform(0.6, 1)
+        endLatitude         = beginningLatitude + velocityX * timeToEnd / 100000
+        endLongitude        = beginningLongitude + velocityY * timeToEnd / 100000
+        endAltitude         = beginningAltitude + velocityZ * timeToEnd
+        magnitude           = -2.5 * np.log(np.random.pareto(2) * 10)
+
         meteor = self.create(
             timestamp           = timestamp,
-            lightmaxTime        = timestamp,
-            magnitude           = -2.5 * np.log(np.random.pareto(2) * 10),
-            lightmaxLatitude    = np.random.uniform(20, 60),
-            lightmaxLongitude   = np.random.uniform(-20, 30),
-            lightmaxAltitude    = np.random.normal(80000, 15000),
-            velocityX           = np.random.normal(0, 20000),
-            velocityY           = np.random.normal(0, 20000),
-            velocityZ           = np.random.normal(0, 20000),
+            beginningLatitude   = beginningLatitude,
+            beginningLongitude  = beginningLongitude,
+            beginningAltitude   = beginningAltitude,
+            beginningTime       = beginningTime,
+            velocityX           = velocityX,
+            velocityY           = velocityY,
+            velocityZ           = velocityZ,
+
+            lightmaxLatitude    = lightmaxLatitude,
+            lightmaxLongitude   = lightmaxLongitude,
+            lightmaxAltitude    = lightmaxAltitude,
+            lightmaxTime        = beginningTime + datetime.timedelta(seconds = timeToLightmax),
+
+            endLatitude         = lightmaxLatitude,
+            endLongitude        = lightmaxLongitude,
+            endAltitude         = lightmaxAltitude,
+            endTime             = beginningTime + datetime.timedelta(seconds = timeToEnd),
+            magnitude           = magnitude,
         )
+
         return meteor
+
 
 class Meteor(models.Model):
     class Meta:

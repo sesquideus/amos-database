@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static %}
+{% load meteor_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -12,6 +13,12 @@
 {% endblock %}
 
 {% block page %}
+    <p>
+        Night of <abbr title="{{ timeFrom|date:"Y-m-d H:i:s" }} &ndash; {{ timeTo|date:"Y-m-d H:i:s" }}">{{ date|date:"Y-m-d" }}</abbr>
+        <a href="{% url 'listMeteors' %}?date={{ date|previousDay|date:"Y-m-d" }}">previous night</a>
+        <a href="{% url 'listMeteors' %}?date={{ currentDate|date:"Y-m-d" }}">last night</a>
+        <a href="{% url 'listMeteors' %}?date={{ date|nextDay|date:"Y-m-d" }}">next night</a>
+    </p>
     <table>
         <tr>
             <th>timestamp</th>
@@ -36,7 +43,7 @@
             </tr>
         {% empty %}
             <tr>
-                <td class="empty" colspan="6">There are no recorded meteors in the database.</td>
+                <td class="empty" colspan="6">There are no recorded meteors in the database for this night.</td>
             </tr>
         {% endfor %}
     </table>
