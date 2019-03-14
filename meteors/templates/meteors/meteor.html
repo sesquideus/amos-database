@@ -33,8 +33,12 @@
                 <th class="group" colspan="3">generic attributes</th>
             </tr>
             <tr>
-                <td colspan="2">timestamp</td>
-                <td class="r">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
+                <td colspan="2">date</td>
+                <td class="r">{{ meteor.timestamp|date:"Y-m-d" }}</td>
+            </tr>
+            <tr>
+                <td colspan="2">time</td>
+                <td class="r">{{ meteor.timestamp|date:"H:i:s.u" }}</td>
             </tr>
             <tr>
                 <td colspan="2">absolute magnitude</td>

@@ -28,14 +28,20 @@ def multiply(value: float, factor: float):
 
 @register.filter
 def latitude(value: float):
-    return "{lat}° {ns}".format(
+    return "{lat:.5f}° {ns}".format(
         lat     = abs(value),
         ns      = 'N' if value > 0 else 'S',
     )
 
 @register.filter
 def longitude(value: float):
-    return "{lon}° {ew}".format(
+    return "{lon:.5f}° {ew}".format(
         lon     = abs(value),
         ew      = 'E' if value > 0 else 'W',
+    )
+
+@register.filter
+def altitude(value: float):
+    return "{alt:.0f} m".format(
+        alt     = value,
     )

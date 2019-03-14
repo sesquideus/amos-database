@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% load meteor_tags %}
+{% load station_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -23,8 +24,9 @@
         <tr>
             <th>timestamp</th>
             <th>magnitude</th>
-            <th>trail start</th>
-            <th>trail end</th>
+            <th>latitude</th>
+            <th>longitude</th>
+            <th>altitude</th>
             <th>speed</th>
             <th>seen by</th>
         </tr>
@@ -32,12 +34,15 @@
             <tr>
                 <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
                 <td  class="r" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
-                <td class="r">{{ meteor.trailStartX }}</td>
-                <td class="r">{{ meteor.trailEndX }}</td>
+                <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
+                <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
+                <td class="r">{{ meteor.lightmaxAltitude|altitude }}</td>
                 <td class="r">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
                 <td class="c">
                     {% for sighting in meteor.sightings.all %}
                         <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.station.code }}</a>
+                    {% empty %}
+                        &mdash;
                     {% endfor %}
                 </td>
             </tr>
