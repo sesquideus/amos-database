@@ -3,8 +3,8 @@ def mainMenu(request):
         'core': {
             'menu': [
                 {'url': 'status',           'caption': 'Status'},
-                {'url': 'listMeteors',      'caption': 'All meteors'},
-                {'url': 'listSightings',    'caption': 'All sightings'},
+                {'url': 'listMeteors',      'caption': 'Meteors'},
+                {'url': 'listSightings',    'caption': 'Sightings'},
                 {'url': 'about',            'caption': 'About'},
                 {'url': 'admin:index',      'caption': 'Admin'},
             ]

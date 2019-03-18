@@ -75,11 +75,15 @@ div.page h2 {
 div.page h3 {
     font-size: 18pt;
     margin: 20px 0px;
+    clear: both;
 }
 
 div.page table {
     padding: 10px;
     border: 1px solid black;
+    float: left;
+    margin-right: 10px;
+    margin-bottom: 10px;
 }
 
 div.page table .c {

@@ -48,22 +48,31 @@
                 <td colspan="2">geocentric velocity</td>
                 <td class="r">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
             </tr>
-            
+        </table>
+
+        <table>            
             <tr>
-                <th class="group" colspan="3">position</th>
+                <th class="group" colspan="4">position</th>
             </tr>
-            <tr>
-                <td colspan="2">latitude</td>
-                <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">longitude</td>
-                <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">altitude</td>
-                <td class="r">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
-            </tr>
+                <tr>
+                    <td>beginning</td>
+                    <td class="r">{{ meteor.beginningLatitude|latitude }}</td>
+                    <td class="r">{{ meteor.beginningLongitude|longitude }}</td>
+                    <td class="r">{{ meteor.beginningAltitude|floatformat:0 }} m</td>
+                </tr>
+                <tr>
+                    <td>max light</td>
+                    <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
+                    <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
+                    <td class="r">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
+                </tr>
+
+                <tr>
+                    <td>end</td>
+                    <td class="r">{{ meteor.endLatitude|latitude }}</td>
+                    <td class="r">{{ meteor.endLongitude|longitude }}</td>
+                    <td class="r">{{ meteor.endAltitude|floatformat:0 }} m</td>
+                </tr>
         </table>
 
     <h3>Recorded sightings</h3>

@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %}
 {% load static %}
 {% load meteor_tags %}
+{% load station_tags %}
 
 {% block pagetitle %}
     <h2>Sightings</h2>
@@ -24,6 +25,7 @@
             <th>magnitude</th>
             <th>elevation</th>
             <th>azimuth</th>
+            <th>distance</th>
         </tr>
         {% for sighting in sightings %}
         <tr>
@@ -44,10 +46,13 @@
                 {{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup>
             </td>
             <td class="r">
-                {{ sighting.lightmaxAltitude|floatformat:1|default:"&mdash; " }}°
+                {{ sighting.lightmaxAltitude|angle|default:"&mdash;" }}
                 </td>
             <td class="r">
-                {{ sighting.lightmaxAzimuth|floatformat:1|default:"&mdash; " }}°
+                {{ sighting.lightmaxAzimuth|angle|default:"&mdash;" }}
+            </td>
+            <td class="r">
+                {{ sighting.distance|distance|default:"&mdash; " }}
             </td>
         </tr>
         {% empty %}
