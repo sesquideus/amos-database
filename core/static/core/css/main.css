@@ -55,13 +55,10 @@ div.page div.titlebar div.controls img {
 
 div.page {
     padding: 20px;
-    background-color: white;
+    background-image: url("/static/solid.png");
+    background-color: hsl(0, 0%, 80%);
+    background-blend-mode: screen;
     min-height: calc(100vh - 85px);
-}
-
-div.page div#map {
-    width: 100%;
-    height: 800px;
 }
 
 div.page span.bold {
@@ -74,7 +71,7 @@ div.page h2 {
 
 div.page h3 {
     font-size: 18pt;
-    margin: 20px 0px;
+    margin: 10px 0px;
     clear: both;
 }
 
@@ -84,6 +81,8 @@ div.page table {
     float: left;
     margin-right: 10px;
     margin-bottom: 10px;
+    min-width: 500px;
+    background-color: white;
 }
 
 div.page table .c {
@@ -117,8 +116,8 @@ div.page table tr th {
     font-size: 100%;
     background-color: hsla(180, 40%, 10%, 1);
     color: white;
-    padding-left: 20px;
-    padding-right: 20px;
+    padding-left: 10px;
+    padding-right: 10px;
 }
 
 div.page table td a {
@@ -154,15 +153,31 @@ div.page .suninfo.standalone {
 }
 
 div.page div.info {
-    min-width: 400px;
+    width: 500px;
     float: left;
-    width: 30%;
+}
+
+div.page div.inner {
+    display: flex;
+    width: 100%;
+    height: 100%;
 }
 
 div.page div.preview {
-    margin-left: 30%;
-    width: 70%;
-    height: 100%;
+    flex: 1;
+    margin-left: 10px;
+}
+
+div.page div#map {
+    width: 100%;
+    height: calc(100vh - 201px);
+    background: repeating-linear-gradient(
+        -45deg,
+        hsl(0, 0%, 90%),
+        hsl(0, 0%, 90%) 20px,
+        hsl(0, 0%, 95%) 20px,
+        hsl(0, 0%, 95%) 40px
+    );
 }
 
 div.page img.sighting {

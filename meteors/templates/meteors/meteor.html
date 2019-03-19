@@ -1,6 +1,7 @@
 {% extends 'core/base.html' %}
 {% load staticfiles %}
 {% load station_tags %}
+{% load meteor_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -28,87 +29,104 @@
 
 {% block page %}
     <h3>Properties</h3>
-        <table>
-            <tr>
-                <th class="group" colspan="3">generic attributes</th>
-            </tr>
-            <tr>
-                <td colspan="2">date</td>
-                <td class="r">{{ meteor.timestamp|date:"Y-m-d" }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">time</td>
-                <td class="r">{{ meteor.timestamp|date:"H:i:s.u" }}</td>
-            </tr>
-            <tr>
-                <td colspan="2">absolute magnitude</td>
-                <td class="r">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
-            </tr>
-            <tr>
-                <td colspan="2">geocentric velocity</td>
-                <td class="r">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
-            </tr>
-        </table>
-
-        <table>            
-            <tr>
-                <th class="group" colspan="4">position</th>
-            </tr>
+    <div class="inner">
+        <div class="info">
+            <table>
+                <thead>
+                    <tr>
+                        <th class="group" colspan="3">generic attributes</th>
+                    </tr>
+                </thead>
                 <tr>
-                    <td>beginning</td>
-                    <td class="r">{{ meteor.beginningLatitude|latitude }}</td>
-                    <td class="r">{{ meteor.beginningLongitude|longitude }}</td>
-                    <td class="r">{{ meteor.beginningAltitude|floatformat:0 }} m</td>
+                    <td>date</td>
+                    <td></td>
+                    <td class="r">{{ meteor.timestamp|date:"Y-m-d" }}</td>
                 </tr>
                 <tr>
-                    <td>max light</td>
-                    <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
-                    <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
-                    <td class="r">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
+                    <td>time</td>
+                    <td></td>
+                    <td class="r">{{ meteor.timestamp|date:"H:i:s.u" }}</td>
                 </tr>
-
                 <tr>
-                    <td>end</td>
-                    <td class="r">{{ meteor.endLatitude|latitude }}</td>
-                    <td class="r">{{ meteor.endLongitude|longitude }}</td>
-                    <td class="r">{{ meteor.endAltitude|floatformat:0 }} m</td>
-                </tr>
-        </table>
-
-    <h3>Recorded sightings</h3>
-        <table>
-            <tr>
-                <th colspan="2">observed from</th>
-                <th>timestamp</th>
-                <th colspan="2">position</th>
-                <th>arc</th>
-                <th>magnitude</th>
-                <th>distance</th>
-            </tr>
-            {% for sighting in meteor.sightings.all %}
-                <tr>
-                    <td>
-                        <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.name }}</a>
+                    <td>absolute magnitude</td>
+                    <td class="r">
+                        <meter min="-10" max="10" low="-5" optimum="0" high="5" value="{{ meteor.magnitude|multiply:-1 }}" />
                     </td>
-                    <td>
-                        {{ sighting.station.country }}
-                    </td>
-                    <td>
-                        <a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a>
-                    </td>
-                    <td class="r">{{ sighting.lightmaxAltitude|floatformat:2|default:"&mdash; " }}°</td>
-                    <td class="r">{{ sighting.lightmaxAzimuth|floatformat:2|default:"&mdash; " }}°</td>
-                    <td class="r">{{ sighting.arcLength|floatformat:1|default:"&mdash; " }}°</td>
-                    <td class="r">{{ sighting.magnitude|floatformat:2 }}<sup>m</sup></td>
-                    <td class="r">{{ sighting.distance }}</td>
+                    <td class="r">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 </tr>
-            {% empty %}
-                <tr class="empty">
-                    <td colspan="8">There are no recorded sightings of this meteor.</td>
+                <tr>
+                    <td>geocentric velocity</td>
+                    <td class="r">
+                        <meter min="0" max="75000" low="20000" optimum="65000" high="60000" value="{{ meteor.speed }}" />
+                    </td>
+                    <td class="r">
+                        {{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s
+                    </td>
                 </tr>
-            {% endfor %}
-        </table>
+            </table>
 
-    <h3>Map</h3>
-        <div id="map" class="map"> </div>
+            <table>
+                <thead>
+                    <tr>
+                        <th class="group" colspan="4">position</th>
+                    </tr>
+                </thead>
+                    <tr>
+                        <td>beginning</td>
+                        <td class="r">{{ meteor.beginningLatitude|latitude }}</td>
+                        <td class="r">{{ meteor.beginningLongitude|longitude }}</td>
+                        <td class="r">{{ meteor.beginningAltitude|floatformat:0 }} m</td>
+                    </tr>
+                    <tr>
+                        <td>max light</td>
+                        <td class="r">{{ meteor.lightmaxLatitude|latitude }}</td>
+                        <td class="r">{{ meteor.lightmaxLongitude|longitude }}</td>
+                        <td class="r">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
+                    </tr>
+
+                    <tr>
+                        <td>end</td>
+                        <td class="r">{{ meteor.endLatitude|latitude }}</td>
+                        <td class="r">{{ meteor.endLongitude|longitude }}</td>
+                        <td class="r">{{ meteor.endAltitude|floatformat:0 }} m</td>
+                    </tr>
+            </table>
+
+        <h3>Recorded sightings</h3>
+            <table>
+                <thead>
+                    <tr>
+                        <th colspan="2">observed from</th>
+                        <th>timestamp</th>
+                        <th>magnitude</th>
+                        <th>distance</th>
+                    </tr>
+                </thead>
+                {% for sighting in meteor.sightings.all %}
+                    <tr>
+                        <td>
+                            <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.code }}</a>
+                        </td>
+                        <td>
+                            {{ sighting.station.subnetwork }}
+                        </td>
+                        <td>
+                            <a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"H:i:s.u" }}</a>
+                        </td>
+                        <td class="r">{{ sighting.magnitude|floatformat:2 }}<sup>m</sup></td>
+                        <td class="r">{{ sighting.distance }}</td>
+                    </tr>
+                {% empty %}
+                    <tr class="empty">
+                        <td colspan="8">There are no recorded sightings of this meteor.</td>
+                    </tr>
+                {% endfor %}
+            </table>
+            <br/>
+        </div>
+
+        <div class="preview">
+            <div id="map" class="map"> </div>
+        </div>
+    </div>
 {% endblock %}

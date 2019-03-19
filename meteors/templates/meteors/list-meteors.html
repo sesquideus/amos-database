@@ -20,16 +20,21 @@
         <a href="{% url 'listMeteors' %}?date={{ currentDate|date:"Y-m-d" }}">last night</a>
         <a href="{% url 'listMeteors' %}?date={{ date|nextDay|date:"Y-m-d" }}">next night</a>
     </p>
+    <h3>
+        {{ meteors|length }} meteors
+    </h3>
     <table>
-        <tr>
-            <th>timestamp</th>
-            <th>magnitude</th>
-            <th>latitude</th>
-            <th>longitude</th>
-            <th>altitude</th>
-            <th>speed</th>
-            <th>seen by</th>
-        </tr>
+        <thead>
+            <tr>
+                <th>timestamp</th>
+                <th>magnitude</th>
+                <th>latitude</th>
+                <th>longitude</th>
+                <th>altitude</th>
+                <th>speed</th>
+                <th>seen by</th>
+            </tr>
+        </thead>
         {% for meteor in meteors %}
             <tr>
                 <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
@@ -53,6 +58,6 @@
         {% endfor %}
     </table>
 
-    <h3>Map</h3>
-        <div id="map" class="map"> </div>
+    {#<h3>Map</h3>#}
+{#        <div id="map" class="map"> </div>#}
 {% endblock %}

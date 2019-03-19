@@ -34,7 +34,7 @@ class MeteorManager(models.Manager):
         endLatitude         = beginningLatitude + velocityX * timeToEnd / 100000
         endLongitude        = beginningLongitude + velocityY * timeToEnd / 100000
         endAltitude         = beginningAltitude + velocityZ * timeToEnd
-        magnitude           = -2.5 * np.log(np.random.pareto(2) * 10)
+        magnitude           = -2.5 * np.log(np.random.pareto(2) * 10) + 5
 
         meteor = self.create(
             timestamp           = timestamp,
@@ -51,10 +51,11 @@ class MeteorManager(models.Manager):
             lightmaxAltitude    = lightmaxAltitude,
             lightmaxTime        = beginningTime + datetime.timedelta(seconds = timeToLightmax),
 
-            endLatitude         = lightmaxLatitude,
-            endLongitude        = lightmaxLongitude,
-            endAltitude         = lightmaxAltitude,
+            endLatitude         = endLatitude,
+            endLongitude        = endLongitude,
+            endAltitude         = endAltitude,
             endTime             = beginningTime + datetime.timedelta(seconds = timeToEnd),
+
             magnitude           = magnitude,
         )
 
@@ -314,10 +315,6 @@ class Sighting(models.Model):
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
-
-    def colour(self):
-        ex = int((-self.magnitude + 5) * 10)
-        return 'hsl(0, 0%, {:02d}%)'.format(max(0, min(ex, 100)))
 
     def colourText(self):
         ex = int((self.magnitude - 5) * 30)
