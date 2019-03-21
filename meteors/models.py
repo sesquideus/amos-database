@@ -62,6 +62,7 @@ class MeteorManager(models.Manager):
         return meteor
 
 
+
 class Meteor(models.Model):
     class Meta:
         verbose_name                = "meteor"

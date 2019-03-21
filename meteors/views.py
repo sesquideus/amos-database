@@ -114,4 +114,8 @@ def createRandom(request):
     meteor = Meteor.objects.createRandom()
     meteor.save()
     print("Meteor created")
+    
+    stations = Station.objects.all()
+    for station in stations:
+        station.observe(meteor)
     return HttpResponse(status = 200)

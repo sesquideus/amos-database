@@ -38,7 +38,7 @@
         {% for meteor in meteors %}
             <tr>
                 <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
-                <td  class="r" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
+                <td class="r" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 <td class="r">{{ meteor.lightmaxLatitude|latitude|default:"&mdash;" }}</td>
                 <td class="r">{{ meteor.lightmaxLongitude|longitude|default:"&mdash;" }}</td>
                 <td class="r">{{ meteor.lightmaxAltitude|distance|default:"&mdash;" }} m</td>
@@ -53,7 +53,7 @@
             </tr>
         {% empty %}
             <tr>
-                <td class="empty" colspan="6">There are no recorded meteors in the database for this night.</td>
+                <td class="empty" colspan="7">There are no recorded meteors in the database for this night.</td>
             </tr>
         {% endfor %}
     </table>

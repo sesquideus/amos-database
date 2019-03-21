@@ -42,7 +42,6 @@ class Subnetwork(core.models.NamedModel):
             'longitude':    sum([station.longitude for station in stations]),
         }
 
-
 class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
@@ -161,6 +160,12 @@ class Station(core.models.NamedModel):
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
         )
+
+    def observe(self, meteor):
+        (x, y, z) = self.earthLocation().to_geocentric()
+        (a, b, c) = meteor.earthLocation().to_geocentric()
+        diff = EarthLocation.from_geocentric()
+        print(difference)
 
 class LogEntry(models.Model):
     class Meta:
