@@ -23,4 +23,5 @@ urlpatterns = [
 
 
     path('create',                          views.createRandom,         name = 'createRandom'),
+    path('receive',                         views.receive,              name = 'receive'),
 ]

@@ -20,12 +20,15 @@ class Profile(models.Model):
                             )
 
     def formatLocation(self):
-       return "{lat:.6f}° {ns}, {lon:.6f}° {ew}".format(
-            lat     = self.latitude,
-            lon     = self.longitude,
-            ns      = 'N' if self.latitude > 0 else 'S',
-            ew      = 'E' if self.longitude > 0 else 'W',
-        )
+        try:
+            return "{lat:.6f}° {ns}, {lon:.6f}° {ew}".format(
+                lat     = self.latitude,
+                lon     = self.longitude,
+                ns      = 'N' if self.latitude > 0 else 'S',
+                ew      = 'E' if self.longitude > 0 else 'W',
+            )
+        except TypeError:
+            return "undefined"
  
 @receiver(post_save, sender = User)
 def createUserProfile(sender, instance, created, **kwargs):

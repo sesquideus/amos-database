@@ -7,7 +7,7 @@ import numpy as np
 def main():
     args = getArgs()
     data = makeData()
-    send('http://192.168.0.177:4805/receive', data, args.filename)
+    send('http://127.0.0.1:4805/meteors/receive', data, args.filename)
 
 def getArgs():
     parser = argparse.ArgumentParser(
@@ -17,7 +17,10 @@ def getArgs():
     return parser.parse_args()
 
 def send(url, data, image):
-    r = requests.post(url, files = {'file': ('image.jpg', image)})
+    print(url)
+    print(data)
+    print(image)
+    r = requests.post(url, data = data, files = {'file': ('image', image, 'image/png')})
     print(r.text)
     print(r.status_code)
 

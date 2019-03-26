@@ -6,6 +6,7 @@ from django.core import serializers
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime, parse_date
 
 from astropy.time import Time
@@ -119,3 +120,9 @@ def createRandom(request):
     for station in stations:
         station.observe(meteor)
     return HttpResponse(status = 200)
+
+### Currently this is unsafe!
+@csrf_exempt
+def receive(request):
+    print(request.POST)
+    return HttpResponse('abc', status = 201)

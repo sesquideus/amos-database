@@ -16,6 +16,9 @@ astropy = "*"
 pyyaml = "*"
 requests = "*"
 numpy = "*"
+django-celery-beat = "*"
+"psycopg2-binary" = "*"
+"psycopg2" = "*"
 
 [requires]
 python_version = "3.5"
