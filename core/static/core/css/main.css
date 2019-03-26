@@ -26,6 +26,10 @@ div.page p {
     margin: 15px 0;
 }
 
+abbr[title] {
+    text-decoration: none;
+}
+
 div.page div.titlebar {
     width: 100%;
     margin-bottom: 10px;

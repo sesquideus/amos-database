@@ -29,7 +29,7 @@
                     <td class="c">unknown</td>
                     <td id="{{ station.code }}-localtime" class="c">
                         {% timezone station.timezone %}
-                            {% now "H:i" %}
+                            <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
                         {% endtimezone %}
                     </td>
                     <td id="{{ station.code }}-sunalt" class="r" style="color: {{ station.sunPosition.alt|altitudeColour }};">
