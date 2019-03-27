@@ -11,7 +11,7 @@ urlpatterns = [
 
     # Sighting listings
     path('sightings/',                      views.listSightings,        name = 'listSightings'),
-    path('sightings/<slug:stationCode>',    views.listSightingsStation, name = 'listSightingsStation'),
+    path('sightings/<slug:stationCode>/',   views.listSightingsStation, name = 'listSightingsStation'),
 
     # Single meteor views
     path('meteor/<slug:id>/',               views.meteor,               name = 'meteor'),
@@ -23,5 +23,5 @@ urlpatterns = [
 
 
     path('create',                          views.createRandom,         name = 'createRandom'),
-    path('receive',                         views.receive,              name = 'receive'),
+    path('receive',                         views.MeteorView.as_view(), name = 'receive'),
 ]

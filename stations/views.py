@@ -25,7 +25,4 @@ def station(request, code):
     return render(request, 'stations/station.html', context)
 
 def stationsJSON(request):
-    stations = {station.id: station.asDict() for station in models.Station.objects.all()}
-
-    return JsonResponse(stations)
-
+    return JsonResponse({station.id: station.asDict() for station in models.Station.objects.all()})

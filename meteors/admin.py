@@ -58,8 +58,15 @@ class MeteorAdmin(admin.ModelAdmin):
         ),
     )
     inlines = [SightingInline]
-    list_display = ['timestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude']
+    
+    def sightingCount(self, obj):
+        return obj.sightings.count()
+    sightingCount.short_description = 'sighting count'
+    
+    list_display = ['timestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
     save_as = True
+
+
     
 @admin.register(Sighting)
 class SightingAdmin(admin.ModelAdmin):

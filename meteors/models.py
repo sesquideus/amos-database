@@ -16,14 +16,15 @@ import numpy as np
 
 class MeteorManager(models.Manager):
     def createRandom(self):
-        timestamp = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
+        timestamp           = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
+        velocityX           = np.random.normal(0, 20000)
+        velocityY           = np.random.normal(0, 20000)
+        velocityZ           = np.random.normal(0, 20000)
+
         beginningLatitude   = np.random.uniform(20, 60)
         beginningLongitude  = np.random.uniform(-20, 30)
         beginningAltitude   = np.random.normal(100000, 10000)
         beginningTime       = timestamp
-        velocityX           = np.random.normal(0, 20000)
-        velocityY           = np.random.normal(0, 20000)
-        velocityZ           = np.random.normal(0, 20000)
 
         timeToLightmax      = np.random.uniform(0.1, 0.5)
         lightmaxLatitude    = beginningLatitude + velocityX * timeToLightmax / 100000
@@ -38,13 +39,11 @@ class MeteorManager(models.Manager):
 
         meteor = self.create(
             timestamp           = timestamp,
+
             beginningLatitude   = beginningLatitude,
             beginningLongitude  = beginningLongitude,
             beginningAltitude   = beginningAltitude,
             beginningTime       = beginningTime,
-            velocityX           = velocityX,
-            velocityY           = velocityY,
-            velocityZ           = velocityZ,
 
             lightmaxLatitude    = lightmaxLatitude,
             lightmaxLongitude   = lightmaxLongitude,
@@ -55,12 +54,48 @@ class MeteorManager(models.Manager):
             endLongitude        = endLongitude,
             endAltitude         = endAltitude,
             endTime             = beginningTime + datetime.timedelta(seconds = timeToEnd),
+            
+            velocityX           = velocityX,
+            velocityY           = velocityY,
+            velocityZ           = velocityZ,
 
             magnitude           = magnitude,
         )
 
         return meteor
 
+    def createFromPost(self, **kwargs):
+        try:
+            timestamp               = datetime.datetime.strptime(kwargs.get('timestamp', None), '%Y-%m-%d %H:%M:%S.%f%z').replace(tzinfo = pytz.UTC)
+        except TypeError as e:
+            print(e)
+            raise TypeError("Timestamp could not be parsed")
+
+        meteor = self.create(
+            timestamp           = timestamp,
+
+            beginningLatitude   = kwargs.get('beginningLatitude', None),
+            beginningLongitude  = kwargs.get('beginningLongitude', None),
+            beginningAltitude   = kwargs.get('beginningAltitude', None),
+            beginningTime       = kwargs.get('beginningTime', None),
+            
+            lightmaxLatitude    = kwargs.get('lightmaxLatitude', None),
+            lightmaxLongitude   = kwargs.get('lightmaxLongitude', None),
+            lightmaxAltitude    = kwargs.get('lightmaxAltitude', None),
+            lightmaxTime        = kwargs.get('lightmaxTime', None),
+
+            endLatitude         = kwargs.get('endLatitude', None),
+            endLongitude        = kwargs.get('endLongitude', None),
+            endAltitude         = kwargs.get('endAltitude', None),
+            endTime             = kwargs.get('endTime', None),
+
+            velocityX           = kwargs.get('velocityX', None),
+            velocityY           = kwargs.get('velocityY', None),
+            velocityZ           = kwargs.get('velocityZ', None),
+
+            magnitude           = kwargs.get('magnitude', None),
+        )
+        return meteor
 
 
 class Meteor(models.Model):

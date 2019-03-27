@@ -1,13 +1,16 @@
 import datetime
 import pytz
+from pprint import pprint as pp
 
 from django.shortcuts import render
 from django.core import serializers
 from django.http import JsonResponse, HttpResponse
 from django.urls import reverse
+from django.views import View
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.csrf import csrf_exempt
 from django.utils.dateparse import parse_datetime, parse_date
+from django.utils.decorators import method_decorator
 
 from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon, get_sun
@@ -122,7 +125,46 @@ def createRandom(request):
     return HttpResponse(status = 200)
 
 ### Currently this is unsafe!
-@csrf_exempt
-def receive(request):
-    print(request.POST)
-    return HttpResponse('abc', status = 201)
+
+@method_decorator(csrf_exempt, name = 'dispatch')
+class MeteorView(View):
+    def get(self, request):
+        return HttpResponse('result')
+
+    def post(self, request):
+        pp(request.POST)
+        print(request.FILES)
+
+        try:
+            meteor = Meteor.objects.createFromPost(
+                timestamp           = request.POST.get('timestamp'),
+
+                beginningLatitude   = request.POST.get('beginningLatitude', None),
+                beginningLongitude  = request.POST.get('beginningLongitude', None),
+                beginningAltitude   = request.POST.get('beginningAltitude', None),
+                beginningTime       = request.POST.get('beginningTime', None),
+                
+                lightmaxLatitude    = request.POST.get('lightmaxLatitude', None),
+                lightmaxLongitude   = request.POST.get('lightmaxLongitude', None),
+                lightmaxAltitude    = request.POST.get('lightmaxAltitude', None),
+                lightmaxTime        = request.POST.get('lightmaxTime', None),
+
+                endLatitude         = request.POST.get('endLatitude', None),
+                endLongitude        = request.POST.get('endLongitude', None),
+                endAltitude         = request.POST.get('endAltitude', None),
+                endTime             = request.POST.get('endTime', None),
+
+                velocityX           = request.POST.get('velocityX', None),
+                velocityY           = request.POST.get('velocityY', None),
+                velocityZ           = request.POST.get('velocityZ', None),
+
+                magnitude           = request.POST.get('magnitude', None),
+            )
+            meteor.save()
+            print("Meteor has been saved")
+
+        except Exception as e:
+            print(e)
+            return HttpResponse(e, status = 400)
+
+        return HttpResponse('Meteor has been accepted', status = 201)

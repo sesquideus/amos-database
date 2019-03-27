@@ -19,6 +19,7 @@ numpy = "*"
 django-celery-beat = "*"
 "psycopg2-binary" = "*"
 "psycopg2" = "*"
+djangorestframework = "*"
 
 [requires]
 python_version = "3.5"
