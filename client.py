@@ -7,7 +7,7 @@ import numpy as np
 def main():
     args = getArgs()
     data = makeData()
-    send('http://127.0.0.1:4805/meteors/receive', data, args.filename)
+    send('http://192.168.0.177:4805/meteors/receive', data, args.filename)
 
 def getArgs():
     parser = argparse.ArgumentParser(
@@ -28,7 +28,7 @@ def makeData():
     return {
         'mag': np.random.pareto(2) * 0.01,
         'az': np.random.uniform(0, 360),
-        'alt': np.arccos(np.random.uniform(0, 1)),
+        'alt': np.degrees(np.arcsin(np.random.uniform(0, 1))),
     }
 
 main()
