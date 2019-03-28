@@ -24,6 +24,8 @@ import accounts.urls
 
 urlpatterns = [
     path('admin/',      admin.site.urls),
+    path('api-auth/',   include('rest_framework.urls')),
+
     path('about/',      include(core.urls)),
     path('',            stations.views.status),
     path('meteors/',    include(meteors.urls)),

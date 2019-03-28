@@ -15,55 +15,6 @@ import pytz
 import numpy as np
 
 class MeteorManager(models.Manager):
-    def createRandom(self):
-        timestamp           = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
-        velocityX           = np.random.normal(0, 20000)
-        velocityY           = np.random.normal(0, 20000)
-        velocityZ           = np.random.normal(0, 20000)
-
-        beginningLatitude   = np.random.uniform(20, 60)
-        beginningLongitude  = np.random.uniform(-20, 30)
-        beginningAltitude   = np.random.normal(100000, 10000)
-        beginningTime       = timestamp
-
-        timeToLightmax      = np.random.uniform(0.1, 0.5)
-        lightmaxLatitude    = beginningLatitude + velocityX * timeToLightmax / 100000
-        lightmaxLongitude   = beginningLongitude + velocityY * timeToLightmax / 100000
-        lightmaxAltitude    = beginningAltitude + velocityZ * timeToLightmax
-
-        timeToEnd           = np.random.uniform(0.6, 1)
-        endLatitude         = beginningLatitude + velocityX * timeToEnd / 100000
-        endLongitude        = beginningLongitude + velocityY * timeToEnd / 100000
-        endAltitude         = beginningAltitude + velocityZ * timeToEnd
-        magnitude           = -2.5 * np.log(np.random.pareto(2) * 10) + 5
-
-        meteor = self.create(
-            timestamp           = timestamp,
-
-            beginningLatitude   = beginningLatitude,
-            beginningLongitude  = beginningLongitude,
-            beginningAltitude   = beginningAltitude,
-            beginningTime       = beginningTime,
-
-            lightmaxLatitude    = lightmaxLatitude,
-            lightmaxLongitude   = lightmaxLongitude,
-            lightmaxAltitude    = lightmaxAltitude,
-            lightmaxTime        = beginningTime + datetime.timedelta(seconds = timeToLightmax),
-
-            endLatitude         = endLatitude,
-            endLongitude        = endLongitude,
-            endAltitude         = endAltitude,
-            endTime             = beginningTime + datetime.timedelta(seconds = timeToEnd),
-            
-            velocityX           = velocityX,
-            velocityY           = velocityY,
-            velocityZ           = velocityZ,
-
-            magnitude           = magnitude,
-        )
-
-        return meteor
-
     def createFromPost(self, **kwargs):
         try:
             timestamp               = datetime.datetime.strptime(kwargs.get('timestamp', None), '%Y-%m-%d %H:%M:%S.%f%z').replace(tzinfo = pytz.UTC)
@@ -249,10 +200,37 @@ class Meteor(models.Model):
         except TypeError:
             return None
 
+
+class SightingManager(models.Manager):
+    def createForMeteor(self, meteor, station):
+        print("Creating for meteor {}, station {}".format(meteor, station))
+        sighting = self.create(
+            beginningAzimuth    = np.random.uniform(0, 360),
+            beginningAltitude   = np.degrees(np.arcsin(np.random.uniform(0, 1))),
+            beginningTime       = meteor.beginningTime,
+
+            lightmaxAzimuth     = np.random.uniform(0, 360),
+            lightmaxAltitude    = np.degrees(np.arcsin(np.random.uniform(0, 1))),
+            lightmaxTime        = meteor.lightmaxTime,
+
+            endAzimuth          = np.random.uniform(0, 360),
+            endAltitude         = np.degrees(np.arcsin(np.random.uniform(0, 1))),
+            endTime             = meteor.endTime,
+            
+            angularSpeed        = np.random.normal(0, 30),
+            magnitude           = -2.5 * np.log(np.random.pareto(2) * 10) + 5,
+
+            meteor              = meteor,
+            station             = station,
+        )
+
+
 class Sighting(models.Model):
     class Meta:
         verbose_name                = "meteor sighting"
         ordering                    = ['lightmaxTime']
+
+    objects                         = SightingManager()
 
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -413,6 +391,7 @@ class Sighting(models.Model):
 
     def getSun(self):
         try:
+            print("AT" + self.coordAltAz())
             return get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         except TypeError:
             return None
@@ -426,13 +405,13 @@ class Sighting(models.Model):
     def getSolarElongation(self):
         try:
             return self.getSun().separation(self.skyCoord())
-        except TypeError:
+        except (TypeError, AttributeError):
             return None
     
     def getLunarElongation(self):
         try:
             return self.getMoon().separation(self.skyCoord())
-        except TypeError:
+        except (TypeError, AttributeError):
             return None
 
     def getSunInfo(self):
@@ -453,12 +432,12 @@ class Sighting(models.Model):
     def save(self, *args, **kwargs):
         try:
             self.solarElongation = self.getSolarElongation().degree
-        except TypeError:
+        except (TypeError, AttributeError):
             self.solarElongation = None
         
         try:
             self.lunarElongation = self.getLunarElongation().degree
-        except TypeError:
+        except (TypeError, AttributeError):
             self.lunarElongation = None
         super(Sighting, self).save(*args, **kwargs)
 

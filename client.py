@@ -1,6 +1,7 @@
 import sys
 import os
 import datetime
+import random
 import requests
 import argparse
 import pytz
@@ -9,8 +10,17 @@ import numpy as np
 
 def main():
     args = getArgs()
-    data = makeData()
-    send('http://192.168.0.177:4805/meteors/receive', data, args.filename)
+    meteor = makeMeteor()
+    stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.4, random.choice([['AGO', 'ARB', 'KNM', 'VAZ'], ['HK', 'MK'], ['LP', 'TE'], ['PC', 'SP']])))
+
+    data = {
+        'meteor': meteor,
+        'sightings': {station: makeSighting(station) for station in stations},
+    }
+
+
+    response = send('http://192.168.0.177:4805/meteors/receive', meteor, args.filename)
+    print(response)
 
 def getArgs():
     parser = argparse.ArgumentParser(
@@ -19,15 +29,26 @@ def getArgs():
     parser.add_argument('filename', type = argparse.FileType('rb')) 
     return parser.parse_args()
 
-def send(url, data, image):
-    pp(url)
-    pp(data)
-    pp(image)
-    r = requests.post(url, data = data, files = {'file': ('image', image, 'image/png')})
-    print(r.text)
-    print(r.status_code)
+def printRequest(req):
+    print("HTTP/1.1 {method} {url}\n{headers}\n\n{body}".format(
+        method = req.method,
+        url = req.url,
+        headers = '\n'.join('{}: {}'.format(k, v) for k, v in req.headers.items()),
+        body = req.body,
+    ))
 
-def makeData():
+def send(url, data, image):
+    s = requests.Session()
+    r = requests.Request('POST', url, data = data, files = {'file': ('image', image, 'image/png')}, auth = ('amos', 'meteorujeme'))
+    prepared = r.prepare()
+    printRequest(prepared)
+
+    response = s.send(prepared)
+    print(response.status_code)
+    print(response.text)
+    print(response.headers['Location'])
+
+def makeMeteor():
     timestamp           = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
     velocityX           = np.random.normal(0, 20000)
     velocityY           = np.random.normal(0, 20000)
@@ -70,6 +91,46 @@ def makeData():
         'endTime'               : (beginningTime + datetime.timedelta(seconds = timeToEnd)).strftime("%Y-%m-%d %H:%M:%S.%f%z"),
 
         'magnitude'             : magnitude,
+    }
+
+def makeSighting(station):
+    timestamp           = datetime.datetime.now(tz = pytz.UTC) - datetime.timedelta(days = np.random.uniform(0, 1))
+
+    beginningAzimuth    = np.random.uniform(0, 360)
+    beginningAltitude   = np.degrees(np.arcsin(np.random.uniform(0, 1)))
+    beginningTime       = timestamp
+
+    daz                 = np.random.normal(0, 30)
+    dalt                = np.random.normal(0, 30)
+
+    timeToLightmax      = np.random.uniform(0.1, 0.5)
+    lightmaxAzimuth     = beginningAzimuth + daz * timeToLightmax
+    lightmaxAltitude    = beginningAltitude + dalt * timeToLightmax
+
+    timeToEnd           = np.random.uniform(0.6, 1)
+    endAzimuth          = beginningAzimuth + daz * timeToEnd
+    endAltitude         = beginningAltitude + dalt * timeToEnd
+    
+    angularSpeed        = np.random.normal(0, 30)
+    magnitude           = -2.5 * np.log(np.random.pareto(2) * 10) + 5
+
+    return {
+        'timestamp'             : timestamp.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
+        'beginningAzimuth'      : beginningAzimuth,
+        'beginningAltitude'     : beginningAltitude,
+        'beginningTime'         : beginningTime.strftime("%Y-%m-%d %H:%M:%S.%f%z"),
+
+        'lightmaxAzimuth'       : lightmaxAzimuth,
+        'lightmaxAltitude'      : lightmaxAltitude,
+        'lightmaxTime'          : (beginningTime + datetime.timedelta(seconds = timeToLightmax)).strftime("%Y-%m-%d %H:%M:%S.%f%z"),
+
+        'endAzimuth'            : endAzimuth,
+        'endAltitude'           : endAltitude,
+        'endTime'               : (beginningTime + datetime.timedelta(seconds = timeToEnd)).strftime("%Y-%m-%d %H:%M:%S.%f%z"),
+
+        'angularSpeed'          : angularSpeed,
+        'magnitude'             : magnitude,
+        'station'               : station,
     }
 
 main()

@@ -4,6 +4,5 @@ from django.shortcuts import render
 
 def account(request, username):
     context = {
-        'a': 'b',
     }
     return render(request, 'accounts/account.html', context)

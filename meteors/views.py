@@ -1,10 +1,12 @@
 import datetime
 import pytz
+import random
+import numpy as np
 from pprint import pprint as pp
 
 from django.shortcuts import render
 from django.core import serializers
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -16,7 +18,7 @@ from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon, get_sun
 
 from .models import Meteor, Sighting
-from stations.models import Station
+from stations.models import Station, Subnetwork
 
 def parseDatetime(string, default = datetime.datetime.now()):
     return parse_datetime(string) if string else default
@@ -90,7 +92,7 @@ def meteor(request, id):
 @login_required
 def meteorJSON(request, id):
     meteor = Meteor.objects.get(id = id)
-    data = serializers.serialize('json', meteor)
+    data = serializers.serialize('json', [meteor])
     return JsonResponse(data, safe = False)
 
 @login_required
@@ -132,39 +134,47 @@ class MeteorView(View):
         return HttpResponse('result')
 
     def post(self, request):
+        print('*' * 20 + "Incoming meteor" + '*' * 20)
         pp(request.POST)
-        print(request.FILES)
+        pp(request.FILES)
 
-        try:
-            meteor = Meteor.objects.createFromPost(
-                timestamp           = request.POST.get('timestamp'),
+        meteor = Meteor.objects.createFromPost(
+            timestamp           = request.POST.get('timestamp'),
 
-                beginningLatitude   = request.POST.get('beginningLatitude', None),
-                beginningLongitude  = request.POST.get('beginningLongitude', None),
-                beginningAltitude   = request.POST.get('beginningAltitude', None),
-                beginningTime       = request.POST.get('beginningTime', None),
-                
-                lightmaxLatitude    = request.POST.get('lightmaxLatitude', None),
-                lightmaxLongitude   = request.POST.get('lightmaxLongitude', None),
-                lightmaxAltitude    = request.POST.get('lightmaxAltitude', None),
-                lightmaxTime        = request.POST.get('lightmaxTime', None),
+            beginningLatitude   = request.POST.get('beginningLatitude', None),
+            beginningLongitude  = request.POST.get('beginningLongitude', None),
+            beginningAltitude   = request.POST.get('beginningAltitude', None),
+            beginningTime       = datetime.datetime.strptime(request.POST.get('beginningTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
+            
+            lightmaxLatitude    = request.POST.get('lightmaxLatitude', None),
+            lightmaxLongitude   = request.POST.get('lightmaxLongitude', None),
+            lightmaxAltitude    = request.POST.get('lightmaxAltitude', None),
+            lightmaxTime        = datetime.datetime.strptime(request.POST.get('lightmaxTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
 
-                endLatitude         = request.POST.get('endLatitude', None),
-                endLongitude        = request.POST.get('endLongitude', None),
-                endAltitude         = request.POST.get('endAltitude', None),
-                endTime             = request.POST.get('endTime', None),
+            endLatitude         = request.POST.get('endLatitude', None),
+            endLongitude        = request.POST.get('endLongitude', None),
+            endAltitude         = request.POST.get('endAltitude', None),
+            endTime             = datetime.datetime.strptime(request.POST.get('endTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
 
-                velocityX           = request.POST.get('velocityX', None),
-                velocityY           = request.POST.get('velocityY', None),
-                velocityZ           = request.POST.get('velocityZ', None),
+            velocityX           = request.POST.get('velocityX', None),
+            velocityY           = request.POST.get('velocityY', None),
+            velocityZ           = request.POST.get('velocityZ', None),
 
-                magnitude           = request.POST.get('magnitude', None),
-            )
-            meteor.save()
-            print("Meteor has been saved")
+            magnitude           = request.POST.get('magnitude', None),
+        )
+        meteor.save()
 
-        except Exception as e:
-            print(e)
-            return HttpResponse(e, status = 400)
+        subnetwork = random.choice(Subnetwork.objects.all())
+        stationsList = Station.objects.filter(subnetwork__id = subnetwork.id)
+        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.0, stationsList))
 
-        return HttpResponse('Meteor has been accepted', status = 201)
+        for station in stations:
+            Sighting.objects.createForMeteor(meteor, station)       
+
+
+        print("Meteor has been saved")
+
+
+        response = HttpResponse('Meteor has been accepted', status = 201)
+        response['Location'] = reverse('meteor', args = [meteor.id])
+        return response

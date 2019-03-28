@@ -38,6 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'django_celery_beat',
+    'rest_framework',
 ] + [
     'accounts',
     'core',
@@ -123,6 +124,7 @@ DATETIME_INPUT_FORMATS = [
     '%Y-%m-%d %H:%M:%S',
 ]
 DATE_FORMAT = 'Y-m-d'
+DATE_INPUT_FORMATS = ['%Y-%m-%d']
 
 TIME_ZONE = 'UTC'
 USE_I18N = False

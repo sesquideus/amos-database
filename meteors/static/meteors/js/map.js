@@ -21,7 +21,7 @@ createMeteorLayer = function(meteors) {
                 geometry: new ol.geom.Point(ol.proj.transform([meteor.longitude, meteor.latitude], 'EPSG:4326', 'EPSG:3857')),
                 style: new ol.style.Style({
                     image: new ol.style.Circle({
-                        radius: 5 - meteor.magnitude,
+                        radius: 5 - (meteor.magnitude / 5),
                     }),
                 }),
             })
