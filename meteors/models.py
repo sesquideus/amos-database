@@ -372,6 +372,12 @@ class Sighting(models.Model):
         except TypeError:
             return None
 
+    def airMass(self):
+        try:
+            return 1 / math.sin(math.radians(self.lightmaxAltitude))
+        except TypeError:
+            return None
+
     def previous(self):
         try:
             result = Sighting.objects.filter(lightmaxTime__lt = self.lightmaxTime).order_by('-lightmaxTime')[0:1].get().id

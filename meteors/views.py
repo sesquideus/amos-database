@@ -166,7 +166,7 @@ class MeteorView(View):
 
         subnetwork = random.choice(Subnetwork.objects.all())
         stationsList = Station.objects.filter(subnetwork__id = subnetwork.id)
-        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.0, stationsList))
+        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.4, stationsList))
 
         for station in stations:
             Sighting.objects.createForMeteor(meteor, station)       

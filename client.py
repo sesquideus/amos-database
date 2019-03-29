@@ -11,14 +11,6 @@ import numpy as np
 def main():
     args = getArgs()
     meteor = makeMeteor()
-    stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.4, random.choice([['AGO', 'ARB', 'KNM', 'VAZ'], ['HK', 'MK'], ['LP', 'TE'], ['PC', 'SP']])))
-
-    data = {
-        'meteor': meteor,
-        'sightings': {station: makeSighting(station) for station in stations},
-    }
-
-
     response = send('http://192.168.0.177:4805/meteors/receive', meteor, args.filename)
     print(response)
 

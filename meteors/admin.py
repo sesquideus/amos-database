@@ -58,6 +58,7 @@ class MeteorAdmin(admin.ModelAdmin):
         ),
     )
     inlines = [SightingInline]
+    date_hierarchy = 'timestamp'
     
     def sightingCount(self, obj):
         return obj.sightings.count()
@@ -109,4 +110,5 @@ class SightingAdmin(admin.ModelAdmin):
 
     list_display = ['lightmaxTime', 'meteor', 'station', 'magnitude', 'lightmaxAzimuth', 'lightmaxAltitude']
     list_filter = ['station']
+    date_hierarchy = 'lightmaxTime'
     save_as = True

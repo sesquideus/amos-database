@@ -1,6 +1,5 @@
 html {
     width: 100%;
-    min-height: 100%;
     padding: 0;
     margin: 0;
     font-family: "Roboto", sans-serif;
@@ -82,7 +81,6 @@ div.page h3 {
 div.page table {
     padding: 10px;
     border: 1px solid black;
-    float: left;
     margin-right: 10px;
     margin-bottom: 10px;
     min-width: 500px;

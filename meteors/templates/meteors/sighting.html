@@ -103,16 +103,20 @@
             <table>
                 <thead>
                     <tr>
-                        <th colspan="3" class="subgroup">photometry</th>
+                        <th colspan="2" class="subgroup">photometry</th>
                     </tr>
                 </thead>
                 <tr>
-                    <td colspan="2">apparent magnitude</td>
+                    <td>apparent magnitude</td>
                     <td class="r">{{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 </tr>
                 <tr>
-                    <td colspan="2">distance to meteor centre</td>
+                    <td>distance to meteor centre</td>
                     <td class="r">{{ sighting.distance|default:"&mdash;" }}</td>
+                </tr>
+                <tr>
+                    <td>air mass</td>
+                    <td class="r">{{ sighting.airMass|floatformat:2|default:"&mdash;" }}</td>
                 </tr>
             </table>
             <table>
@@ -149,6 +153,8 @@
                         <td class="r">{{ moon.elong.degree|floatformat:2|default:"&mdash; " }}°</td>
                     </tr>
                 </tbody>
+                <tfoot>
+                </tfoot>
             </table>
         </div>
         <div class="preview">
