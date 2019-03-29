@@ -21,6 +21,7 @@ django-celery-beat = "*"
 djangorestframework = "*"
 markdown = "*"
 astropy = "*"
+"flake8" = "*"
 
 [requires]
 python_version = "3.5"

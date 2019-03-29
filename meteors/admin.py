@@ -36,11 +36,6 @@ class MeteorAdmin(admin.ModelAdmin):
         }
     }
     fieldsets = (
-        ('Identity',
-            {
-                'fields': ['timestamp'],
-            }
-        ),
         ('Trajectory',
             {
                 'fields': (
@@ -58,13 +53,13 @@ class MeteorAdmin(admin.ModelAdmin):
         ),
     )
     inlines = [SightingInline]
-    date_hierarchy = 'timestamp'
+    date_hierarchy = 'lightmaxTime'
     
     def sightingCount(self, obj):
         return obj.sightings.count()
     sightingCount.short_description = 'sighting count'
     
-    list_display = ['timestamp', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
+    list_display = ['lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
     save_as = True
 
 

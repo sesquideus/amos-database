@@ -131,7 +131,7 @@ div.page .empty {
     text-align: center;
 }
 
-div.page form {
+div.page form.login {
     border: 1px solid grey;
     background-color: hsla(120, 0%, 95%, 1);
     padding: 30px;
@@ -141,8 +141,16 @@ div.page form label {
     font-size: 9pt;
 }
 
-div.page form input {
+div.page form.login input {
     font-size: 14pt;
+}
+
+div.page form.date {
+    display: inline;
+}
+
+div.page form.date p, div.page form.date input {
+    display: inline-block;
 }
 
 div.page .suninfo {

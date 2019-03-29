@@ -14,12 +14,15 @@
 {% endblock %}
 
 {% block page %}
-    <p>
-        Night of <abbr title="{{ timeFrom|date:"Y-m-d H:i:s" }} &ndash; {{ timeTo|date:"Y-m-d H:i:s" }}">{{ date|date:"Y-m-d" }}</abbr>
-        <a href="{% url 'listMeteors' %}?date={{ date|previousDay|date:"Y-m-d" }}">previous night</a>
-        <a href="{% url 'listMeteors' %}?date={{ currentDate|date:"Y-m-d" }}">last night</a>
-        <a href="{% url 'listMeteors' %}?date={{ date|nextDay|date:"Y-m-d" }}">next night</a>
-    </p>
+    <div class="navigation">
+        <a href="{% url 'listMeteors' %}?date={{ date|previousDay|date:"Y-m-d" }}">&lt;&lt;</a>
+        <form class="date" action="{% url 'listMeteors' %}" method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <input type="submit" value="submit">
+        </form>
+        <a href="{% url 'listMeteors' %}?date={{ date|nextDay|date:"Y-m-d" }}">&gt;&gt;</a>
+    </div>
     <h3>
         {{ meteors|length }} meteors
     </h3>
@@ -37,7 +40,7 @@
         </thead>
         {% for meteor in meteors %}
             <tr>
-                <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
+                <td><a href="{% url 'meteor' id=meteor.id %}">{{ meteor.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
                 <td class="r" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|stringformat:"+.2f" }}<sup>m</sup></td>
                 <td class="r">{{ meteor.lightmaxLatitude|latitude|default:"&mdash;" }}</td>
                 <td class="r">{{ meteor.lightmaxLongitude|longitude|default:"&mdash;" }}</td>

@@ -6,7 +6,7 @@ from pprint import pprint as pp
 
 from django.shortcuts import render
 from django.core import serializers
-from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.urls import reverse
 from django.views import View
 from django.contrib.auth.decorators import login_required
@@ -18,6 +18,7 @@ from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon, get_sun
 
 from .models import Meteor, Sighting
+from .forms import DateForm
 from stations.models import Station, Subnetwork
 
 def parseDatetime(string, default = datetime.datetime.now()):
@@ -44,14 +45,25 @@ class DateParser():
             'timeTo':       self.timeTo,
         }
 
-@login_required
-def listMeteors(request):
-    time = DateParser(request)   
-    context = {
-        'meteors': Meteor.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
-    }
-    context.update(time.context())
-    return render(request, 'meteors/list-meteors.html', context)
+
+@method_decorator(login_required, name = 'dispatch')
+class ListMeteorsView(View):
+    def get(self, request):
+        time = DateParser(request)   
+        context = {
+            'meteors': Meteor.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
+            'form': DateForm(initial = {'datetime': time.midnight}),
+        }
+        context.update(time.context())
+        return render(request, 'meteors/list-meteors.html', context)
+
+    def post(self, request):
+        form = DateForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(reverse('listMeteors') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+        else:
+            return HttpResponseBadRequest()
+
 
 @login_required
 def listMeteorsJSON(request):
@@ -61,33 +73,38 @@ def listMeteorsJSON(request):
 
     return JsonResponse(meteors)
 
-@login_required
-def listSightings(request):
-    time = DateParser(request)   
-    context = {
-        'sightings': Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
-        'navigation': reverse('listSightings')
-    }
-    context.update(time.context())
-    return render(request, 'meteors/list-sightings.html', context)
+@method_decorator(login_required, name = 'dispatch')
+class ListSightingsView(View):
+    def get(self, request):
+        time = DateParser(request)   
+        context = {
+            'sightings':    Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
+            'form':         DateForm(initial = {'datetime': time.midnight}),
+            'navigation':   reverse('listSightings')
+        }
+        context.update(time.context())
+        return render(request, 'meteors/list-sightings.html', context)
+
+    def post(self, request):
+        form = DateForm(request.POST)
+        if form.is_valid():
+            return HttpResponseRedirect(reverse('listSightings') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+        else:
+            return HttpResponseBadRequest()
+
 
 @login_required
 def listSightingsStation(request, stationCode):
     time = DateParser(request)   
     context = {
         'station': Station.objects.get(code = stationCode),
+        'form':         DateForm(initial = {'datetime': time.midnight}),
         'sightings': Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo, station__code = stationCode),
     }
     context.update(time.context())
     return render(request, 'meteors/list-sightings-station.html', context)
     
 
-@login_required
-def meteor(request, id):
-    context = {
-        'meteor': Meteor.objects.get(id = id)
-    }        
-    return render(request, 'meteors/meteor.html', context)
 
 @login_required
 def meteorJSON(request, id):
@@ -128,8 +145,16 @@ def createRandom(request):
 
 ### Currently this is unsafe!
 
-@method_decorator(csrf_exempt, name = 'dispatch')
+@method_decorator(login_required, name = 'dispatch')
 class MeteorView(View):
+    def get(self, request, id):
+        context = {
+            'meteor': Meteor.objects.get(id = id),
+        } 
+        return render(request, 'meteors/meteor.html', context)
+
+@method_decorator(csrf_exempt, name = 'dispatch')
+class MeteorAPIView(View):
     def get(self, request):
         return HttpResponse('result')
 
