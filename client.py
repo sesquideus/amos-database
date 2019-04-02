@@ -1,3 +1,5 @@
+### Temporary testing script to generate meteors for AMOS database. Not suitable for production!
+
 import sys
 import os
 import datetime

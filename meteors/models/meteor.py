@@ -150,10 +150,10 @@ class Meteor(models.Model):
 
     def asDict(self):
         return {
-            'latitude': self.lightmaxLatitude,
-            'longitude': self.lightmaxLongitude,
-            'altitude': self.lightmaxAltitude,
-            'magnitude': self.magnitude,
+            'latitude':     self.lightmaxLatitude,
+            'longitude':    self.lightmaxLongitude,
+            'altitude':     self.lightmaxAltitude,
+            'magnitude':    self.magnitude,
         }
 
     def earthLocation(self):
