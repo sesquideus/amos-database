@@ -15,8 +15,13 @@ import pytz
 import numpy as np
 
 class SightingManager(models.Manager):
+    
+    """
+        Reverse observation: create a sighting from a Meteor instance in the database.
+        Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
+    """
     def createForMeteor(self, meteor, station):
-        print("Creating for meteor {}, station {}".format(meteor, station))
+        print(f"Creating for meteor {meteor}, station {station}")
         sighting = self.create(
             beginningAzimuth    = np.random.uniform(0, 360),
             beginningAltitude   = np.degrees(np.arcsin(np.random.uniform(0, 1))),
@@ -135,23 +140,16 @@ class Sighting(models.Model):
                                     )
     
     def __str__(self):
-        return '{time} from {station}'.format(
-            time    = '<unknown time>' if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f"),
-            station = self.station,
-        )
+        return f"{self.timestamp()} from {self.station}"
+
+    def timestamp(self):
+        return "<unknown time>" if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
 
-    def colourText(self):
-        ex = int((self.magnitude - 5) * 30)
-        return '#{0:02X}{0:02X}{0:02X}'.format(min(64 + ex, 255))
-
     def imageFile(self):
-        return "M-{station}-{timestamp}P.jpg".format(
-            station     = self.station.code,
-            timestamp   = self.lightmaxTime.strftime("%Y-%m-%dT%H-%M-%S")
-        ) if self.lightmaxTime else None
+        return f"M-{self.station.code}-{self.lightmaxTime.strftime('%Y-%m-%dT%H-%M-%S')}P.jpg" if self.lightmaxTime else None
 
     def duration(self):
         return self.endTime - self.beginningTime if self.endTime != None and self.beginningTime != None else None

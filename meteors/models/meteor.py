@@ -47,6 +47,11 @@ class Meteor(models.Model):
                                         primary_key         = True,
                                         verbose_name        = "ID",
                                     )
+    name                            = models.CharField(
+                                        max_length          = 64,
+                                        blank               = False,
+                                        verbose_name        = "name",
+                                    )
 
     magnitude                       = models.FloatField(
                                         null                = True,
@@ -141,9 +146,7 @@ class Meteor(models.Model):
                                     )
 
     def __str__(self):
-        return "{time}".format(
-            time = self.lightmaxTime.strftime("%Y%m%d-%H%M%S-%f"),
-        )
+        return self.name
 
     def get_absolute_url(self):
         return reverse('meteor', kwargs = {'id': self.id})

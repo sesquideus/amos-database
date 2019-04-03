@@ -27,7 +27,7 @@
                 <th>timestamp</th>
                 <th>meteor</th>
                 <th>station</th>
-                <th>magnitude</th>
+                <th colspan="2">magnitude</th>
                 <th>elevation</th>
                 <th>azimuth</th>
                 <th>distance</th>
@@ -48,7 +48,10 @@
             <td class="c">
                 <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
             </td>
-            <td class="r" style="background-color: {{ sighting.colour }}; color: {{ sighting.colourText }}">
+            <td class="r">
+                <meter min="-10" max="10" value="{{ sighting.magnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
+            </td>
+            <td class="r">
                 {{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup>
             </td>
             <td class="r">
@@ -63,7 +66,7 @@
         </tr>
         {% empty %}
             <tr class="empty">
-                <td colspan="7">There are no recorded sightings in the database.</td>
+                <td colspan="8">There are no recorded sightings in the database.</td>
             </tr>
         {% endfor %}
     </table>
