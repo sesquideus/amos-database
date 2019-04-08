@@ -126,6 +126,26 @@ div.page table td a {
     text-decoration: none;
 }
 
+td {
+    white-space: nowrap;
+    width: auto;
+}
+
+td.timestamp {
+    width: 100px;
+}
+
+td.magnitude {
+    text-align: right;
+}
+
+td.magnitude:after {
+    font-size: 75%;
+    vertical-align: super;
+    content: "m";
+}
+
+
 div.page .empty {
     color: grey;
     text-align: center;

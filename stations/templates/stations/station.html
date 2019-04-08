@@ -32,10 +32,9 @@
             </tr>
             {% for sighting in lastDay %}
                 <tr>
-                    <td><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
-                    <td class="r">
-                        {{ sighting.magnitude|stringformat:"+.2f"|default_if_none:"&mdash;" }}<sup>m</sup>
-                    </td>
+                    <td class="timestamp"><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime }}</td>
+                    <td class="magnitude">
+                        {{ sighting.magnitude|stringformat:"+.2f"|default_if_none:"&mdash;" }}</td>
                 </tr>
             {% empty %}
                 <tr>
