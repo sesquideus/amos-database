@@ -12,7 +12,7 @@
 {% block pagetitle %}
     <h2>Meteor {{ meteor.timestamp|date:"Ymd-His" }}</h2>
     <div class="controls">
-        <a href="{% url 'meteor' id=meteor.previous %}">
+        <a href="{% url 'meteor' name=meteor.previous %}">
             <img src="{% static "pictures/previous.png" %}" alt="Previous" />
         </a>
         <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">
@@ -21,7 +21,7 @@
         <a href="{{ meteor.get_absolute_url }}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
-        <a href="{% url 'meteor' id=meteor.next %}">
+        <a href="{% url 'meteor' name=meteor.next %}">
             <img src="{% static "pictures/next.png" %}" alt="Next" />
         </a>
     </div>

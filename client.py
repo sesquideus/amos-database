@@ -1,4 +1,6 @@
+#!/home/kvik/virtualenvs/amos-Nzgqg3N0/bin/python
 ### Temporary testing script to generate meteors for AMOS database. Not suitable for production!
+
 
 import sys
 import os
@@ -13,7 +15,7 @@ import numpy as np
 def main():
     args = getArgs()
     meteor = makeMeteor()
-    response = send('http://192.168.248.145:4805/meteors/receive', meteor, args.filename)
+    response = send('http://192.168.0.177:4805/meteors/receive', meteor, args.filename)
     print(response)
 
 def getArgs():

@@ -12,7 +12,7 @@ urlpatterns = [
     path('sightings/<slug:stationCode>/',   views.listSightingsStation,         name = 'listSightingsStation'),
 
     # Single meteor views
-    path('meteor/<int:id>/',                views.MeteorView.as_view(),         name = 'meteor'),
+    path('meteor/<slug:name>/',             views.MeteorView.as_view(),         name = 'meteor'),
     path('meteor/<int:id>/json',            views.meteorJSON,                   name = 'meteorJSON'),
     path('meteor/<int:id>/path',            views.meteorKML,                    name = 'meteorKML'),
 

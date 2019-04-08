@@ -40,7 +40,7 @@
             </td>
             <td {% if not sighting.meteor %}class="empty"{% endif %}>
                 {% if sighting.meteor %}
-                    <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
+                    <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
                 {% else %}
                     (not identified)
                 {% endif %}

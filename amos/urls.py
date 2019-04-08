@@ -28,7 +28,7 @@ urlpatterns = [
 
     path('about/',      include(core.urls)),
     path('',            stations.views.status),
-    path('meteors/',    include(meteors.urls)),
+    path('',            include(meteors.urls)),
     path('stations/',   include(stations.urls)),
 
     path('accounts/',   include(accounts.urls)),

@@ -107,15 +107,15 @@ def listSightingsStation(request, stationCode):
 
 
 @login_required
-def meteorJSON(request, id):
-    meteor = Meteor.objects.get(id = id)
+def meteorJSON(request, name):
+    meteor = Meteor.objects.get(name = name)
     data = serializers.serialize('json', [meteor])
     return JsonResponse(data, safe = False)
 
 @login_required
-def meteorKML(request, id):
+def meteorKML(request, name):
     context = {
-        'meteor': Meteor.objects.get(id = id)
+        'meteor': Meteor.objects.get(name = name)
     }
     return render(request, 'meteors/meteor.kml', context)
 
@@ -147,9 +147,9 @@ def createRandom(request):
 
 @method_decorator(login_required, name = 'dispatch')
 class MeteorView(View):
-    def get(self, request, id):
+    def get(self, request, name):
         context = {
-            'meteor': Meteor.objects.get(id = id),
+            'meteor': Meteor.objects.get(name = name),
         } 
         return render(request, 'meteors/meteor.html', context)
 
@@ -159,7 +159,7 @@ class MeteorAPIView(View):
         return HttpResponse('result')
 
     def post(self, request):
-        print('*' * 20 + "Incoming meteor" + '*' * 20)
+        print('*' * 20 + " Incoming meteor " + '*' * 20)
         pp(request.POST)
         pp(request.FILES)
 
@@ -201,5 +201,5 @@ class MeteorAPIView(View):
 
 
         response = HttpResponse('Meteor has been accepted', status = 201)
-        response['Location'] = reverse('meteor', args = [meteor.id])
+        response['Location'] = reverse('meteor', args = [meteor.name])
         return response

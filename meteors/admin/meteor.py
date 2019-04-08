@@ -27,7 +27,7 @@ class MeteorAdmin(admin.ModelAdmin):
         ('Identity',
             {
                 'fields': (
-                    ('name'),
+                    ('name',),
                 ),
             },
         ),

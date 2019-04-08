@@ -49,7 +49,9 @@ class Meteor(models.Model):
                                     )
     name                            = models.CharField(
                                         max_length          = 64,
+                                        null                = False,
                                         blank               = False,
+                                        unique              = True,
                                         verbose_name        = "name",
                                     )
 
@@ -149,7 +151,7 @@ class Meteor(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('meteor', kwargs = {'id': self.id})
+        return reverse('meteor', kwargs = {'name': self.name})
 
     def asDict(self):
         return {
@@ -168,16 +170,16 @@ class Meteor(models.Model):
 
     def previous(self):
         try:
-            result = Meteor.objects.filter(lightmaxTime__lt = self.lightmaxTime).order_by('-lightmaxTime')[0:1].get().id
+            result = Meteor.objects.filter(lightmaxTime__lt = self.lightmaxTime).order_by('-lightmaxTime')[0:1].get().name
         except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('lightmaxTime').last().id
+            result = Meteor.objects.order_by('lightmaxTime').last().name
         return result
 
     def next(self):
         try:
-            result = Meteor.objects.filter(lightmaxTime__gt = self.lightmaxTime).order_by('lightmaxTime')[0:1].get().id
+            result = Meteor.objects.filter(lightmaxTime__gt = self.lightmaxTime).order_by('lightmaxTime')[0:1].get().name
         except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('lightmaxTime').first().id
+            result = Meteor.objects.order_by('lightmaxTime').first().name
         return result
 
     def speed(self):
@@ -185,5 +187,11 @@ class Meteor(models.Model):
             return np.sqrt(self.velocityX**2 + self.velocityY**2 + self.velocityZ**2)
         except TypeError:
             return None
+
+    def save(self, *args, **kwargs):
+        if self.name is None or self.name == "":
+            self.name = self.lightmaxTime.strftime('%Y%m%d-%H%M%S-%f')
+
+        super().save(*args, **kwargs)
 
     

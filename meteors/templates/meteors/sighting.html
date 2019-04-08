@@ -30,7 +30,7 @@
         </p>
         <p>
             {% if sighting.meteor.id %}
-                Meteor <a href="{% url 'meteor' id=sighting.meteor.id %}">{{ sighting.meteor }}</a>
+                Meteor <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
                 as seen from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default:"(unknown)" }}</a>
                 by <span id="observer-name">{{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }}</span>
                 at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
