@@ -99,14 +99,6 @@ td, th {
     vertical-align: middle;
 }
 
-td:first-child {
-    padding-left: 10px;
-}
-
-td:last-child {
-    padding-right: 10px;
-}
-
 th {
     font-size: 100%;
     background-color: hsla(180, 40%, 10%, 1);
@@ -143,7 +135,7 @@ td.duration:after {
 }
 
 td.time {
-    text-align: center;
+    text-align: right;
 }
 
 td.seen {
