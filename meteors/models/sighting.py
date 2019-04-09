@@ -13,6 +13,7 @@ import datetime
 import math
 import pytz
 import numpy as np
+from pprint import pprint as pp
 
 class SightingManager(models.Manager):
     
@@ -208,7 +209,6 @@ class Sighting(models.Model):
 
     def getSun(self):
         try:
-            print("AT" + self.coordAltAz())
             return get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         except TypeError:
             return None

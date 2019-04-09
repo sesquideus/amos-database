@@ -38,31 +38,23 @@
             <td id="{{ sighting.id }}-timestamp">
                 <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s" }}</a>
             </td>
-            <td {% if not sighting.meteor %}class="empty"{% endif %}>
+            <td class="data time {% if not sighting.meteor %} empty{% endif %}">
                 {% if sighting.meteor %}
                     <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
                 {% else %}
                     (not identified)
                 {% endif %}
             </td>
-            <td class="c">
+            <td class="data station">
                 <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
             </td>
             <td class="r">
                 <meter min="-10" max="10" value="{{ sighting.magnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
             </td>
-            <td class="r">
-                {{ sighting.magnitude|stringformat:"+.2f" }}<sup>m</sup>
-            </td>
-            <td class="r">
-                {{ sighting.lightmaxAltitude|angle|default:"&mdash;" }}
-                </td>
-            <td class="r">
-                {{ sighting.lightmaxAzimuth|angle|default:"&mdash;" }}
-            </td>
-            <td class="r">
-                {{ sighting.distance|distance|default:"&mdash; " }}
-            </td>
+            <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
+            <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>
+            <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}</td>
+            <td class="data length">{{ sighting.distance|distance|default:"&mdash; " }}</td>
         </tr>
         {% empty %}
             <tr class="empty">

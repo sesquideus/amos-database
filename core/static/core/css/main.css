@@ -64,57 +64,50 @@ div.page {
     height: 100%;
 }
 
-div.page span.bold {
-    font-weight: bold;
-}
-
-div.page h2 {
+h2 {
     font-size: 24pt;
+    padding-bottom: 10px;
 }
 
-div.page h3 {
+h3 {
     font-size: 18pt;
-    margin: 10px 0px;
+    margin-top: 20px;
+    margin-bottom: 10px;
     clear: both;
 }
 
-div.page table {
+table {
     padding: 10px;
     border: 1px solid black;
-    margin-right: 10px;
     margin-bottom: 10px;
-    min-width: 500px;
+    min-width: 540px;
     background-color: white;
 }
 
-div.page table .c {
-    text-align: center;
-}
-
-div.page table .r {
-    text-align: right;
-}
-
-div.page table tr {
-    padding: 0px 12px;
+tr {
+    padding: 5px 12px;
     border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
     border-collapse: collapse;
 }
 
-div.page table tr:last-child {
+tr:last-child {
     border-bottom: 1px solid black;
 }
 
-div.page table tr td, div.page table tr th {
-    padding: 7px 10px;
+td, th {
+    padding: 7px 7px;
     vertical-align: middle;
 }
 
-div.page table tr td {
-    border-collapse: collapse;
+td:first-child {
+    padding-left: 10px;
 }
 
-div.page table tr th {
+td:last-child {
+    padding-right: 10px;
+}
+
+th {
     font-size: 100%;
     background-color: hsla(180, 40%, 10%, 1);
     color: white;
@@ -127,24 +120,47 @@ div.page table td a {
 }
 
 td {
+    border-collapse: collapse;
     white-space: nowrap;
     width: auto;
+    vertical-align: baseline;
+}
+
+td.multihead {
+    vertical-align: middle;
+}
+
+td.data {
+    text-align: right; 
 }
 
 td.timestamp {
     width: 100px;
 }
 
-td.magnitude {
-    text-align: right;
+td.duration:after {
+    content: " s";
 }
 
-td.magnitude:after {
-    font-size: 75%;
-    vertical-align: super;
-    content: "m";
+td.time {
+    text-align: center;
 }
 
+td.seen {
+    text-align: center;
+}
+
+td.station {
+    text-align: center;
+}
+
+td.c {
+    text-align: center;
+}
+
+span.name {
+    font-weight: bold;
+}
 
 div.page .empty {
     color: grey;
@@ -183,7 +199,7 @@ div.page .suninfo.standalone {
 }
 
 div.page div.info {
-    width: 500px;
+    width: 560px;
     float: left;
 }
 
@@ -200,7 +216,7 @@ div.page div.preview {
 
 div.page div#map {
     width: 100%;
-    height: calc(100vh - 201px);
+    height: calc(100vh - 167px);
     background: repeating-linear-gradient(
         -45deg,
         hsl(0, 0%, 90%),

@@ -22,39 +22,39 @@
             {% for station in subnetwork.station_set.all %}
                 <tr>
                     {% if forloop.first %}
-                        <td rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.name }}</td>
+                        <td class="multihead" rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.name }}</td>
                     {% endif %}
-                    <td class="c">{{ station.code }}</td>
+                    <td class="station">{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
-                    <td class="c">unknown</td>
-                    <td id="{{ station.code }}-localtime" class="c">
+                    <td class="status">unknown</td>
+                    <td id="{{ station.code }}-localtime" class="time">
                         {% timezone station.timezone %}
                             <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
                         {% endtimezone %}
                     </td>
-                    <td id="{{ station.code }}-sunalt" class="r" style="color: {{ station.sunPosition.alt|altitudeColour }};">
+                    <td id="{{ station.code }}-sunalt" class="data" style="color: {{ station.sunPosition.alt|altitudeColour }};">
                         {{ station.sunPosition.alt|floatformat:1 }}°
                         <span class="suninfo" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
                     </td>
-                    <td id="{{ station.code }}-sunaz" class="r">
+                    <td id="{{ station.code }}-sunaz" class="data">
                         {{ station.sunPosition.az|floatformat:1 }}°
                         <span class="suninfo" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
                     </td>
-                    <td class="c">
+                    <td class="time">
                         {% if station.lastSighting %}
                             {{ station.lastSighting.lightmaxTime }}
                         {% else %}
                             <span class="empty">no sightings</span>
                         {% endif %}
                     </td>
-                    <td class="c">
+                    <td class="time">
                         {% if station.lastSighting %}
                             {{ station.lastSighting.lightmaxTime|timesince }}
                         {% else %}
                             <span class="empty">&mdash;</span>
                         {% endif %}
                     </td>
-                    <td class="c"><a href="{% url 'admin:stations_station_change' station.id %}">Edit</a></td>
+                    <td class="c"><a href="{% url 'admin:stations_station_change' station.id %}">edit</a></td>
                 </tr>
             {% empty %}
                 <tr>

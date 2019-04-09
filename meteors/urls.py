@@ -2,7 +2,7 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path('json',                            views.listMeteorsJSON,              name = 'listMeteorsJSON'),
+    path('meteors/json',                    views.listMeteorsJSON,              name = 'listMeteorsJSON'),
 
     # Meteor listings
     path('meteors/',                        views.ListMeteorsView.as_view(),    name = 'listMeteors'),

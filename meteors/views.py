@@ -21,11 +21,6 @@ from .models import Meteor, Sighting
 from .forms import DateForm
 from stations.models import Station, Subnetwork
 
-def parseDatetime(string, default = datetime.datetime.now()):
-    return parse_datetime(string) if string else default
-
-# Create your views here.
-
 class DateParser():
     def __init__(self, request):
         self.date       = parse_date(request.GET.get('date', datetime.date.today().isoformat()))
@@ -97,9 +92,13 @@ class ListSightingsView(View):
 def listSightingsStation(request, stationCode):
     time = DateParser(request)   
     context = {
-        'station': Station.objects.get(code = stationCode),
+        'station':      Station.objects.get(code = stationCode),
         'form':         DateForm(initial = {'datetime': time.midnight}),
-        'sightings': Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo, station__code = stationCode),
+        'sightings':    Sighting.objects.filter(
+                            lightmaxTime__gte = time.timeFrom,
+                            lightmaxTime__lte = time.timeTo,
+                            station__code = stationCode
+                        ),
     }
     context.update(time.context())
     return render(request, 'meteors/list-sightings-station.html', context)
@@ -122,9 +121,6 @@ def meteorKML(request, name):
 @login_required
 def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
-    loc = AltAz(obstime = Time(sighting.lightmaxTime), location = sighting.station.earthLocation())
-    moon = get_moon(Time(sighting.lightmaxTime), sighting.station.earthLocation()).transform_to(loc)
-    sun = get_sun(Time(sighting.lightmaxTime)).transform_to(loc)
     context = {
         'sighting': Sighting.objects.get(id = id),
         'moon': sighting.getMoonInfo(),

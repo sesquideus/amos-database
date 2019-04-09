@@ -3,6 +3,8 @@ import pytz
 from django import template
 from django.utils.safestring import mark_safe
 
+from meteors.templatetags.meteor_tags import mdash
+
 register = template.Library()
 
 def reduceAzimuth(azimuth: float, number: int):
@@ -27,6 +29,7 @@ def multiply(value: float, factor: float):
     return value * factor
 
 @register.filter
+@mdash
 def latitude(value: float):
     if value is None:
         return mark_safe("&mdash;")
