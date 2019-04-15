@@ -72,6 +72,11 @@ class SightingAdmin(admin.ModelAdmin):
                 'fields': ['magnitude', 'solarElongation', 'lunarElongation'],
             }
         ),
+        ('Images',
+            {
+                'fields': ['composite'],
+            }
+        ),
     )
     readonly_fields = ['solarElongation', 'lunarElongation']
 

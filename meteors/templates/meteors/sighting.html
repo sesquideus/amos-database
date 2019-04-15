@@ -158,9 +158,13 @@
             </table>
         </div>
         <div class="preview">
-            <a href="{% get_static_prefix %}data/{{ sighting.imageFile }}">
-                <img class="sighting" src="{% get_static_prefix %}data/{{ sighting.imageFile }}" alt="Image for sighting {{ sighting.id }} is missing" />
+            {% if sighting.composite %}
+            <a href="{{ sighting.composite.url }}">
+                <img class="sighting" src="{{ sighting.composite.url }}" alt="Image for sighting {{ sighting.id }} is missing" />
             </a>
+            {% else %}
+                <img class="sighting empty" src="{% static "no-image.png" %} "/>
+            {% endif %}
         </div>
     </div>
 

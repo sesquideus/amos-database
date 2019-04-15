@@ -27,7 +27,7 @@
                     <td class="station">{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
                     <td class="status">unknown</td>
-                    <td id="{{ station.code }}-localtime" class="time">
+                    <td id="{{ station.code }}-localtime" class="time c">
                         {% timezone station.timezone %}
                             <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
                         {% endtimezone %}

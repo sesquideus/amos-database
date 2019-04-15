@@ -21,7 +21,7 @@ class SightingManager(models.Manager):
         Reverse observation: create a sighting from a Meteor instance in the database.
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
     """
-    def createForMeteor(self, meteor, station):
+    def createForMeteor(self, meteor, station, **kwargs):
         print(f"Creating for meteor {meteor}, station {station}")
         sighting = self.create(
             beginningAzimuth    = np.random.uniform(0, 360),
@@ -41,13 +41,14 @@ class SightingManager(models.Manager):
 
             meteor              = meteor,
             station             = station,
+            composite           = kwargs.get(composite, None),
         )
 
 
 class Sighting(models.Model):
     class Meta:
         verbose_name                = "meteor sighting"
-        ordering                    = ['lightmaxTime']
+        ordering                    = ['lightmaxTime', 'station__code']
 
     objects                         = SightingManager()
 
@@ -108,7 +109,12 @@ class Sighting(models.Model):
                                         blank               = True,
                                         verbose_name        = "timestamp at end",
                                     )
-                                        
+
+    composite                       = models.ImageField(
+                                        upload_to           = 'sightings/',
+                                        null                = True,
+                                        blank               = True,
+                                    )
 
     angularSpeed                    = models.FloatField(
                                         null                = True,

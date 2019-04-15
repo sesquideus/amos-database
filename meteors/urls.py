@@ -20,6 +20,6 @@ urlpatterns = [
     path('sighting/<slug:id>',              views.sighting,                     name = 'sighting'),
 
 
-    path('create',                          views.createRandom,                 name = 'createRandom'),
-    path('receive',                         views.MeteorAPIView.as_view(),      name = 'receive'),
+    path('meteor/random',                   views.createRandom,                 name = 'createRandom'),
+    path('meteor/receive',                  views.MeteorAPIView.as_view(),      name = 'receive'),
 ]

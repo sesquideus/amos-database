@@ -15,7 +15,7 @@ import numpy as np
 def main():
     args = getArgs()
     meteor = makeMeteor()
-    response = send('http://192.168.0.177:4805/meteors/receive', meteor, args.filename)
+    response = send('http://192.168.0.177:4805/meteor/receive', meteor, args.filename)
     print(response)
 
 def getArgs():
