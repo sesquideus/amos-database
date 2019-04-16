@@ -130,10 +130,6 @@ td.timestamp {
     width: 100px;
 }
 
-td.duration:after {
-    content: " s";
-}
-
 td.time {
     text-align: right;
 }
@@ -220,5 +216,5 @@ div.page div#map {
 
 div.page img.sighting {
     float: right;
-    max-width: 80%;
+    width: 100%;
 }

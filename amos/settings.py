@@ -71,6 +71,8 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.mainMenu',
             ],
+            'debug': DEBUG,
+            'string_if_invalid': 'Invalid template variable: "%s"',
         },
     },
 ]

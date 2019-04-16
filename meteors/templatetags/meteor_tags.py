@@ -11,7 +11,7 @@ def mdash(func):
     @functools.wraps(func)
     def wrapper(arg):
         if arg is None:
-            return mark_safe("&mdash; ")
+            return mark_safe("&mdash;")
         else:
             return func(arg)
 
@@ -44,3 +44,7 @@ def angle(ang):
 @mdash
 def safetime(time):
     return time.strftime("%H:%M:%S.%f")
+
+@register.filter
+def nonedash(arg):
+    return mark_safe("&mdash;") if arg is None else arg

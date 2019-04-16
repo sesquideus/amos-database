@@ -26,7 +26,7 @@ def altitudeColour(altitude: float):
 
 @register.filter
 def multiply(value: float, factor: float):
-    return value * factor
+    return None if value is None else value * factor
 
 @register.filter
 @mdash

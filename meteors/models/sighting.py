@@ -79,18 +79,12 @@ class Sighting(models.Model):
                                     )
 
     lightmaxAltitude                = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
                                         verbose_name        = "altitude at max light",
                                     )
     lightmaxAzimuth                 = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
                                         verbose_name        = "azimuth at max light",
                                     )
     lightmaxTime                    = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
                                         verbose_name        = "timestamp at max light",
                                     )
 
@@ -159,7 +153,7 @@ class Sighting(models.Model):
         return f"M-{self.station.code}-{self.lightmaxTime.strftime('%Y-%m-%dT%H-%M-%S')}P.jpg" if self.lightmaxTime else None
 
     def duration(self):
-        return self.endTime - self.beginningTime if self.endTime != None and self.beginningTime != None else None
+        return (self.endTime - self.beginningTime).total_seconds() if self.endTime != None and self.beginningTime != None else None
 
     def distance(self):
         try:
@@ -214,12 +208,16 @@ class Sighting(models.Model):
         return AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
 
     def getSun(self):
+        if self.lightmaxTime is None:
+            return None
         try:
             return get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         except TypeError:
             return None
 
     def getMoon(self):
+        if self.lightmaxTime is None:
+            return None
         try:
             return get_moon(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
         except TypeError:
@@ -241,14 +239,14 @@ class Sighting(models.Model):
         sun = self.getSun()
         return {
             'coord': sun,
-            'elong': self.getSolarElongation(),
+            'elong': self.getSolarElongation().degree,
         }
 
     def getMoonInfo(self):
         moon = self.getMoon()
         return {
             'coord': moon,
-            'elong': self.getLunarElongation(),
+            'elong': self.getLunarElongation().degree,
         }
 
 
@@ -262,4 +260,4 @@ class Sighting(models.Model):
             self.lunarElongation = self.getLunarElongation().degree
         except (TypeError, AttributeError):
             self.lunarElongation = None
-        super(Sighting, self).save(*args, **kwargs)
+        super().save(*args, **kwargs)

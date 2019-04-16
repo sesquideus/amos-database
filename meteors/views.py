@@ -97,7 +97,7 @@ def listSightingsStation(request, stationCode):
         'sightings':    Sighting.objects.filter(
                             lightmaxTime__gte = time.timeFrom,
                             lightmaxTime__lte = time.timeTo,
-                            station__code = stationCode
+                            station__code = stationCode,
                         ),
     }
     context.update(time.context())
@@ -122,9 +122,9 @@ def meteorKML(request, name):
 def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
     context = {
-        'sighting': Sighting.objects.get(id = id),
-        'moon': sighting.getMoonInfo(),
-        'sun': sighting.getSunInfo(),
+        'sighting':     sighting,
+        'moon':         sighting.getMoonInfo(),
+        'sun':          sighting.getSunInfo(),
     }
     return render(request, 'meteors/sighting.html', context)
 

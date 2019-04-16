@@ -1,5 +1,6 @@
 from django.db import models
 from django.urls import reverse
+from django.core.validators import validate_slug, RegexValidator
 
 from astropy.coordinates import EarthLocation
 from astropy import units
@@ -53,6 +54,7 @@ class Meteor(models.Model):
                                         blank               = False,
                                         unique              = True,
                                         verbose_name        = "name",
+                                        validators          = [validate_slug],
                                     )
 
     magnitude                       = models.FloatField(

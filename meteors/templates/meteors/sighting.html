@@ -31,8 +31,14 @@
         <p>
             {% if sighting.meteor.id %}
                 Meteor <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
-                as seen from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default:"(unknown)" }}</a>
-                by <span id="observer-name">{{ sighting.observer.name|default:"<span class=\"unknown\">unknown observer</span>" }}</span>
+                observed from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
+                by <span id="observer-name">
+                    {% if sighting.observer is None %}
+                        <span class="unknown">unknown observer</span>
+                    {% else %}
+                        {{ sighting.observer.name }}
+                    {% endif %}
+                </span>
                 at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
@@ -67,7 +73,7 @@
                 <tr>
                     <td class="multihead" rowspan="3">max light</td>
                     <td>time</td>
-                    <td class="data time">{{ sighting.lightmaxTime|date:"H:i:s.u"|default:"&mdash;" }}</td>
+                    <td class="data time">{{ sighting.lightmaxTime|safetime }}</td>
                 </tr>
                 <tr>
                     <td>azimuth</td>
@@ -81,7 +87,7 @@
                 <tr>
                     <td class="multihead" rowspan="3">trail end</td>
                     <td>time</td>
-                    <td class="data time">{{ sighting.endTime|date:"H:i:s.u"|default:"&mdash;" }}</td>
+                    <td class="data time">{{ sighting.endTime|safetime }}</td>
                 </tr>
                 <tr>
                     <td>azimuth</td>
@@ -93,11 +99,11 @@
                 </tr>
                 <tr>
                     <td colspan="2">duration</td>
-                    <td class="data duration">{{ sighting.duration.total_seconds|floatformat:3|default:"&mdash; " }}</td>
+                    <td class="data duration">{{ sighting.duration|floatformat:3|default:"&mdash;" }} s</td>
                 </tr>
                 <tr>
                     <td colspan="2">arc length</td>
-                    <td class="data angle">{{ sighting.arcLength|floatformat:2|default:"&mdash; " }}</td>
+                    <td class="data angle">{{ sighting.arcLength|angle }}</td>
                 </tr>
             </table>
             <table>
@@ -112,7 +118,7 @@
                 </tr>
                 <tr>
                     <td>distance to meteor centre</td>
-                    <td class="data length">{{ sighting.distance|default:"&mdash;" }}</td>
+                    <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
                 </tr>
                 <tr>
                     <td>air mass</td>
@@ -137,7 +143,7 @@
                     </tr>
                     <tr>
                         <td>elongation</td>
-                        <td class="data angle">{{ sun.elong.degree|angle }}</td>
+                        <td class="data angle">{{ sun.elong|angle }}</td>
                     </tr>
                     <tr>
                         <td class="multihead" rowspan="3">Moon</td>
@@ -150,7 +156,7 @@
                     </tr>
                     <tr>
                         <td>elongation</td>
-                        <td class="data angle">{{ moon.elong.degree|angle }}</td>
+                        <td class="data angle">{{ moon.elong|angle }}</td>
                     </tr>
                 </tbody>
                 <tfoot>
@@ -163,7 +169,7 @@
                 <img class="sighting" src="{{ sighting.composite.url }}" alt="Image for sighting {{ sighting.id }} is missing" />
             </a>
             {% else %}
-                <img class="sighting empty" src="{% static "no-image.png" %} "/>
+                <img class="sighting empty" src="{% static "no-image.svg" %} "/>
             {% endif %}
         </div>
     </div>
