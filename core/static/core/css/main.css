@@ -218,3 +218,7 @@ div.page img.sighting {
     float: right;
     width: 100%;
 }
+
+img.sighting.empty {
+    opacity: 0.25;
+}

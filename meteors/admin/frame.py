@@ -1,0 +1,65 @@
+from django.contrib import admin
+from django.db import models
+from django.forms.widgets import NumberInput
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.utils.safestring import mark_safe
+
+from meteors.models import Frame
+from .widgets import MicrosecondDateTimeWidget
+
+
+@admin.register(Frame)
+class FrameAdmin(admin.ModelAdmin):
+    def sightingLink(self, frame):
+        if frame.sighting is None:
+            return mark_safe("&mdash;")
+        else:
+            return mark_safe('<a href="{url}">{title}</a>'.format(
+                url = reverse("admin:meteors_sighting_change", args = [frame.sighting.id]),
+                title = frame.sighting.id,
+            ))
+    sightingLink.short_description = "sighting"
+
+    formfield_overrides = {
+        models.DateTimeField: {
+            'widget': MicrosecondDateTimeWidget(
+                date_format = '%Y-%m-%d',
+                time_format = '%H:%M:%S.%f',
+            )
+        },
+        models.FloatField: {
+            'widget': NumberInput(attrs = {
+                'size': 10,
+            })
+        }
+    }
+ 
+    fieldsets = (
+        ('Identity',
+            {
+                'fields': ('sighting', 'order'),            
+            }
+        ),
+        ('Coordinates',
+            {
+                'fields': [
+                    ('timestamp'),
+                    ('x', 'y'),
+                    ('altitude', 'azimuth'),
+                ]
+            }
+        ),
+        ('Photometry',
+            {
+                'fields': ('magnitude',),
+            }
+        ),
+    )
+
+    list_display = ['__str__', 'sightingLink', 'order', 'magnitude', 'x', 'y', 'altitude', 'azimuth']
+    list_filter = ['sighting']
+    readonly_fields = ['id']
+#    date_hierarchy = 'lightmaxTime'
+    save_as = True
+

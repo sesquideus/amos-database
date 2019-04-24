@@ -41,7 +41,6 @@ class SightingManager(models.Manager):
 
             meteor              = meteor,
             station             = station,
-            composite           = kwargs.get(composite, None),
         )
 
 
