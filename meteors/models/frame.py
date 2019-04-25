@@ -1,6 +1,5 @@
 from django.db import models
 from django.db.models import UniqueConstraint, Index
-from .sighting import Sighting
 
 class Frame(models.Model):
     class Meta:
@@ -26,6 +25,7 @@ class Frame(models.Model):
     sighting                        = models.ForeignKey(
                                         'Sighting',
                                         on_delete           = models.CASCADE,
+                                        related_name        = 'frames',
                                     )
 
     order                           = models.PositiveSmallIntegerField()
@@ -57,3 +57,13 @@ class Frame(models.Model):
 
     def __str__(self):
         return f"Sighting {self.sighting.id}, frame {self.order}"
+
+    def flightTime(self):
+        return (self.timestamp - self.sighting.firstFrame().timestamp).total_seconds()
+
+    def airMass(self):
+        try:
+            return 1 / math.sin(math.radians(self.lightmaxAltitude))
+        except TypeError:
+            return None
+

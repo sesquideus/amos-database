@@ -108,7 +108,7 @@
                 </thead>
                 {% for sighting in meteor.sightings.all %}
                     <tr>
-                        <td>
+                        <td class="data seen">
                             <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.code }}</a>
                         </td>
                         <td class="data time">

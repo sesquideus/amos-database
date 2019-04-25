@@ -5,6 +5,7 @@ from django.urls import reverse
 from django.utils.safestring import mark_safe
 
 from meteors.models import Sighting
+from .frame import FrameInline
 from .widgets import MicrosecondDateTimeWidget
 
 
@@ -54,22 +55,15 @@ class SightingAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Identity',
             {
-                'fields': ('meteor', 'station'),            
-            }
-        ),
-        ('Observed trajectory',
-            {
-                'fields': [
-                    ('beginningTime', 'beginningAltitude', 'beginningAzimuth'),                    
-                    ('lightmaxTime', 'lightmaxAltitude', 'lightmaxAzimuth'),                    
-                    ('endTime', 'endAltitude', 'endAzimuth'),
-                    'angularSpeed',
-                ]
+                'fields': ('meteor', 'station', 'timestamp'),            
             }
         ),
         ('Photometry', 
             {
-                'fields': ['magnitude', 'solarElongation', 'lunarElongation'],
+                'fields': [
+                    ('magnitude', 'angularSpeed'),
+                    ('solarElongation', 'lunarElongation'),
+                ],
             }
         ),
         ('Images',
@@ -82,5 +76,6 @@ class SightingAdmin(admin.ModelAdmin):
 
     list_display = ['lightmaxTime', 'meteorLink', 'stationLink', 'magnitude', 'lightmaxAzimuth', 'lightmaxAltitude']
     list_filter = ['station']
-    date_hierarchy = 'lightmaxTime'
+    date_hierarchy = 'timestamp'
     save_as = True
+    inlines = [FrameInline]

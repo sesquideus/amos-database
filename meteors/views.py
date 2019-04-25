@@ -17,7 +17,7 @@ from django.utils.decorators import method_decorator
 from astropy.time import Time
 from astropy.coordinates import AltAz, get_moon, get_sun
 
-from .models import Meteor, Sighting
+from .models import Meteor, Sighting, Frame
 from .forms import DateForm
 from stations.models import Station, Subnetwork
 
@@ -129,6 +129,14 @@ def sighting(request, id):
     return render(request, 'meteors/sighting.html', context)
 
 @login_required
+def frame(request, sighting, order):
+    frame = Frame.objects.filter(sighting = sighting).get(order = order)
+    context = {
+        'frame':        frame,
+    }
+    return render(request, 'meteors/frame.html', context)
+
+@login_required
 def createRandom(request):
     meteor = Meteor.objects.createRandom()
     meteor.save()
@@ -137,7 +145,7 @@ def createRandom(request):
     stations = Station.objects.all()
     for station in stations:
         station.observe(meteor)
-    return HttpResponse(status = 200)
+    return HttpResponse(status = 201)
 
 ### Currently this is unsafe!
 

@@ -23,6 +23,7 @@ markdown = "*"
 astropy = "*"
 "flake8" = "*"
 pillow = "*"
+matplotlib = "*"
 
 [requires]
 python_version = "3.7"

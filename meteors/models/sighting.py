@@ -1,3 +1,9 @@
+import datetime
+import math
+import pytz
+import numpy as np
+from pprint import pprint as pp
+
 from django.db import models
 from django.db.models import Max, Min
 from django.contrib import admin
@@ -8,12 +14,7 @@ from astropy.time import Time
 from astropy import units
 
 import core.models
-
-import datetime
-import math
-import pytz
-import numpy as np
-from pprint import pprint as pp
+from .frame import Frame
 
 class SightingManager(models.Manager):
     
@@ -22,7 +23,7 @@ class SightingManager(models.Manager):
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
     """
     def createForMeteor(self, meteor, station, **kwargs):
-        print(f"Creating for meteor {meteor}, station {station}")
+        print(f"Creating a sighting for meteor {meteor}, station {station}")
         sighting = self.create(
             beginningAzimuth    = np.random.uniform(0, 360),
             beginningAltitude   = np.degrees(np.arcsin(np.random.uniform(0, 1))),
@@ -47,7 +48,7 @@ class SightingManager(models.Manager):
 class Sighting(models.Model):
     class Meta:
         verbose_name                = "meteor sighting"
-        ordering                    = ['lightmaxTime', 'station__code']
+        ordering                    = ['timestamp']
 
     objects                         = SightingManager()
 
@@ -55,54 +56,15 @@ class Sighting(models.Model):
                                         primary_key         = True,
                                         verbose_name        = "ID",
                                     )
+    timestamp                      = models.DateTimeField(
+                                        verbose_name        = "timestamp",
+                                    )
     magnitude                       = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "apparent magnitude",
                                     )
     
-    beginningAltitude               = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "altitude at beginning",
-                                    )
-    beginningAzimuth                = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "azimuth at beginning",
-                                    )
-    beginningTime                   = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "time of beginning",
-                                    )
-
-    lightmaxAltitude                = models.FloatField(
-                                        verbose_name        = "altitude at max light",
-                                    )
-    lightmaxAzimuth                 = models.FloatField(
-                                        verbose_name        = "azimuth at max light",
-                                    )
-    lightmaxTime                    = models.DateTimeField(
-                                        verbose_name        = "timestamp at max light",
-                                    )
-
-    endAltitude                     = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "altitude at end",
-                                    )
-    endAzimuth                      = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "azimuth at end",
-                                    )
-    endTime                         = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "timestamp at end",
-                                    )
-
     composite                       = models.ImageField(
                                         upload_to           = 'sightings/',
                                         null                = True,
@@ -140,19 +102,51 @@ class Sighting(models.Model):
                                     )
     
     def __str__(self):
-        return f"{self.timestamp()} from {self.station}"
-
-    def timestamp(self):
-        return "<unknown time>" if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
+        return f"{self.timestamp} from {self.station}"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
 
-    def imageFile(self):
-        return f"M-{self.station.code}-{self.lightmaxTime.strftime('%Y-%m-%dT%H-%M-%S')}P.jpg" if self.lightmaxTime else None
+
+    # frame shortcuts
+
+    def firstFrame(self):
+        return self.frames.earliest('timestamp')
+
+    def lightmaxFrame(self):
+        return self.frames.order_by('-magnitude').first()
+
+    def lastFrame(self):
+        return self.frames.latest('timestamp')
+
+    def lightmaxTime(self):
+        try:
+            return self.lightmaxFrame().timestamp
+        except AttributeError:
+            return None
+
+    def lightmaxAltitude(self):
+        try:
+            return self.lightmaxFrame().altitude
+        except AttributeError:
+            return None
+
+    def lightmaxAzimuth(self):
+        try:
+            return self.lightmaxFrame().azimuth
+        except AttributeError:
+            return None
+
+    # 
+    
+    #def timestamp(self):
+    #    return "<unknown time>" if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
 
     def duration(self):
-        return (self.endTime - self.beginningTime).total_seconds() if self.endTime != None and self.beginningTime != None else None
+        try:
+            return (self.firstFrame.timestamp - self.lastFrame.timestamp).total_seconds()
+        except AttributeError:
+            return None
 
     def distance(self):
         try:
@@ -165,60 +159,56 @@ class Sighting(models.Model):
     def skyCoord(self):
         try:
             return AltAz(
-                alt         = self.lightmaxAltitude * units.degree,
-                az          = self.lightmaxAzimuth * units.degree,
+                alt         = self.lightmaxFrame().altitude * units.degree,
+                az          = self.lightmaxFrame().azimuth * units.degree,
                 location    = self.station.earthLocation(),
-                obstime     = Time(self.lightmaxTime)
+                obstime     = Time(self.lightmaxFrame().timestamp)
             )
         except TypeError:
             return None
 
     def arcLength(self):
         try:
-            phi1 = math.radians(self.beginningAltitude)
-            phi2 = math.radians(self.endAltitude)
-            lambda1 = math.radians(self.beginningAzimuth)
-            lambda2 = math.radians(self.endAzimuth)
+            first = self.firstFrame()
+            last = self.lastFrame()
+            phi1 = math.radians(first.altitude)
+            phi2 = math.radians(last.altitude)
+            lambda1 = math.radians(first.azimuth)
+            lambda2 = math.radians(last.azimuth)
             return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
-        except TypeError:
-            return None
-
-    def airMass(self):
-        try:
-            return 1 / math.sin(math.radians(self.lightmaxAltitude))
         except TypeError:
             return None
 
     def previous(self):
         try:
-            result = Sighting.objects.filter(lightmaxTime__lt = self.lightmaxTime).order_by('-lightmaxTime')[0:1].get().id
+            result = Sighting.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').id
         except Sighting.DoesNotExist:
-            result = Sighting.objects.order_by('lightmaxTime').last().id
+            result = Sighting.objects.latest('timestamp').id
         return result
 
     def next(self):
         try:
-            result = Sighting.objects.filter(lightmaxTime__gt = self.lightmaxTime).order_by('lightmaxTime')[0:1].get().id
+            result = Sighting.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').id
         except Sighting.DoesNotExist:
-            result = Sighting.objects.order_by('lightmaxTime').first().id
+            result = Sighting.objects.earliest('timestamp').id
         return result
 
     def coordAltAz(self):
-        return AltAz(obstime = Time(self.lightmaxTime), location = self.station.earthLocation())
+        return AltAz(obstime = Time(self.lightmaxFrame().timestamp), location = self.station.earthLocation())
 
     def getSun(self):
-        if self.lightmaxTime is None:
+        if self.lightmaxFrame() is None:
             return None
         try:
-            return get_sun(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
+            return get_sun(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
         except TypeError:
             return None
 
     def getMoon(self):
-        if self.lightmaxTime is None:
+        if self.lightmaxFrame() is None:
             return None
         try:
-            return get_moon(Time(self.lightmaxTime)).transform_to(self.coordAltAz())
+            return get_moon(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
         except TypeError:
             return None
 
@@ -236,16 +226,20 @@ class Sighting(models.Model):
 
     def getSunInfo(self):
         sun = self.getSun()
+        elong = self.getSolarElongation()
+
         return {
             'coord': sun,
-            'elong': self.getSolarElongation().degree,
+            'elong': None if elong is None else elong.degree,
         }
 
     def getMoonInfo(self):
         moon = self.getMoon()
+        elong = self.getLunarElongation()
+
         return {
             'coord': moon,
-            'elong': self.getLunarElongation().degree,
+            'elong': None if elong is None else elong.degree,
         }
 
 

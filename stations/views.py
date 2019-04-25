@@ -20,7 +20,7 @@ def station(request, code):
 
     context = {
         'station': station,
-        'lastDay': station.sighting_set.filter(lightmaxTime__gte = datetime.datetime.now(pytz.utc) - datetime.timedelta(days = 1))
+        'lastDay': station.sighting_set.filter(timestamp__gte = datetime.datetime.now(pytz.utc) - datetime.timedelta(days = 1))
     }
     return render(request, 'stations/station.html', context)
 

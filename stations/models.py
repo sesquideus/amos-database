@@ -144,8 +144,7 @@ class Station(core.models.NamedModel):
 
     def lastSighting(self):
         try:
-            last = Sighting.objects.filter(station__id = self.id).latest('lightmaxTime')
-            return last
+            return Sighting.objects.filter(station__id = self.id).latest('timestamp')
         except ObjectDoesNotExist:
             return None
 

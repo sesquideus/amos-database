@@ -36,7 +36,7 @@
         {% for sighting in sightings %}
         <tr>
             <td id="{{ sighting.id }}-timestamp">
-                <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s" }}</a>
+                <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a>
             </td>
             <td class="data c {% if not sighting.meteor %} empty{% endif %}">
                 {% if sighting.meteor %}

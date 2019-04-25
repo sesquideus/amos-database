@@ -9,6 +9,14 @@ from meteors.models import Frame
 from .widgets import MicrosecondDateTimeWidget
 
 
+class FrameInline(admin.TabularInline):
+    model = Frame
+    show_change_link = True
+
+    fields = ['order', 'timestamp', 'magnitude', 'altitude', 'azimuth']
+    readonly_fields = ['order', 'timestamp', 'magnitude', 'altitude', 'azimuth']
+    
+
 @admin.register(Frame)
 class FrameAdmin(admin.ModelAdmin):
     def sightingLink(self, frame):
@@ -60,6 +68,4 @@ class FrameAdmin(admin.ModelAdmin):
     list_display = ['__str__', 'sightingLink', 'order', 'magnitude', 'x', 'y', 'altitude', 'azimuth']
     list_filter = ['sighting']
     readonly_fields = ['id']
-#    date_hierarchy = 'lightmaxTime'
     save_as = True
-
