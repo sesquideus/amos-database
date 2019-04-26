@@ -8,12 +8,14 @@ from django.db import models
 from django.db.models import Max, Min
 from django.contrib import admin
 from django.urls import reverse
+from django.utils.decorators import method_decorator
 
 from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
 from astropy.time import Time
 from astropy import units
 
 import core.models
+from core.models import noneIfError
 from .frame import Frame
 
 class SightingManager(models.Manager):
@@ -112,145 +114,130 @@ class Sighting(models.Model):
 
     def firstFrame(self):
         return self.frames.earliest('timestamp')
+    firstFrame.short_description = "first frame"
 
     def lightmaxFrame(self):
-        return self.frames.order_by('-magnitude').first()
+        return self.frames.order_by('magnitude').first()
+    lightmaxFrame.short_description = "brightest frame"
 
     def lastFrame(self):
         return self.frames.latest('timestamp')
+    lastFrame.short_description = "last frame"
 
+    def frameCount(self):
+        return self.frames.count()
+    frameCount.short_description = "frame count"
+
+    @method_decorator(noneIfError(AttributeError))
     def lightmaxTime(self):
-        try:
-            return self.lightmaxFrame().timestamp
-        except AttributeError:
-            return None
+        return self.lightmaxFrame().timestamp
+    lightmaxTime.short_description = "timestamp at light-max"
 
+    @method_decorator(noneIfError(AttributeError))
     def lightmaxAltitude(self):
-        try:
-            return self.lightmaxFrame().altitude
-        except AttributeError:
-            return None
+        r = self.lightmaxFrame().altitude
+        print("Fuck", r)
+        return r
+    lightmaxAltitude.short_description = "altitude at light-max"
 
+    @method_decorator(noneIfError(AttributeError))
     def lightmaxAzimuth(self):
-        try:
-            return self.lightmaxFrame().azimuth
-        except AttributeError:
-            return None
-
-    # 
-    
-    #def timestamp(self):
-    #    return "<unknown time>" if self.lightmaxTime is None else self.lightmaxTime.strftime("%Y-%m-%d %H:%M:%S.%f")
+        return self.lightmaxFrame().azimuth
+    lightmaxAzimuth.short_description = "azimuth at light-max"
 
     def duration(self):
         try:
-            return (self.firstFrame.timestamp - self.lastFrame.timestamp).total_seconds()
+            return (self.firstFrame().timestamp - self.lastFrame().timestamp).total_seconds()
         except AttributeError:
             return None
 
+    @method_decorator(noneIfError(AttributeError))
     def distance(self):
-        try:
-            obsLoc = self.station.earthLocation()
-            metLoc = self.meteor.earthLocation()
-            return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
-        except AttributeError:
-            return None
+        obsLoc = self.station.earthLocation()
+        metLoc = self.meteor.earthLocation()
+        return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
 
+    #@method_decorator(noneIfError(TypeError))
     def skyCoord(self):
-        try:
-            return AltAz(
-                alt         = self.lightmaxFrame().altitude * units.degree,
-                az          = self.lightmaxFrame().azimuth * units.degree,
-                location    = self.station.earthLocation(),
-                obstime     = Time(self.lightmaxFrame().timestamp)
-            )
-        except TypeError:
-            return None
+        print(self.station)
+        return AltAz(
+            alt         = self.lightmaxFrame().altitude * units.degree,
+            az          = self.lightmaxFrame().azimuth * units.degree,
+            location    = self.station.earthLocation(),
+            obstime     = Time(self.lightmaxFrame().timestamp)
+        )
 
     def arcLength(self):
-        try:
-            first = self.firstFrame()
-            last = self.lastFrame()
-            phi1 = math.radians(first.altitude)
-            phi2 = math.radians(last.altitude)
-            lambda1 = math.radians(first.azimuth)
-            lambda2 = math.radians(last.azimuth)
-            return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
-        except TypeError:
-            return None
+        first = self.firstFrame()
+        last = self.lastFrame()
+        phi1 = math.radians(first.altitude)
+        phi2 = math.radians(last.altitude)
+        lambda1 = math.radians(first.azimuth)
+        lambda2 = math.radians(last.azimuth)
+        return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
 
     def previous(self):
         try:
-            result = Sighting.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').id
+            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__lt = self.timestamp).latest('timestamp').id
         except Sighting.DoesNotExist:
-            result = Sighting.objects.latest('timestamp').id
-        return result
+            return Sighting.objects.latest('timestamp').id
 
     def next(self):
         try:
-            result = Sighting.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').id
+            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__lt = self.timestamp).earliest('timestamp').id
         except Sighting.DoesNotExist:
-            result = Sighting.objects.earliest('timestamp').id
-        return result
+            return Sighting.objects.earliest('timestamp').id
 
     def coordAltAz(self):
         return AltAz(obstime = Time(self.lightmaxFrame().timestamp), location = self.station.earthLocation())
 
     def getSun(self):
-        if self.lightmaxFrame() is None:
+        frame = self.lightmaxFrame()
+        if frame is None or frame.timestamp is None or self.coordAltAz is None:
             return None
-        try:
-            return get_sun(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
-        except TypeError:
-            return None
+
+        return get_sun(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
 
     def getMoon(self):
-        if self.lightmaxFrame() is None:
-            return None
-        try:
-            return get_moon(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
-        except TypeError:
+        frame = self.lightmaxFrame()
+        if frame is None or frame.timestamp is None or self.coordAltAz is None:
             return None
 
+        return get_moon(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
+
+    @method_decorator(noneIfError(AttributeError, TypeError))
     def getSolarElongation(self):
-        try:
-            return self.getSun().separation(self.skyCoord())
-        except (TypeError, AttributeError):
-            return None
+        return self.getSun().separation(self.skyCoord()).degree
     
+    @method_decorator(noneIfError(AttributeError, TypeError))
     def getLunarElongation(self):
-        try:
-            return self.getMoon().separation(self.skyCoord())
-        except (TypeError, AttributeError):
-            return None
+        return self.getMoon().separation(self.skyCoord()).degree
 
     def getSunInfo(self):
         sun = self.getSun()
         elong = self.getSolarElongation()
-
         return {
             'coord': sun,
-            'elong': None if elong is None else elong.degree,
+            'elong': elong,
         }
 
     def getMoonInfo(self):
         moon = self.getMoon()
         elong = self.getLunarElongation()
-
         return {
             'coord': moon,
-            'elong': None if elong is None else elong.degree,
+            'elong': elong,
         }
 
 
     def save(self, *args, **kwargs):
         try:
-            self.solarElongation = self.getSolarElongation().degree
+            self.solarElongation = self.getSolarElongation()
         except (TypeError, AttributeError):
             self.solarElongation = None
         
         try:
-            self.lunarElongation = self.getLunarElongation().degree
+            self.lunarElongation = self.getLunarElongation()
         except (TypeError, AttributeError):
             self.lunarElongation = None
         super().save(*args, **kwargs)

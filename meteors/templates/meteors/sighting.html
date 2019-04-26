@@ -31,18 +31,18 @@
         <p>
             {% if sighting.meteor.id %}
                 Meteor <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
-                observed from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
-                by <span id="observer-name">
-                    {% if sighting.observer is None %}
-                        <span class="unknown">unknown observer</span>
-                    {% else %}
-                        {{ sighting.observer.name }}
-                    {% endif %}
-                </span>
-                at <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
+            observed from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
+            by <span id="observer-name">
+                {% if sighting.observer is None %}
+                    <span class="unknown">unknown observer</span>
+                {% else %}
+                    {{ sighting.observer.name }}
+                {% endif %}
+            </span>
+            at <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
         </p>
     </div>
     
@@ -74,43 +74,28 @@
                     </tr>
                 </tbody>
             </table>
+
+            <h3>Sky info</h3>
             <table>
                 <thead>
-                    <tr>
-                        <th class="group" colspan="3">sky info</th>
-                    </tr>
-                </thead>
-                <tbody>
                     <tr>
                         <th class="subgroup">object</th>
                         <th class="subgroup">altitude</th>
                         <th class="subgroup">azimuth</th>
                         <th class="subgroup">elongation</th>
                     </tr>
+                </thead>
+                <tbody>
                     <tr>
-                        <td class="multihead" rowspan="3">Sun</td>
-                        <td>azimuth</td>
-                        <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elevation</td>
+                        <td>Sun</td>
                         <td class="data angle altitude">{{ sun.coord.alt.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elongation</td>
+                        <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
                         <td class="data angle">{{ sun.elong|angle }}</td>
                     </tr>
                     <tr>
-                        <td class="multihead" rowspan="3">Moon</td>
-                        <td>azimuth</td>
-                        <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elevation</td>
+                        <td>Moon</td>
                         <td class="data angle altitude">{{ moon.coord.alt.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elongation</td>
+                        <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
                         <td class="data angle">{{ moon.elong|angle }}</td>
                     </tr>
                 </tbody>
@@ -136,20 +121,12 @@
                                 {{ frame.order }}
                             </td>
                             <td class="data time">
-                                {{ frame.timestamp|date:"H:m:s.u" }}
+                                {{ frame.timestamp|date:"H:m:s.u"|default:"&mdash;" }}
                             </td>
-                            <td class="data time">
-                                {{ frame.flightTime|floatformat:3|default:"&mdash;" }}
-                            </td>
-                            <td class="data magnitude">
-                                {{ frame.magnitude|magnitude }}
-                            </td>
-                            <td class="data angle">
-                                {{ frame.altitude|angle }}
-                            </td>
-                            <td class="data angle">
-                                {{ frame.azimuth|angle }}
-                            </td>
+                            <td class="data time">{{ frame.flightTime|floatformat:3|default:"&mdash;" }} s</td>
+                            <td class="data magnitude">{{ frame.magnitude|magnitude }}</td>
+                            <td class="data angle">{{ frame.altitude|angle }}</td>
+                            <td class="data angle">{{ frame.azimuth|angle }}</td>
                         </tr>
                     {% empty %}
                         <tr class="empty">

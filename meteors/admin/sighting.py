@@ -74,7 +74,7 @@ class SightingAdmin(admin.ModelAdmin):
     )
     readonly_fields = ['solarElongation', 'lunarElongation']
 
-    list_display = ['lightmaxTime', 'meteorLink', 'stationLink', 'magnitude', 'lightmaxAzimuth', 'lightmaxAltitude']
+    list_display = ['timestamp', 'meteorLink', 'stationLink', 'magnitude', 'frameCount', 'lightmaxAzimuth', 'lightmaxAltitude']
     list_filter = ['station']
     date_hierarchy = 'timestamp'
     save_as = True

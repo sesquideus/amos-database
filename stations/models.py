@@ -160,12 +160,6 @@ class Station(core.models.NamedModel):
             altitude    = self.altitude,
         )
 
-    def observe(self, meteor):
-        (x, y, z) = self.earthLocation().to_geocentric()
-        (a, b, c) = meteor.earthLocation().to_geocentric()
-        diff = EarthLocation.from_geocentric()
-        print(difference)
-
 class LogEntry(models.Model):
     class Meta:
         verbose_name                = 'log entry'

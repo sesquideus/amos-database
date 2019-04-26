@@ -1,5 +1,8 @@
 from django.db import models
 from django.db.models import UniqueConstraint, Index
+from django.utils.decorators import method_decorator
+
+from core.models import noneIfError
 
 class Frame(models.Model):
     class Meta:
@@ -59,6 +62,9 @@ class Frame(models.Model):
         return f"Sighting {self.sighting.id}, frame {self.order}"
 
     def flightTime(self):
+        if self.timestamp is None or self.sighting.firstFrame().timestamp is None:
+            return None
+
         return (self.timestamp - self.sighting.firstFrame().timestamp).total_seconds()
 
     def airMass(self):
