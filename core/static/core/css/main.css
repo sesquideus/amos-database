@@ -94,6 +94,10 @@ tr:last-child {
     border-bottom: 1px solid black;
 }
 
+tr.maxLight {
+    font-weight: bold;
+}
+
 td, th {
     padding: 7px 7px;
     vertical-align: middle;

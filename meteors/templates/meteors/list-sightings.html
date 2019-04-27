@@ -5,6 +5,12 @@
 
 {% block pagetitle %}
     <h2>Sightings</h2>
+    <div class="controls">
+        <a href="{% url 'admin:app_list' 'meteors' %}">
+            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
+        </a>
+    </div>
+
 {% endblock pagetitle %}
 {% block page %}
     <div class="navigation">
@@ -51,7 +57,7 @@
             <td class="r">
                 <meter min="-10" max="10" value="{{ sighting.magnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
             </td>
-            <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
+            <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
             <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>
             <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}</td>
             <td class="data length">{{ sighting.distance|distance|default:"&mdash; " }}</td>

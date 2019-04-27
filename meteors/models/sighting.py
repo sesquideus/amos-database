@@ -16,7 +16,6 @@ from astropy import units
 
 import core.models
 from core.models import noneIfError
-from .frame import Frame
 
 class SightingManager(models.Manager):
     
@@ -58,13 +57,8 @@ class Sighting(models.Model):
                                         primary_key         = True,
                                         verbose_name        = "ID",
                                     )
-    timestamp                      = models.DateTimeField(
+    timestamp                       = models.DateTimeField(
                                         verbose_name        = "timestamp",
-                                    )
-    magnitude                       = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "apparent magnitude",
                                     )
     
     composite                       = models.ImageField(
@@ -134,10 +128,13 @@ class Sighting(models.Model):
     lightmaxTime.short_description = "timestamp at light-max"
 
     @method_decorator(noneIfError(AttributeError))
+    def lightmaxMagnitude(self):
+        return self.lightmaxFrame().magnitude
+    lightmaxMagnitude.short_description = "apparent magnitude"
+
+    @method_decorator(noneIfError(AttributeError))
     def lightmaxAltitude(self):
-        r = self.lightmaxFrame().altitude
-        print("Fuck", r)
-        return r
+        return self.lightmaxFrame().altitude
     lightmaxAltitude.short_description = "altitude at light-max"
 
     @method_decorator(noneIfError(AttributeError))
@@ -184,7 +181,7 @@ class Sighting(models.Model):
 
     def next(self):
         try:
-            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__lt = self.timestamp).earliest('timestamp').id
+            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__gt = self.timestamp).earliest('timestamp').id
         except Sighting.DoesNotExist:
             return Sighting.objects.earliest('timestamp').id
 

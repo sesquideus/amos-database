@@ -1,6 +1,7 @@
 from django.db import models
 from django.db.models import UniqueConstraint, Index
 from django.utils.decorators import method_decorator
+from django.urls import reverse
 
 from core.models import noneIfError
 
@@ -60,6 +61,23 @@ class Frame(models.Model):
 
     def __str__(self):
         return f"Sighting {self.sighting.id}, frame {self.order}"
+
+    def get_absolute_url(self):
+        return reverse('frame', kwargs = {'sighting': self.sighting.id, 'order': self.order})
+
+    def previous(self):
+        try:
+            return Frame.objects.filter(sighting__id = self.sighting.id).filter(timestamp__lt = self.timestamp).latest('timestamp').order
+        except Frame.DoesNotExist:
+            return None
+
+    def next(self):
+        try:
+            return Frame.objects.filter(sighting__id = self.sighting.id).filter(timestamp__gt = self.timestamp).earliest('timestamp').order
+        except Frame.DoesNotExist:
+            return None
+
+
 
     def flightTime(self):
         if self.timestamp is None or self.sighting.firstFrame().timestamp is None:

@@ -62,7 +62,7 @@
                     </tr>
                     <tr>
                         <td>apparent magnitude</td>
-                        <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
+                        <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
                     </tr>
                     <tr>
                         <td>distance to meteor centre</td>
@@ -106,7 +106,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th>order</th>
+                        <th>#</th>
                         <th>timestamp</th>
                         <th>time</th>
                         <th>magnitude</th>
@@ -116,8 +116,8 @@
                 </thead>
                 <tbody>
                     {% for frame in sighting.frames.all %}
-                        <tr>
-                            <td class="data">
+                        <tr {% if frame.order == maxLight %}class="maxLight"{% endif %}>
+                            <td class="data order">
                                 {{ frame.order }}
                             </td>
                             <td class="data time">

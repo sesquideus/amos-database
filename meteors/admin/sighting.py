@@ -13,8 +13,8 @@ class SightingInline(admin.TabularInline):
     model = Sighting
     show_change_link = True
 
-    fields = ['station', 'angularSpeed', 'magnitude', 'lightmaxAltitude', 'lightmaxAzimuth']
-    readonly_fields = ['station', 'angularSpeed', 'magnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'distance', 'arcLength']
+    fields = ['station', 'angularSpeed', 'lightmaxAltitude', 'lightmaxAzimuth']
+    readonly_fields = ['station', 'angularSpeed', 'lightmaxMagnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'distance', 'arcLength']
 
     
 @admin.register(Sighting)
@@ -58,11 +58,11 @@ class SightingAdmin(admin.ModelAdmin):
                 'fields': ('meteor', 'station', 'timestamp'),            
             }
         ),
-        ('Photometry', 
+        ('Sky info', 
             {
                 'fields': [
-                    ('magnitude', 'angularSpeed'),
-                    ('solarElongation', 'lunarElongation'),
+                    'solarElongation',
+                    'lunarElongation',
                 ],
             }
         ),
@@ -72,9 +72,9 @@ class SightingAdmin(admin.ModelAdmin):
             }
         ),
     )
-    readonly_fields = ['solarElongation', 'lunarElongation']
+    readonly_fields = ['lightmaxMagnitude', 'solarElongation', 'lunarElongation']
 
-    list_display = ['timestamp', 'meteorLink', 'stationLink', 'magnitude', 'frameCount', 'lightmaxAzimuth', 'lightmaxAltitude']
+    list_display = ['timestamp', 'meteorLink', 'stationLink', 'lightmaxMagnitude', 'frameCount', 'lightmaxAzimuth', 'lightmaxAltitude']
     list_filter = ['station']
     date_hierarchy = 'timestamp'
     save_as = True

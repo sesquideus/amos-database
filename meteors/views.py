@@ -73,7 +73,7 @@ class ListSightingsView(View):
     def get(self, request):
         time = DateParser(request)   
         context = {
-            'sightings':    Sighting.objects.filter(lightmaxTime__gte = time.timeFrom, lightmaxTime__lte = time.timeTo),
+            'sightings':    Sighting.objects.filter(timestamp__gte = time.timeFrom, timestamp__lte = time.timeTo),
             'form':         DateForm(initial = {'datetime': time.midnight}),
             'navigation':   reverse('listSightings')
         }
@@ -121,11 +121,14 @@ def meteorKML(request, name):
 @login_required
 def sighting(request, id):
     sighting = Sighting.objects.get(id = id)
+    maxLight = sighting.lightmaxFrame()
     context = {
         'sighting':     sighting,
         'moon':         sighting.getMoonInfo(),
         'sun':          sighting.getSunInfo(),
+        'maxLight':     maxLight.order if maxLight else None,
     }
+    print(context)
     return render(request, 'meteors/sighting.html', context)
 
 @login_required

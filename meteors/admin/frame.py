@@ -65,7 +65,7 @@ class FrameAdmin(admin.ModelAdmin):
         ),
     )
 
-    list_display = ['__str__', 'sightingLink', 'order', 'magnitude', 'x', 'y', 'altitude', 'azimuth']
+    list_display = ['__str__', 'sightingLink', 'order', 'timestamp', 'flightTime', 'magnitude', 'x', 'y', 'altitude', 'azimuth']
     list_filter = ['sighting']
     readonly_fields = ['id']
     save_as = True
