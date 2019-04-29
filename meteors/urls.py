@@ -1,14 +1,14 @@
 from django.urls import path
-from . import views
+from .views import meteor, sighting, frame
 
 urlpatterns = [
-    path('meteors/json',                            views.listMeteorsJSON,              name = 'listMeteorsJSON'),
+    path('meteors/json',                            meteor.listJSON,                    name = 'listMeteorsJSON'),
 
     # Meteor listings
-    path('meteors/',                                views.ListMeteorsView.as_view(),    name = 'listMeteors'),
+    path('meteors/',                                meteor.ListView.as_view(),          name = 'listMeteors'),
 
     # Sighting listings
-    path('sightings/',                              views.ListSightingsView.as_view(),  name = 'listSightings'),
+    path('sightings/',                              sighting.ListView.as_view(),        name = 'listSightings'),
     path('sightings/<slug:stationCode>/',           views.listSightingsStation,         name = 'listSightingsStation'),
 
     # Single meteor views
@@ -18,6 +18,7 @@ urlpatterns = [
 
     # Single sighting views
     path('sighting/<slug:id>/',                     views.sighting,                     name = 'sighting'),
+    path('sighting/<slug:id>/chart',                views.sightingChart,                name = 'sightingChart'),
     path('sighting/<slug:sighting>/<int:order>',    views.frame,                        name = 'frame'),
 
     # API views, to be tidied up

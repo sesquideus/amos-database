@@ -14,7 +14,7 @@ class FrameInline(admin.TabularInline):
     show_change_link = True
 
     fields = ['order', 'timestamp', 'magnitude', 'altitude', 'azimuth']
-    readonly_fields = ['order', 'timestamp', 'magnitude', 'altitude', 'azimuth']
+    #readonly_fields = ['order', 'timestamp', 'magnitude', 'altitude', 'azimuth']
     
 
 @admin.register(Frame)

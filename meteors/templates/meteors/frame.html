@@ -67,53 +67,17 @@
                 </thead>
 
                 <tr>
-                    <td class="multihead" rowspan="3">trail beginning</td>
-                    <td>time</td>
-                    <td class="data time">{{ sighting.beginningTime|safetime }}</td>
-                </tr>
-                <tr>
-                    <td>azimuth</td>
-                    <td class="data angle azimuth">{{ sighting.beginningAzimuth|angle }}</td>
-                </tr>
-                <tr>
-                    <td>elevation</td>
-                    <td class="data angle altitude">{{ sighting.beginningAltitude|angle }}</td>
-                </tr>
-                
-                <tr>
                     <td class="multihead" rowspan="3">max light</td>
-                    <td>time</td>
+                    <td>timestamp</td>
                     <td class="data time">{{ frame.timestamp|safetime }}</td>
                 </tr>
                 <tr>
                     <td>azimuth</td>
-                    <td class="data angle azimuth">{{ sighting.lightmaxAzimuth|angle }}</td>
+                    <td class="data angle azimuth">{{ frame.azimuth|angle }}</td>
                 </tr>
                 <tr>
-                    <td>elevation</td>
-                    <td class="data angle altitude">{{ sighting.lightmaxAltitude|angle }}</td>
-                </tr>
-
-                <tr>
-                    <td class="multihead" rowspan="3">trail end</td>
-                    <td>time</td>
-                    <td class="data time">{{ sighting.endTime|safetime }}</td>
-                </tr>
-                <tr>
-                    <td>azimuth</td>
-                    <td class="data angle azimuth">{{ sighting.endAzimuth|angle }}</td>
-                </tr>
-                <tr>
-                    <td>elevation</td>
-                    <td class="data angle altitude">{{ sighting.endAltitude|angle }}</td>
-                </tr>
-                <tr>
-                    <td colspan="2">duration</td>
-                    <td class="data duration">{{ sighting.duration|floatformat:3|default:"&mdash;" }} s</td>
-                </tr>
-                <tr>
-                    <td colspan="2">arc length</td>
-                    <td class="data angle">{{ sighting.arcLength|angle }}</td>
+                    <td>altitude</td>
+                    <td class="data angle altitude">{{ frame.altitude|angle }}</td>
                 </tr>
             </table>
             <table>

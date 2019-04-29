@@ -98,7 +98,7 @@ class Sighting(models.Model):
                                     )
     
     def __str__(self):
-        return f"{self.timestamp} from {self.station}"
+        return f"{self.id} ({self.timestamp} from {self.station})"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
