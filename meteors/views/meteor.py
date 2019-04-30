@@ -1,10 +1,16 @@
-from django.shortcuts import render
-
-from django.views import View
-from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
+from django.shortcuts import render
+from django.urls import reverse
+from django.utils.decorators import method_decorator
+from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from django.views.generic.detail import DetailView
 
+from core.utils import DateParser
+
+from meteors.models import Meteor
+from meteors.forms import DateForm
 
 
 @method_decorator(login_required, name = 'dispatch')
@@ -27,7 +33,7 @@ class ListView(View):
 
 
 @login_required
-def meteorKML(request, name):
+def singleKML(request, name):
     context = {
         'meteor': Meteor.objects.get(name = name)
     }
@@ -35,14 +41,14 @@ def meteorKML(request, name):
 
 
 @login_required
-def meteorJSON(request, name):
+def singleJSON(request, name):
     meteor = Meteor.objects.get(name = name)
     data = serializers.serialize('json', [meteor])
     return JsonResponse(data, safe = False)
 
 
 @login_required
-def listMeteorsJSON(request):
+def listJSON(request):
     meteors = {}
     for meteor in Meteor.objects.all():
         meteors[meteor.id] = meteor.asDict()
@@ -51,15 +57,20 @@ def listMeteorsJSON(request):
 
 
 @method_decorator(login_required, name = 'dispatch')
-class MeteorView(View):
-    def get(self, request, name):
-        context = {
-            'meteor': Meteor.objects.get(name = name),
-        } 
-        return render(request, 'meteors/meteor.html', context)
+class SingleView(DetailView):
+    model           = Meteor
+    slug_field      = 'name'
+    slug_url_kwarg  = 'name'
+    template_name   = 'meteors/meteor.html'
+
+#    def get_context_data(self, request, name):
+#        context = {
+#            'meteor': Meteor.objects.get(name = name),
+#        } 
+#        return render(request, 'meteors/meteor.html', context)
 
 @method_decorator(csrf_exempt, name = 'dispatch')
-class MeteorAPIView(View):
+class APIView(View):
     def get(self, request):
         return HttpResponse('result')
 
@@ -108,15 +119,6 @@ class MeteorAPIView(View):
         response = HttpResponse('Meteor has been accepted', status = 201)
         response['Location'] = reverse('meteor', args = [meteor.name])
         return response
-
-
-@method_decorator(login_required, name = 'dispatch')
-class MeteorView(View):
-    def get(self, request, name):
-        context = {
-            'meteor': Meteor.objects.get(name = name),
-        } 
-        return render(request, 'meteors/meteor.html', context)
 
 
 @method_decorator(csrf_exempt, name = 'dispatch')

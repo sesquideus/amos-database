@@ -150,6 +150,10 @@ td.c {
     text-align: center;
 }
 
+a.object-link {
+    font-weight: bold;
+}
+
 span.name {
     font-weight: bold;
 }

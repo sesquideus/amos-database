@@ -24,6 +24,7 @@ astropy = "*"
 "flake8" = "*"
 pillow = "*"
 matplotlib = "*"
+pygal = "*"
 
 [requires]
 python_version = "3.7"

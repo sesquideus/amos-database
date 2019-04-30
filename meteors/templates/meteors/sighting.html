@@ -30,11 +30,11 @@
         </p>
         <p>
             {% if sighting.meteor.id %}
-                Meteor <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
+                Meteor <a class="object-link meteor" href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
-            observed from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
+            observed from <a class="object-link station" href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
             by <span id="observer-name">
                 {% if sighting.observer is None %}
                     <span class="unknown">unknown observer</span>
@@ -67,10 +67,6 @@
                     <tr>
                         <td>distance to meteor centre</td>
                         <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
-                    </tr>
-                    <tr>
-                        <td>air mass</td>
-                        <td class="data airmass">{{ sighting.airMass|floatformat:2|default:"&mdash;" }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -144,6 +140,7 @@
             {% else %}
                 <img class="sighting empty" src="{% static "no-image.svg" %} "/>
             {% endif %}
+            <img src="{% url 'sightingChart' id=sighting.id %}" alt="Magnitude chart" />
         </div>
     </div>
 

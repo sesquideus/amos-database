@@ -154,9 +154,8 @@ class Sighting(models.Model):
         metLoc = self.meteor.earthLocation()
         return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
 
-    #@method_decorator(noneIfError(TypeError))
+    @method_decorator(noneIfError(AttributeError))
     def skyCoord(self):
-        print(self.station)
         return AltAz(
             alt         = self.lightmaxFrame().altitude * units.degree,
             az          = self.lightmaxFrame().azimuth * units.degree,
