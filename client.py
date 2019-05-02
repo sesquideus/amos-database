@@ -1,6 +1,4 @@
-#!/home/kvik/virtualenvs/amos-Nzgqg3N0/bin/python
 ### Temporary testing script to generate meteors for AMOS database. Not suitable for production!
-
 
 import sys
 import os
