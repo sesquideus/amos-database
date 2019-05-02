@@ -10,17 +10,17 @@
             <img src="{% static "pictures/edit.png" %}" alt="Edit" />
         </a>
     </div>
-
 {% endblock pagetitle %}
+
 {% block page %}
     <div class="navigation">
-        <a href="{% url 'listSightings' %}?date={{ date|previousDay|date:"Y-m-d" }}">&lt;&lt;</a>
-        <form class="date" action="{% url 'listSightings' %}" method="post">
+        <a href="{{ request.path }}?date={{ date|previousDay|date:"Y-m-d" }}">&lt;&lt;</a>
+        <form class="date" action="{{ request.path }}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="change">
         </form>
-        <a href="{% url 'listSightings' %}?date={{ date|nextDay|date:"Y-m-d" }}">&gt;&gt;</a>
+        <a href="{{ request.path }}?date={{ date|nextDay|date:"Y-m-d" }}">&gt;&gt;</a>
     </div>
     <h3>
         {% block stationName %}All stations{% endblock %}

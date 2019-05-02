@@ -15,13 +15,14 @@ import numpy as np
 def main():
     args = getArgs()
     meteor = makeMeteor()
-    response = send('http://127.0.0.1:4805/meteor/receive', meteor, args.filename)
+    response = send(f'http://{args.ip}:4805/meteor/receive', meteor, args.filename)
     print(response)
 
 def getArgs():
     parser = argparse.ArgumentParser(
         description = "AMOS HTTP POST request testbed",
     )
+    parser.add_argument('ip', type = str)
     parser.add_argument('filename', type = argparse.FileType('rb')) 
     return parser.parse_args()
 

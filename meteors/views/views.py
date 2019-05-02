@@ -1,11 +1,7 @@
 import datetime
-import io
 import pytz
 import random
 import numpy as np
-from matplotlib import pyplot as plt
-from matplotlib.figure import Figure
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from pprint import pprint as pp
 
 from django.core import serializers

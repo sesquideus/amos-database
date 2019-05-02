@@ -5,10 +5,10 @@ urlpatterns = [
     path('meteors/json',                            meteor.listJSON,                        name = 'listMeteorsJSON'),
 
     # Meteor listings
-    path('meteors/',                                meteor.ListView.as_view(),              name = 'listMeteors'),
+    path('meteors/',                                meteor.ListDateView.as_view(),          name = 'listMeteors'),
 
     # Sighting listings
-    path('sightings/',                              sighting.ListView.as_view(),            name = 'listSightings'),
+    path('sightings/',                              sighting.ListDateView.as_view(),        name = 'listSightings'),
     path('sightings/<slug:stationCode>/',           sighting.ListByStationView.as_view(),   name = 'listSightingsStation'),
 
     # Single meteor views

@@ -5,8 +5,6 @@ import numpy as np
 from pprint import pprint as pp
 
 from django.db import models
-from django.db.models import Max, Min
-from django.contrib import admin
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 
@@ -14,8 +12,8 @@ from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moo
 from astropy.time import Time
 from astropy import units
 
-import core.models
 from core.models import noneIfError
+from meteors.models import Frame
 
 class SightingManager(models.Manager):
     
@@ -26,24 +24,34 @@ class SightingManager(models.Manager):
     def createForMeteor(self, meteor, station, **kwargs):
         print(f"Creating a sighting for meteor {meteor}, station {station}")
         sighting = self.create(
-            beginningAzimuth    = np.random.uniform(0, 360),
-            beginningAltitude   = np.degrees(np.arcsin(np.random.uniform(0, 1))),
-            beginningTime       = meteor.beginningTime,
-
-            lightmaxAzimuth     = np.random.uniform(0, 360),
-            lightmaxAltitude    = np.degrees(np.arcsin(np.random.uniform(0, 1))),
-            lightmaxTime        = meteor.lightmaxTime,
-
-            endAzimuth          = np.random.uniform(0, 360),
-            endAltitude         = np.degrees(np.arcsin(np.random.uniform(0, 1))),
-            endTime             = meteor.endTime,
-            
+            timestamp           = meteor.timestamp,
             angularSpeed        = np.random.normal(0, 30),
-            magnitude           = -2.5 * np.log(np.random.pareto(2) * 10) + 5,
-
             meteor              = meteor,
             station             = station,
         )
+
+        time = meteor.timestamp
+        alt0 = np.degrees(np.arcsin(np.random.random()))
+        az0 = np.random.random() * 360.0
+        dalt = np.random.normal(0, 3)
+        daz = np.random.normal(0, 3)
+
+        mag = 6 - 3 * np.random.pareto(2.3) 
+        cnt = np.floor(np.random.pareto(1.3) + 5)
+
+        print(f"Adding {cnt} frames")
+        for x in np.arange(0, cnt):
+            mag = mag + np.random.random() if np.random.random() < x / cnt else mag - np.random.random()
+            frame = Frame.objects.create(
+                timestamp   = time + datetime.timedelta(seconds = x * 0.05),
+                sighting    = sighting,
+                order       = x,
+                x           = np.random.randint(0, 1600),
+                y           = np.random.randint(0, 1200),
+                altitude    = alt0 + x * dalt,
+                azimuth     = az0 + x * daz,
+                magnitude   = mag,
+            )
 
 
 class Sighting(models.Model):
@@ -122,24 +130,28 @@ class Sighting(models.Model):
         return self.frames.count()
     frameCount.short_description = "frame count"
 
-    @method_decorator(noneIfError(AttributeError))
     def lightmaxTime(self):
-        return self.lightmaxFrame().timestamp
+        if self.lightmaxFrame() is not None:
+            return self.lightmaxFrame().timestamp
+        return None
     lightmaxTime.short_description = "timestamp at light-max"
 
-    @method_decorator(noneIfError(AttributeError))
     def lightmaxMagnitude(self):
-        return self.lightmaxFrame().magnitude
+        if self.lightmaxFrame() is not None:
+            return self.lightmaxFrame().magnitude
+        return None
     lightmaxMagnitude.short_description = "apparent magnitude"
 
-    @method_decorator(noneIfError(AttributeError))
     def lightmaxAltitude(self):
-        return self.lightmaxFrame().altitude
+        if self.lightmaxFrame() is not None:
+            return self.lightmaxFrame().altitude
+        return None
     lightmaxAltitude.short_description = "altitude at light-max"
 
-    @method_decorator(noneIfError(AttributeError))
     def lightmaxAzimuth(self):
-        return self.lightmaxFrame().azimuth
+        if self.lightmaxFrame() is not None:
+            return self.lightmaxFrame().azimuth
+        return None
     lightmaxAzimuth.short_description = "azimuth at light-max"
 
     def duration(self):

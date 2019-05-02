@@ -19,10 +19,26 @@
         <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
 
     <h3>Sun</h3>
-        <span class="suninfo standalone" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
-        <span class="suninfo standalone" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg); color: {{ station.sunPosition.alt|altitudeColour }}">&#8594;</span>
-        <span class="suninfo standalone">{{ station.sunPosition.az|floatformat:1 }}°</span>
-        <span class="suninfo standalone" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
+        <table>
+            <tr>
+                <td>altitude</td>
+                <td class="data sun">
+                    <span class="suninfo standalone" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
+                </td>
+                <td class="data arrow">
+                    <span class="arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg); color: {{ station.sunPosition.alt|altitudeColour }}">&#8594;</span>
+                </td>
+            </tr>
+            <tr>
+                <td>azimuth</td>
+                <td class="data sun">
+                    <span>{{ station.sunPosition.az|floatformat:1 }}°</span>
+                </td>
+                <td class="data arrow">
+                    <span class="arrow" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
+                </td>
+            </tr>
+        </table>
 
     <h3>Sightings</h3>
         <table>

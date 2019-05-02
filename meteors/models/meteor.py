@@ -13,6 +13,7 @@ import numpy as np
 class MeteorManager(models.Manager):
     def createFromPost(self, **kwargs):
         meteor = self.create(
+            timestamp           = kwargs.get('timestamp', None),
             beginningLatitude   = kwargs.get('beginningLatitude', None),
             beginningLongitude  = kwargs.get('beginningLongitude', None),
             beginningAltitude   = kwargs.get('beginningAltitude', None),
@@ -55,6 +56,9 @@ class Meteor(models.Model):
                                         unique              = True,
                                         verbose_name        = "name",
                                         validators          = [validate_slug],
+                                    )
+    timestamp                       = models.DateTimeField(
+                                        verbose_name        = "timestamp",
                                     )
 
     magnitude                       = models.FloatField(
@@ -149,6 +153,7 @@ class Meteor(models.Model):
                                         verbose_name        = "geocentric velocity at infinity, z"
                                     )
 
+    
     def __str__(self):
         return self.name
 
@@ -172,16 +177,16 @@ class Meteor(models.Model):
 
     def previous(self):
         try:
-            result = Meteor.objects.filter(lightmaxTime__lt = self.lightmaxTime).order_by('-lightmaxTime')[0:1].get().name
+            result = Meteor.objects.filter(lightmaxTime__lt = self.lightmaxTime).earliest('timestamp').name
         except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('lightmaxTime').last().name
+            result = Meteor.objects.order_by('timestamp').last().name
         return result
 
     def next(self):
         try:
-            result = Meteor.objects.filter(lightmaxTime__gt = self.lightmaxTime).order_by('lightmaxTime')[0:1].get().name
+            result = Meteor.objects.filter(lightmaxTime__gt = self.lightmaxTime).latest('timestamp').name
         except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('lightmaxTime').first().name
+            result = Meteor.objects.order_by('timestamp').first().name
         return result
 
     def speed(self):

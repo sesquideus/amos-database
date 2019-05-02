@@ -40,7 +40,7 @@
         </thead>
         {% for meteor in meteors %}
             <tr>
-                <td><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.lightmaxTime|date:"Y-m-d H:i:s.u" }}</a></td>
+                <td><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
                 <td class="data magnitude" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|magnitude }}</td>
                 <td class="data angle">{{ meteor.lightmaxLatitude|latitude }}</td>
                 <td class="data angle">{{ meteor.lightmaxLongitude|longitude }}</td>

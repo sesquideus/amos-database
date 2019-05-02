@@ -5,6 +5,7 @@ from django.urls import reverse
 
 from core.models import noneIfError
 
+
 class Frame(models.Model):
     class Meta:
         verbose_name                = "sighting frame"
@@ -31,13 +32,8 @@ class Frame(models.Model):
                                         on_delete           = models.CASCADE,
                                         related_name        = 'frames',
                                     )
-
     order                           = models.PositiveSmallIntegerField()
-
-    timestamp                       = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                    )
+    timestamp                       = models.DateTimeField()
     x                               = models.SmallIntegerField(
                                         null                = True,
                                         blank               = True,

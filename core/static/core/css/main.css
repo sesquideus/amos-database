@@ -185,14 +185,19 @@ div.page form.date p, div.page form.date input {
     display: inline-block;
 }
 
-div.page .suninfo {
-    display: inline-block;
+span.sun {
     padding: 0 5px;
+    font-weight: bold;
 }
 
-div.page .suninfo.standalone {
-    font-size: 20pt;
+td.arrow {
+    width: 20px;
 }
+
+span.arrow {
+    display: inline-block;
+}
+
 
 div.page div.info {
     width: 560px;

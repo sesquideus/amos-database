@@ -17,10 +17,17 @@ def formatAzimuth(azimuth: float):
 
 
 @register.filter
-def altitudeColour(altitude: float):
+def altitudeColourFront(altitude: float):
+    return 'white' if altitude < 0 else 'black'
+
+
+@register.filter
+def altitudeColourBack(altitude: float):
     if altitude < 0:
-        return "hsl(240, 100%, {:.0f}%);".format(altitude * 100.0 / 180.0 + 50)
-    return "hsl({:.0f}, 100%, 48%);".format(30 + altitude * 30.0 / 90.0)
+        return f"hsl(240, 50%, {altitude * 100.0 / 180.0 + 50:.0f}%);"
+    if altitude < 45:
+        return f"hsl({30 + altitude * 30.0 / 45.0:.0f}, 100%, 70%);"
+    return f"hsl(60, 100%, {70 + 20 * (altitude - 45) / 45}%);" 
 
 
 @register.filter

@@ -7,6 +7,7 @@ def noneIfError(*exceptions):
     def protected(function):
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
+            #return function(*args, **kwargs)
             try:
                 return function(*args, **kwargs)
             except exceptions as e:
