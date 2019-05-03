@@ -24,7 +24,7 @@ def altitudeColourFront(altitude: float):
 @register.filter
 def altitudeColourBack(altitude: float):
     if altitude < 0:
-        return f"hsl(240, 50%, {altitude * 100.0 / 180.0 + 50:.0f}%);"
+        return f"hsl(240, 50%, {altitude * 5.0 / 9.0 + 50:.0f}%);"
     if altitude < 45:
         return f"hsl({30 + altitude * 30.0 / 45.0:.0f}, 100%, 70%);"
     return f"hsl(60, 100%, {70 + 20 * (altitude - 45) / 45}%);" 

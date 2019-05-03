@@ -1,13 +1,17 @@
+import datetime
+import pytz
+import numpy as np
+
 from django.db import models
 from django.urls import reverse
+from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_slug, RegexValidator
+from django.utils.decorators import method_decorator
 
 from astropy.coordinates import EarthLocation
 from astropy import units
 
-import datetime
-import pytz
-import numpy as np
+from core.models import noneIfError
 
 
 class MeteorManager(models.Manager):
@@ -175,19 +179,13 @@ class Meteor(models.Model):
             result = None
         return result
 
+    @method_decorator(noneIfError(ObjectDoesNotExist))
     def previous(self):
-        try:
-            result = Meteor.objects.filter(lightmaxTime__lt = self.lightmaxTime).earliest('timestamp').name
-        except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('timestamp').last().name
-        return result
+        result = Meteor.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').name
 
+    @method_decorator(noneIfError(ObjectDoesNotExist))
     def next(self):
-        try:
-            result = Meteor.objects.filter(lightmaxTime__gt = self.lightmaxTime).latest('timestamp').name
-        except Meteor.DoesNotExist:
-            result = Meteor.objects.order_by('timestamp').first().name
-        return result
+        result = Meteor.objects.filter(timestamp__gt = self.timestamp).latest('timestamp').name
 
     def speed(self):
         try:

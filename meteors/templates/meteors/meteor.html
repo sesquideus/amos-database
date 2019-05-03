@@ -12,18 +12,29 @@
 {% block pagetitle %}
     <h2>Meteor <span class="name">{{ meteor.name }}</span></h2>
     <div class="controls">
-        <a href="{% url 'meteor' name=meteor.previous %}">
-            <img src="{% static "pictures/previous.png" %}" alt="Previous" />
-        </a>
+        {% if meteor.previous != None %}
+            <a href="{% url 'meteor' id=meteor.previous %}">
+                <img src="{% static "pictures/previous.png" %}" alt="Previous" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first meteor" />
+        {% endif %}
+
         <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">
             <img src="{% static "pictures/edit.png" %}" alt="Edit" />
         </a>
+
         <a href="{{ meteor.get_absolute_url }}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
-        <a href="{% url 'meteor' name=meteor.next %}">
-            <img src="{% static "pictures/next.png" %}" alt="Next" />
-        </a>
+        
+        {% if meteor.next != None %}
+            <a href="{% url 'meteor' id=meteor.next %}">
+                <img src="{% static "pictures/next.png" %}" alt="Next" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
+        {% endif %}
     </div>
 {% endblock pagetitle %}
 
@@ -114,9 +125,9 @@
                         <td class="data time">
                             <a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"H:i:s.u" }}</a>
                         </td>
+                        <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
                         <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>
                         <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}</td>
-                        <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
                         <td class="data length">{{ sighting.distance }}</td>
                     </tr>
                 {% empty %}

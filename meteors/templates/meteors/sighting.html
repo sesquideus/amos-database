@@ -4,18 +4,29 @@
 {% block pagetitle %}
     <h2>Sighting {{ sighting.id }}</h2>
     <div class="controls">
-        <a href="{% url 'sighting' id=sighting.previous %}">
-            <img src="{% static "pictures/previous.png" %}" alt="Previous" />
-        </a>
+        {% if sighting.previous != None %}
+            <a href="{% url 'sighting' id=sighting.previous %}">
+                <img src="{% static "pictures/previous.png" %}" alt="Previous" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first sighting" />
+        {% endif %}
+
         <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
             <img src="{% static "pictures/edit.png" %}" alt="Edit" />
         </a>
+
         <a href="{% url 'sighting' id=sighting.id %}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
-        <a href="{% url 'sighting' id=sighting.next %}">
-            <img src="{% static "pictures/next.png" %}" alt="Next" />
-        </a>
+        
+        {% if sighting.next != None %}
+            <a href="{% url 'sighting' id=sighting.next %}">
+                <img src="{% static "pictures/next.png" %}" alt="Next" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
+        {% endif %}
     </div>
 {% endblock pagetitle %}
 
@@ -58,7 +69,7 @@
                 <tbody>
                     <tr>
                         <td>timestamp</td>
-                        <td class="data time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}
+                        <td class="data time ar">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}
                     </tr>
                     <tr>
                         <td>apparent magnitude</td>
@@ -131,6 +142,9 @@
                     {% endfor %}
                 </tbody>
             </table>
+            
+            <h3>Magnitude time series</h3>
+            <img class="chart" src="{% url 'sightingChart' id=sighting.id %}" alt="Magnitude chart" />
         </div>
         <div class="preview">
             {% if sighting.composite %}
@@ -140,7 +154,6 @@
             {% else %}
                 <img class="sighting empty" src="{% static "no-image.svg" %} "/>
             {% endif %}
-            <img src="{% url 'sightingChart' id=sighting.id %}" alt="Magnitude chart" />
         </div>
     </div>
 

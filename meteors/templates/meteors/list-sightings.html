@@ -27,7 +27,7 @@
     </h3>
 
     <p>{{ sightings|length }} recorded sighting{{ sightings|length|pluralize:",s" }}</p>
-    <table>
+    <table class="full-width">
         <thead>
             <tr>
                 <th>timestamp</th>
@@ -55,7 +55,7 @@
                 <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
             </td>
             <td class="r">
-                <meter min="-10" max="10" value="{{ sighting.magnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
+                <meter min="-10" max="10" value="{{ sighting.lightmaxMagnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
             </td>
             <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
             <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>

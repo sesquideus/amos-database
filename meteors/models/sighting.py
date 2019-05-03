@@ -5,6 +5,7 @@ import numpy as np
 from pprint import pprint as pp
 
 from django.db import models
+from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 
@@ -184,17 +185,13 @@ class Sighting(models.Model):
         lambda2 = math.radians(last.azimuth)
         return math.degrees(math.acos(math.sin(phi1) * math.sin(phi2) + math.cos(phi1) * math.cos(phi2) * math.cos(lambda1 - lambda2)))
 
+    @method_decorator(noneIfError(ObjectDoesNotExist))
     def previous(self):
-        try:
-            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__lt = self.timestamp).latest('timestamp').id
-        except Sighting.DoesNotExist:
-            return Sighting.objects.latest('timestamp').id
+        return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__lt = self.timestamp).latest('timestamp').id
 
+    @method_decorator(noneIfError(ObjectDoesNotExist))
     def next(self):
-        try:
-            return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__gt = self.timestamp).earliest('timestamp').id
-        except Sighting.DoesNotExist:
-            return Sighting.objects.earliest('timestamp').id
+        return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__gt = self.timestamp).earliest('timestamp').id
 
     def coordAltAz(self):
         return AltAz(obstime = Time(self.lightmaxFrame().timestamp), location = self.station.earthLocation())
@@ -215,10 +212,24 @@ class Sighting(models.Model):
 
     @method_decorator(noneIfError(AttributeError, TypeError))
     def getSolarElongation(self):
+        if self.solarElongation is None:
+            return self.computeSolarElongation()
+        else: 
+            return self.solarElongation
+        
+    @method_decorator(noneIfError(AttributeError, TypeError))
+    def computeSolarElongation(self):
         return self.getSun().separation(self.skyCoord()).degree
     
     @method_decorator(noneIfError(AttributeError, TypeError))
     def getLunarElongation(self):
+        if self.lunarElongation is None:
+            return self.computeLunarElongation()
+        else: 
+            return self.lunarElongation
+
+    @method_decorator(noneIfError(AttributeError, TypeError))
+    def computeLunarElongation(self):
         return self.getMoon().separation(self.skyCoord()).degree
 
     def getSunInfo(self):
@@ -239,13 +250,7 @@ class Sighting(models.Model):
 
 
     def save(self, *args, **kwargs):
-        try:
-            self.solarElongation = self.getSolarElongation()
-        except (TypeError, AttributeError):
-            self.solarElongation = None
-        
-        try:
-            self.lunarElongation = self.getLunarElongation()
-        except (TypeError, AttributeError):
-            self.lunarElongation = None
+        self.solarElongation = self.getSolarElongation()
+        self.lunarElongation = self.getLunarElongation()
+
         super().save(*args, **kwargs)

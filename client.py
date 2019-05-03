@@ -1,3 +1,4 @@
+#!/usr/bin/env python
 ### Temporary testing script to generate meteors for AMOS database. Not suitable for production!
 
 import sys

@@ -11,6 +11,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from matplotlib import pyplot
+from matplotlib import ticker
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
@@ -91,10 +92,11 @@ def chart(request, id):
     magnitudes = [frame.magnitude for frame in sighting.frames.all()]
 
     fig, ax = pyplot.subplots()
-    fig.tight_layout(rect = (0, 0.05, 1.03, 1))
-    fig.set_size_inches(8, 2)
+    fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
+    fig.set_size_inches(5.38, 1.5)
     ax.plot(timestamps, magnitudes, marker = '*')
     ax.invert_yaxis()
+    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
     canvas = FigureCanvasAgg(fig)
     buf = io.BytesIO()
     

@@ -84,6 +84,10 @@ table {
     background-color: white;
 }
 
+table.full-width {
+    width: 100%;
+}
+
 tr {
     padding: 5px 12px;
     border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
@@ -130,12 +134,16 @@ td.data {
     text-align: right; 
 }
 
+td.name {
+    text-align: center;
+}
+
 td.timestamp {
     width: 100px;
 }
 
 td.time {
-    text-align: right;
+    text-align: center;
 }
 
 td.seen {
@@ -143,6 +151,10 @@ td.seen {
 }
 
 td.station {
+    text-align: center;
+}
+
+td.status {
     text-align: center;
 }
 
@@ -234,4 +246,8 @@ div.page img.sighting {
 
 img.sighting.empty {
     opacity: 0.25;
+}
+
+img.chart {
+    border: 1px solid black;
 }

@@ -18,25 +18,35 @@
         <p id="location">{{ station.location }}</p>
         <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
 
-    <h3>Sun</h3>
+    <h3>Sky info</h3>
         <table>
+            <thead>
+                <tr>
+                    <th>object</th>
+                    <th colspan="2">altitude</th>
+                    <th colspan="2">azimuth</th>
+                    <th>magnitude</th>
+                </tr>
+            </thead>
             <tr>
-                <td>altitude</td>
-                <td class="data sun">
-                    <span class="suninfo standalone" style="color: {{ station.sunPosition.alt|altitudeColour }}">{{ station.sunPosition.alt|floatformat:1 }}°</span>
+                <td>Sun</td>
+                <td class="data sun" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }}">
+                    <span class="suninfo standalone">
+                        {{ station.sunPosition.alt|floatformat:1 }}°
+                    </span>
                 </td>
-                <td class="data arrow">
-                    <span class="arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg); color: {{ station.sunPosition.alt|altitudeColour }}">&#8594;</span>
+                <td class="data arrow" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }};">
+                    <span class="arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
                 </td>
-            </tr>
-            <tr>
-                <td>azimuth</td>
                 <td class="data sun">
                     <span>{{ station.sunPosition.az|floatformat:1 }}°</span>
                 </td>
                 <td class="data arrow">
                     <span class="arrow" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
                 </td>
+                <td class="data sun">
+                    -26.74
+                </Td>
             </tr>
         </table>
 

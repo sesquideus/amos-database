@@ -7,7 +7,7 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    <table>
+    <table class="full-width">
         <tr>
             <th>subnetwork</th>
             <th>code</th>
@@ -26,14 +26,14 @@
                     {% endif %}
                     <td class="station">{{ station.code }}</td>
                     <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
-                    <td class="status">unknown</td>
+                    <td class="data status">not implemented</td>
                     <td id="{{ station.code }}-localtime" class="time c">
                         {% timezone station.timezone %}
                             <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
                         {% endtimezone %}
                     </td>
                     <td id="{{ station.code }}-sunalt"
-                        class="data"
+                        class="data angle"
                         style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
                         {{ station.sunPosition.alt|floatformat:1 }}°
                         <span class="sun arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>

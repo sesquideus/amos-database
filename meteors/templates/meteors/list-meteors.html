@@ -26,9 +26,10 @@
     <h3>
         {{ meteors|length }} meteors
     </h3>
-    <table>
+    <table class="full-width">
         <thead>
             <tr>
+                <th>id</th>
                 <th>timestamp</th>
                 <th>magnitude</th>
                 <th>latitude</th>
@@ -40,7 +41,8 @@
         </thead>
         {% for meteor in meteors %}
             <tr>
-                <td><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</a></td>
+                <td class="data name"><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.name }}</a></td>
+                <td class="data time">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
                 <td class="data magnitude" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|magnitude }}</td>
                 <td class="data angle">{{ meteor.lightmaxLatitude|latitude }}</td>
                 <td class="data angle">{{ meteor.lightmaxLongitude|longitude }}</td>
@@ -56,7 +58,7 @@
             </tr>
         {% empty %}
             <tr>
-                <td class="empty" colspan="7">There are no recorded meteors in the database for this night.</td>
+                <td class="empty" colspan="8">There are no recorded meteors in the database for this night.</td>
             </tr>
         {% endfor %}
     </table>

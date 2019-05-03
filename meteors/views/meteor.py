@@ -90,9 +90,9 @@ class APIView(View):
         return HttpResponse('result')
 
     def post(self, request):
-        print('*' * 20 + " Incoming meteor " + '*' * 20)
-        pp(request.POST)
-        pp(request.FILES)
+        print(f"{'*' * 20} Incoming meteor {'*' * 20}")
+        #pp(request.POST)
+        #pp(request.FILES)
 
         meteor = Meteor.objects.createFromPost(
             timestamp           = datetime.datetime.strptime(request.POST.get('timestamp', None), '%Y-%m-%d %H:%M:%S.%f%z'),
@@ -122,9 +122,10 @@ class APIView(View):
 
         subnetwork = random.choice(Subnetwork.objects.all())
         stationsList = Station.objects.filter(subnetwork__id = subnetwork.id)
-        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.4, stationsList))
+        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.2, stationsList))
 
         for station in stations:
+            print(f"")
             Sighting.objects.createForMeteor(meteor, station)
 
         print("Meteor has been saved")
