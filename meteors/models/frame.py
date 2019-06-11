@@ -1,9 +1,7 @@
-from django.db import models
-from django.db.models import UniqueConstraint, Index
-from django.utils.decorators import method_decorator
-from django.urls import reverse
+import math
 
-from core.models import noneIfError
+from django.db import models
+from django.urls import reverse
 
 
 class Frame(models.Model):
@@ -11,7 +9,7 @@ class Frame(models.Model):
         verbose_name                = "sighting frame"
         ordering                    = ['sighting__id', 'order']
         constraints                 = [
-                                        UniqueConstraint(
+                                        models.UniqueConstraint(
                                             fields          = ['sighting', 'order'],
                                             name            = 'frameOrdering',
                                         )
@@ -73,8 +71,6 @@ class Frame(models.Model):
         except Frame.DoesNotExist:
             return None
 
-
-
     def flightTime(self):
         if self.timestamp is None or self.sighting.firstFrame().timestamp is None:
             return None
@@ -86,4 +82,3 @@ class Frame(models.Model):
             return 1 / math.sin(math.radians(self.lightmaxAltitude))
         except TypeError:
             return None
-

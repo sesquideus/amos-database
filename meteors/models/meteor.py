@@ -1,11 +1,9 @@
-import datetime
-import pytz
 import numpy as np
 
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.validators import validate_slug, RegexValidator
+from django.core.validators import validate_slug
 from django.utils.decorators import method_decorator
 
 from astropy.coordinates import EarthLocation
@@ -76,7 +74,7 @@ class Meteor(models.Model):
                                         blank               = True,
                                         verbose_name        = "meteor shower",
                                         on_delete           = models.SET_NULL,
-                                    )    
+                                    )
 
     beginningLatitude               = models.FloatField(
                                         null                = True,
@@ -92,13 +90,13 @@ class Meteor(models.Model):
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude of trail beginning",
-                                    )   
+                                    )
     beginningTime                   = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "timestamp of trail beginning",
                                     )
-    
+
     lightmaxLatitude                = models.FloatField(
                                         null                = True,
                                         blank               = True,
@@ -113,7 +111,7 @@ class Meteor(models.Model):
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude at max light",
-                                    )   
+                                    )
     lightmaxTime                    = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
@@ -134,7 +132,7 @@ class Meteor(models.Model):
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude of trail end",
-                                    )   
+                                    )
     endTime                         = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
@@ -157,7 +155,6 @@ class Meteor(models.Model):
                                         verbose_name        = "geocentric velocity at infinity, z"
                                     )
 
-    
     def __str__(self):
         return self.name
 
@@ -181,11 +178,11 @@ class Meteor(models.Model):
 
     @method_decorator(noneIfError(ObjectDoesNotExist))
     def previous(self):
-        result = Meteor.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').name
+        return Meteor.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').name
 
     @method_decorator(noneIfError(ObjectDoesNotExist))
     def next(self):
-        result = Meteor.objects.filter(timestamp__gt = self.timestamp).latest('timestamp').name
+        return Meteor.objects.filter(timestamp__gt = self.timestamp).latest('timestamp').name
 
     def speed(self):
         try:
@@ -198,5 +195,3 @@ class Meteor(models.Model):
             self.name = self.lightmaxTime.strftime('%Y%m%d-%H%M%S-%f')
 
         super().save(*args, **kwargs)
-
-    

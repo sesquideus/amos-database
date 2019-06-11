@@ -1,23 +1,21 @@
 import datetime
 import math
-import pytz
 import numpy as np
-from pprint import pprint as pp
 
 from django.db import models
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 
-from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
+from astropy.coordinates import AltAz, get_sun, get_moon
 from astropy.time import Time
 from astropy import units
 
 from core.models import noneIfError
 from meteors.models import Frame
 
+
 class SightingManager(models.Manager):
-    
     """
         Reverse observation: create a sighting from a Meteor instance in the database.
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
@@ -37,13 +35,13 @@ class SightingManager(models.Manager):
         dalt = np.random.normal(0, 3)
         daz = np.random.normal(0, 3)
 
-        mag = 6 - 3 * np.random.pareto(2.3) 
+        mag = 6 - 3 * np.random.pareto(2.3)
         cnt = np.floor(np.random.pareto(1.3) + 5)
 
         print(f"Adding {cnt} frames")
         for x in np.arange(0, cnt):
             mag = mag + np.random.random() if np.random.random() < x / cnt else mag - np.random.random()
-            frame = Frame.objects.create(
+            Frame.objects.create(
                 timestamp   = time + datetime.timedelta(seconds = x * 0.05),
                 sighting    = sighting,
                 order       = x,
@@ -69,7 +67,7 @@ class Sighting(models.Model):
     timestamp                       = models.DateTimeField(
                                         verbose_name        = "timestamp",
                                     )
-    
+
     composite                       = models.ImageField(
                                         upload_to           = 'sightings/',
                                         null                = True,
@@ -105,13 +103,12 @@ class Sighting(models.Model):
                                         blank               = True,
                                         verbose_name        = "lunar elongation",
                                     )
-    
+
     def __str__(self):
         return f"{self.id} ({self.timestamp} from {self.station})"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
-
 
     # frame shortcuts
 
@@ -214,18 +211,18 @@ class Sighting(models.Model):
     def getSolarElongation(self):
         if self.solarElongation is None:
             return self.computeSolarElongation()
-        else: 
+        else:
             return self.solarElongation
-        
+
     @method_decorator(noneIfError(AttributeError, TypeError))
     def computeSolarElongation(self):
         return self.getSun().separation(self.skyCoord()).degree
-    
+
     @method_decorator(noneIfError(AttributeError, TypeError))
     def getLunarElongation(self):
         if self.lunarElongation is None:
             return self.computeLunarElongation()
-        else: 
+        else:
             return self.lunarElongation
 
     @method_decorator(noneIfError(AttributeError, TypeError))
@@ -248,9 +245,7 @@ class Sighting(models.Model):
             'elong': elong,
         }
 
-
     def save(self, *args, **kwargs):
         self.solarElongation = self.getSolarElongation()
         self.lunarElongation = self.getLunarElongation()
-
         super().save(*args, **kwargs)
