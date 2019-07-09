@@ -43,9 +43,10 @@ class ListDateView(ListView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('listMeteors') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+            return HttpResponseRedirect(f"{reverse('listMeteors')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
         else:
             return HttpResponseBadRequest()
+
 
 @login_required
 def singleKML(request, name):
@@ -125,7 +126,6 @@ class APIView(View):
         stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.2, stationsList))
 
         for station in stations:
-            print(f"")
             Sighting.objects.createForMeteor(meteor, station)
 
         print("Meteor has been saved")

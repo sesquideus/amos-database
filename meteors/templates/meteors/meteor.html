@@ -13,7 +13,7 @@
     <h2>Meteor <span class="name">{{ meteor.name }}</span></h2>
     <div class="controls">
         {% if meteor.previous != None %}
-            <a href="{% url 'meteor' id=meteor.previous %}">
+            <a href="{% url 'meteor' name=meteor.previous %}">
                 <img src="{% static "pictures/previous.png" %}" alt="Previous" />
             </a>
         {% else %}
@@ -29,7 +29,7 @@
         </a>
         
         {% if meteor.next != None %}
-            <a href="{% url 'meteor' id=meteor.next %}">
+            <a href="{% url 'meteor' name=meteor.next %}">
                 <img src="{% static "pictures/next.png" %}" alt="Next" />
             </a>
         {% else %}

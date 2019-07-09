@@ -30,12 +30,12 @@
             </thead>
             <tr>
                 <td>Sun</td>
-                <td class="data sun" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }}">
+                <td class="data sun" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
                     <span class="suninfo standalone">
                         {{ station.sunPosition.alt|floatformat:1 }}°
                     </span>
                 </td>
-                <td class="data arrow" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }};">
+                <td class="data arrow" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
                     <span class="arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
                 </td>
                 <td class="data sun">

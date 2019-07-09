@@ -178,11 +178,11 @@ class Meteor(models.Model):
 
     @method_decorator(noneIfError(ObjectDoesNotExist))
     def previous(self):
-        return Meteor.objects.filter(timestamp__lt = self.timestamp).earliest('timestamp').name
+        return Meteor.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').name
 
     @method_decorator(noneIfError(ObjectDoesNotExist))
     def next(self):
-        return Meteor.objects.filter(timestamp__gt = self.timestamp).latest('timestamp').name
+        return Meteor.objects.filter(timestamp__gt = self.timestamp).earliest('timestamp').name
 
     def speed(self):
         try:
