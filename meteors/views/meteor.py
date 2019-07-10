@@ -79,11 +79,6 @@ class SingleView(DetailView):
     slug_url_kwarg  = 'name'
     template_name   = 'meteors/meteor.html'
 
-#    def get_context_data(self, request, name):
-#        context = {
-#            'meteor': Meteor.objects.get(name = name),
-#        } 
-#        return render(request, 'meteors/meteor.html', context)
 
 @method_decorator(csrf_exempt, name = 'dispatch')
 class APIView(View):

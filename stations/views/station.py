@@ -10,19 +10,22 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from . import models
+from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
+
+from stations.models import Station, Subnetwork
 
 # Create your views here.
 
 @login_required
 def status(request):
     context = {
-        'subnetworks': models.Subnetwork.objects.all(),
+        'subnetworks': Subnetwork.objects.all(),
     }
     return render(request, 'stations/status.html', context)
 
 def station(request, code):
-    station = models.Station.objects.get(code = code)
+    station = Station.objects.get(code = code)
 
     context = {
         'station': station,
@@ -31,7 +34,25 @@ def station(request, code):
     return render(request, 'stations/station.html', context)
 
 def stationsJSON(request):
-    return JsonResponse({station.id: station.asDict() for station in models.Station.objects.all()})
+    return JsonResponse({station.id: station.asDict() for station in Station.objects.all()})
+
+
+@method_decorator(login_required, name = 'dispatch')
+class SingleView(DetailView):
+    model           = Station
+    slug_field      = 'name'
+    slug_url_kwarg  = 'name'
+    template_name   = 'meteors/meteor.html'
+
+
+# This is not working right now
+@method_decorator(login_required, name = 'dispatch')
+class JSONView(DetailView):
+    model           = Station
+    slug_field      = 'name'
+    slug_url_kwargs = 'name',
+    template_name   = 'stations/abc.html'
+
 
 #@method_decorator(login_required, name = 'dispatch')
 @method_decorator(csrf_exempt, name = 'dispatch')

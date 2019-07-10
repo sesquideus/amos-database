@@ -29,7 +29,7 @@ urlpatterns = [
     path('api-auth/',   include('rest_framework.urls')),
 
     path('about/',      include(core.urls)),
-    path('',            stations.views.status),
+    path('',            stations.views.station.status),
     path('',            include(meteors.urls)),
     path('stations/',   include(stations.urls)),
 

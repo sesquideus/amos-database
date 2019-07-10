@@ -1,9 +1,11 @@
 from django.urls import include, path
-from . import views
+from .views import station, subnetwork
 
 urlpatterns = [
-    path('',                            views.status,               name = 'status'),
-    path('<slug:code>/',                views.station,              name = 'station'),
-    path('json',                        views.stationsJSON,         name = 'stationsJSON'),
-    path('status-update',               views.APIView.as_view(),    name = 'receive'),
+    path('',                            station.status,                 name = 'status'),
+    path('<slug:code>/',                station.SingleView.as_view(),   name = 'station'),
+    path('json',                        station.JSONView.as_view(),     name = 'stationJSON'),
+    path('status-update',               station.APIView.as_view(),      name = 'receive'),
+
+    path('subnetwork/<slug:code>',      subnetwork.SingleView.as_view(),    name = 'subnetwork'),
 ]
