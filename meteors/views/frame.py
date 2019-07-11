@@ -12,6 +12,7 @@ def single(request, sighting, order):
     frame = Frame.objects.filter(sighting = sighting).get(order = order)
     context = {
         'frame': frame,
+        'sighting': frame.sighting,
     }
     return render(request, 'meteors/frame.html', context)
 

@@ -21,6 +21,11 @@ from meteors.forms import DateForm
 from stations.models import Station, Subnetwork
 
 
+class JSONResponseMixin:
+    def render_to_json_response(self, context, **kwargs):
+        return JsonResponse(context, **kwargs)
+
+
 @method_decorator(login_required, name = 'dispatch')
 class ListDateView(ListView):
     template_name = 'meteors/list-meteors.html'

@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
-from .models import Country, Subnetwork, Station, LogEntry
+from .models import Country, Subnetwork, Station, LogEntry, StatusReport
 
 class StationInline(admin.TabularInline):
     model = Station
@@ -23,7 +23,7 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(Subnetwork)
 class SubnetworkAdmin(admin.ModelAdmin):
-    list_display = ['name', 'count']
+    list_display = ['name', 'code', 'count']
     inlines = [StationInline]
 
 @admin.register(Station)
@@ -47,3 +47,8 @@ class LogEntryAdmin(admin.ModelAdmin):
         return False
 
     readonly_fields = ['created', 'updated']
+
+@admin.register(StatusReport)
+class StatusReportAdmin(admin.ModelAdmin):
+   
+    readonly_fields = ['timestamp', 'received']

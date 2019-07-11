@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load tz %}
+{% load station_tags %}
+
+{% block pagetitle %}
+    <h2>Subnetwork <span class="bold">{{ subnetwork.name }}</span> (<span class="bold">{{ subnetwork.code }}</span>)</h2>
+    <div class="controls">
+        <a href="{% url 'admin:stations_subnetwork_change' subnetwork.id %}">
+            <img class="" src="{% static 'pictures/edit.png' %}" />
+        </a>
+    </div>
+{% endblock pagetitle %}
+
+{% block page %}
+    <h3>Subnetwork info</h3>
+        <p>Founded on {{ subnetwork.founded }}</p>
+
+    <h3>Stations</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>station</th>
+                    <th>latitude</th>
+                    <th>longitude</th>
+                    <th>altitude</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for station in subnetwork.station_set.all %}
+                    <tr>
+                        <td><a href="{{ station.get_absolute_url }}">{{ station.name }}</a></td>
+                        <td class="data">{{ station.latitude|latitude }}</td>
+                        <td class="data">{{ station.longitude|longitude }}</td>
+                        <td class="data">{{ station.altitude|floatformat:0 }} m</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td class="empty" colspan="4">There are no stations in this subnetwork.</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+{% endblock page %}
+

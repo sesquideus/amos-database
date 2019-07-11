@@ -12,44 +12,7 @@ from astropy import units
 
 import core.models
 from meteors.models import Sighting
-
-class Country(core.models.NamedModel):
-    class Meta:
-        verbose_name                = 'country'
-        verbose_name_plural         = 'countries'
-
-
-class Subnetwork(core.models.NamedModel):
-    class Meta:
-        verbose_name                = 'subnetwork'
-        ordering                    = ['id']
-  
-    code                            = models.CharField(
-                                        max_length          = 8,
-                                        unique              = True,
-                                        help_text           = "a simple unique code (2-4 uppercase letters)",
-                                    )  
-
-    founded                         = models.DateField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "founding date",
-                                        help_text           = "date when the subnetwork was founded",
-                                    ) 
-
-    def count(self):
-        return Station.objects.filter(subnetwork = self.id).count()
-    count.short_description = 'Station count'
-
-    def centre(self):
-        stations = self.station_set.all()
-        return {
-            'latitude':     sum([station.latitude for station in stations]),
-            'longitude':    sum([station.longitude for station in stations]),
-        }
-
-    def get_absolute_url(self):
-        return reverse('subnetwork', kwargs = {'code': self.code})
+from .country import Country
 
 
 class Station(core.models.NamedModel):
@@ -168,34 +131,4 @@ class Station(core.models.NamedModel):
             longitude   = self.longitude,
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
-        )
-
-class LogEntry(models.Model):
-    class Meta:
-        verbose_name                = 'log entry'
-        verbose_name_plural         = 'log entries'
-        ordering                    = ['created']
-
-    station                         = models.ForeignKey(
-                                        'Station',
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "station",
-                                        help_text           = "the station in question",
-                                        on_delete           = models.CASCADE,
-                                    )
-    text                            = models.TextField(
-                                        help_text           = "text of the log entry",
-                                    )
-    created                         = models.DateTimeField(
-                                        auto_now_add        = True,
-                                    )
-    updated                         = models.DateTimeField(
-                                        auto_now            = True,
-                                    )
-
-    def __str__(self):
-        return "[{}] {}".format(
-            self.created.strftime('%Y-%m-%d %H:%M:%S'),
-            textwrap.shorten(self.text, 50, placeholder = '...'),
         )

@@ -3,29 +3,34 @@
 {% load tz %}
 
 {% block pagetitle %}
-<h2>Network status</h2>
+<h2>AMOS network status</h2>
 {% endblock pagetitle %}
 
 {% block page %}
     <table class="full-width">
-        <tr>
-            <th>subnetwork</th>
-            <th>code</th>
-            <th>name</th>
-            <th>status</th>
-            <th>local time</th>
-            <th colspan="2">&#x2600;</th>
-            <th colspan="2">last sighting</th>
-            <th>admin</th>
-        </tr>
+        <thead>
+            <tr>
+                <th colspan="2">subnetwork</th>
+                <th>code</th>
+                <th>name</th>
+                <th>status</th>
+                <th>local time</th>
+                <th colspan="2">&#x2600;</th>
+                <th colspan="2">last sighting</th>
+                <th>admin</th>
+            </tr>
+        </thead>
         {% for subnetwork in subnetworks %}
             {% for station in subnetwork.station_set.all %}
                 <tr>
                     {% if forloop.first %}
-                        <td class="multihead" rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.name }}</td>
+                        <td class="multihead station" rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.code }}</td>
+                        <td class="multihead" rowspan="{{ subnetwork.station_set.all|length }}">
+                            <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }}</a>
+                        </td>
                     {% endif %}
                     <td class="station">{{ station.code }}</td>
-                    <td><a href="{% url 'station' code=station.code %}">{{ station.name }}</a></td>
+                    <td><a href="{{ station.get_absolute_url }}">{{ station.name }}</a></td>
                     <td class="data status">not implemented</td>
                     <td id="{{ station.code }}-localtime" class="time c">
                         {% timezone station.timezone %}
@@ -60,8 +65,11 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td>{{ subnetwork.name }}</td>
-                    <td colspan="9" class="empty">No stations are defined in this subnetwork.</td>
+                    <td class="station">{{ subnetwork.code }}</td>
+                    <td>
+                        <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }}</a>
+                    </td>
+                    <td colspan="10" class="empty">No stations are defined in this subnetwork.</td>
                 </tr>
             {% endfor %}
         {% endfor %}

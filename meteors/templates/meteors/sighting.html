@@ -143,8 +143,8 @@
                 </tbody>
             </table>
             
-            <h3>Magnitude time series</h3>
-            <img class="chart" src="{% url 'sightingChart' id=sighting.id %}" alt="Magnitude chart" />
+            <h3>Light curve</h3>
+            <img class="chart" src="{% url 'sightingLightCurve' id=sighting.id %}" alt="Light curve" />
         </div>
         <div class="preview">
             {% if sighting.composite %}

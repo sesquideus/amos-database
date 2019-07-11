@@ -29,9 +29,8 @@ urlpatterns = [
     path('api-auth/',   include('rest_framework.urls')),
 
     path('about/',      include(core.urls)),
-    path('',            stations.views.station.status),
     path('',            include(meteors.urls)),
-    path('stations/',   include(stations.urls)),
+    path('',            include(stations.urls)),
 
     path('accounts/',   include(accounts.urls)),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)          # THIS IS FOR DEVELOPMENT ONLY

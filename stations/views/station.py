@@ -10,12 +10,20 @@ from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth.decorators import login_required
 
-from django.views.generic.detail import DetailView
+from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
 from stations.models import Station, Subnetwork
 
 # Create your views here.
+
+class JSONResponseMixin:
+    def render_to_json_response(self, context, **kwargs):
+        return JsonResponse(context, **kwargs)
+
+class JSONDetailView(JSONResponseMixin, BaseDetailView):
+    def render_to_response(self, context, **response_kwargs):
+        return self.render_to_json_response(context, **response_kwargs)
 
 @login_required
 def status(request):
@@ -40,18 +48,24 @@ def stationsJSON(request):
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):
     model           = Station
-    slug_field      = 'name'
-    slug_url_kwarg  = 'name'
-    template_name   = 'meteors/meteor.html'
+    slug_field      = 'code'
+    slug_url_kwarg  = 'code'
+    template_name   = 'stations/station.html'
 
 
-# This is not working right now
 @method_decorator(login_required, name = 'dispatch')
-class JSONView(DetailView):
+class JSONView(JSONDetailView):
     model           = Station
-    slug_field      = 'name'
-    slug_url_kwargs = 'name',
-    template_name   = 'stations/abc.html'
+    slug_field      = 'code'
+    slug_url_kwarg  = 'code'
+
+    
+def process(request):
+    print(f"{'*' * 20} Incoming status report {'*' * 20}")
+
+    pp(request.body)
+
+    return HttpResponse('Status update received', status = 201)
 
 
 #@method_decorator(login_required, name = 'dispatch')

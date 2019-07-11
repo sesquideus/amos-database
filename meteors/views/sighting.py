@@ -63,7 +63,7 @@ class ListByStationView(ListDateView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('listSightingsStation') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+            return HttpResponseRedirect(reverse('listSightingsByStation') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
         else:
             return HttpResponseBadRequest()
 
@@ -86,7 +86,7 @@ class SingleView(DetailView):
 
 
 @login_required
-def chart(request, id):
+def lightCurve(request, id):
     sighting = Sighting.objects.get(id = id)
     timestamps = [frame.flightTime() for frame in sighting.frames.all()]
     magnitudes = [frame.magnitude for frame in sighting.frames.all()]

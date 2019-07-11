@@ -10,7 +10,7 @@ from stations.models import Subnetwork
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):
     model           = Subnetwork
-    slug_field      = 'name'
-    slug_url_kwarg  = 'name'
+    slug_field      = 'code'
+    slug_url_kwarg  = 'code'
     template_name   = 'stations/subnetwork.html'
 
