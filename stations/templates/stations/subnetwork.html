@@ -27,7 +27,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for station in subnetwork.station_set.all %}
+                {% for station in subnetwork.stations.all %}
                     <tr>
                         <td><a href="{{ station.get_absolute_url }}">{{ station.name }}</a></td>
                         <td class="data">{{ station.latitude|latitude }}</td>

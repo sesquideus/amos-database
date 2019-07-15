@@ -71,23 +71,48 @@
             {% endfor %}
         </table>
 
-    <h3>Device log</h3>
+    <h3>Status</h3>
         <table>
-            <tr>
-                <th>date</th>
-                <th>entry</th>
-            </tr>
-            {% for entry in station.logentry_set.all %}
+            <thead>
                 <tr>
-                    <td>{{ entry.created|date:"Y-m-d" }}</td>
-                    <td>{{ entry.text }}</td>
+                    <th>Timestamp</th>
+                    <th>Status</th>
+                </tr>
+            </thead>
+            {% for report in station.statusreport_set.all %}
+                <tr>
+                    <td>{{ report.timestamp }}</td>
+                    <td>{{ report.status }}</td>
                 </tr>
             {% empty %}
-                <tr>
-                    <td colspan="2" class="empty">
-                        There are no log entries for this station.
-                    </td>
+                <tr colspan="2">
+                    <td class="empty">There are no status reports for this station.</td>
                 </tr>
             {% endfor %}
+        </table>
+
+
+    <h3>Station log</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>date</th>
+                    <th>entry</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for entry in station.logentry_set.all|slice:":10" %}
+                    <tr>
+                        <td>{{ entry.created|date:"Y-m-d" }}</td>
+                        <td>{{ entry.text }}</td>
+                    </tr>
+                {% empty %}
+                    <tr>
+                        <td colspan="2" class="empty">
+                            There are no log entries for this station.
+                        </td>
+                    </tr>
+                {% endfor %}
+            </tbody>
         </table>
 {% endblock page %}

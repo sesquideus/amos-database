@@ -1,19 +1,21 @@
 import datetime
 import pytz
+import json
 
 from pprint import pprint as pp
 
-from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse
+from django.shortcuts import render
+from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.contrib.auth.decorators import login_required
 
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
-from stations.models import Station, Subnetwork
+from stations.models import Station, Subnetwork, StatusReport
 
 # Create your views here.
 
@@ -74,10 +76,15 @@ class APIView(View):
     def get(self, request):
         return JsonResponse({'ok': 'OK'})
     
-
     def post(self, request):
         print(f"{'*' * 20} Incoming status report {'*' * 20}")
-
         pp(request.body)
 
-        return HttpResponse('Status update received', status = 201)
+        data = json.loads(request.body)
+
+        report = StatusReport.objects.createFromPOST(**data)
+        report.save()
+
+        response = HttpResponse('Status update received', status = 201)
+        #response['location'] = reverse('statusUpdate', args = [report.id])
+        return response

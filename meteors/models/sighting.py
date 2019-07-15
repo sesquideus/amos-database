@@ -36,7 +36,7 @@ class SightingManager(models.Manager):
         daz = np.random.normal(0, 3)
 
         mag = 6 - 3 * np.random.pareto(2.3)
-        cnt = np.floor(np.random.pareto(1.3) + 5)
+        cnt = int(np.floor(np.random.pareto(1.3) + 5))
 
         print(f"Adding {cnt} frames")
         for x in np.arange(0, cnt):

@@ -21,32 +21,43 @@
             </tr>
         </thead>
         {% for subnetwork in subnetworks %}
-            {% for station in subnetwork.station_set.all %}
+            {% for station in subnetwork.stations.all %}
                 <tr>
                     {% if forloop.first %}
-                        <td class="multihead station" rowspan="{{ subnetwork.station_set.all|length }}">{{ subnetwork.code }}</td>
-                        <td class="multihead" rowspan="{{ subnetwork.station_set.all|length }}">
+                        <td class="multihead station" rowspan="{{ subnetwork.stations.all|length }}">{{ subnetwork.code }}</td>
+                        <td class="multihead" rowspan="{{ subnetwork.stations.all|length }}">
                             <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }}</a>
                         </td>
                     {% endif %}
+                    
                     <td class="station">{{ station.code }}</td>
-                    <td><a href="{{ station.get_absolute_url }}">{{ station.name }}</a></td>
-                    <td class="data status">not implemented</td>
+                    
+                    <td class="station">
+                        <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
+                    </td>
+                    
+                    <td class="data">
+                        <abbr class="status {{ station.currentStatus }}" title="{{ station.currentStatusTitle }}">{{ station.currentStatusTitle }}</abbr>
+                    </td>
+                    
                     <td id="{{ station.code }}-localtime" class="time c">
                         {% timezone station.timezone %}
                             <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
                         {% endtimezone %}
                     </td>
+
                     <td id="{{ station.code }}-sunalt"
                         class="data angle"
                         style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
                         {{ station.sunPosition.alt|floatformat:1 }}°
                         <span class="sun arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
                     </td>
+
                     <td id="{{ station.code }}-sunaz" class="data">
                         {{ station.sunPosition.az|floatformat:1 }}°
                         <span class="sun arrow" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
                     </td>
+
                     <td class="time">
                         {% if station.lastSighting %}
                             {{ station.lastSighting.timestamp }}
@@ -58,7 +69,7 @@
                         {% if station.lastSighting %}
                             {{ station.lastSighting.timestamp|timesince }}
                         {% else %}
-                            <span class="empty">&mdash;</span>
+                            <span class="empty">never</span>
                         {% endif %}
                     </td>
                     <td class="c"><a href="{% url 'admin:stations_station_change' station.id %}">edit</a></td>

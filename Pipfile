@@ -26,6 +26,7 @@ pillow = "*"
 matplotlib = "*"
 pygal = "*"
 pip = "*"
+dotmap = "*"
 
 [requires]
 python_version = "3.7"

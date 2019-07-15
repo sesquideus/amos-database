@@ -1,6 +1,8 @@
 import textwrap
 import datetime
+import dotmap
 import pytz
+
 from django.db import models
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -12,7 +14,7 @@ from astropy import units
 
 import core.models
 from meteors.models import Sighting
-from .country import Country
+from . import Country
 
 
 class Station(core.models.NamedModel):
@@ -31,6 +33,7 @@ class Station(core.models.NamedModel):
                                         null                = True,
                                         blank               = True,
                                         on_delete           = models.CASCADE, 
+                                        related_name        = 'stations',
                                     )
     country                         = models.ForeignKey(
                                         'Country',
@@ -73,7 +76,7 @@ class Station(core.models.NamedModel):
                                         blank               = False,
                                         max_length          = 64,
                                         choices             = zip(pytz.common_timezones, pytz.common_timezones),
-                                        help_text           = 'official timezone name',
+                                        help_text           = "official timezone name",
                                     )
 
 
@@ -121,14 +124,40 @@ class Station(core.models.NamedModel):
         except ObjectDoesNotExist:
             return None
 
-    def register(self, meteor):
-        return meteor.earthLocation() - self.earthLocation()
-
     def location(self):
-        return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.1f} m".format(
+        return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.0f} m".format(
             latitude    = self.latitude,
             latNS       = 'N' if self.latitude >= 0 else 'S',
             longitude   = self.longitude,
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
         )
+
+    def currentStatus(self):
+        try:
+            lastReport = self.reports.latest()
+            print(self.name, lastReport)
+        except ObjectDoesNotExist:
+            print(self.name, "Does not exist")
+            return 'noreports'
+
+        if (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() > 180:
+            return 'nodata'
+        else:
+            return 'ok'
+
+
+    def currentStatusTitle(self):
+        print(self.name, {
+            'ok':           "The station is working as expected",
+            'nodata':       f"The station has not sent a report since {self.reports.latest().timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+            'noreports':    "The station has never sent any reports",
+        }[self.currentStatus()])
+        return "a"
+
+    def currentStatusText(self):
+        return {
+            'ok':           "OK",
+            'nodata':       f"no data",
+            'noreports':    "no status reports",
+        }[self.currentStatus()]

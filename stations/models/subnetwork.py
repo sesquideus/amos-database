@@ -8,7 +8,7 @@ from .station import Station
 class Subnetwork(core.models.NamedModel):
     class Meta:
         verbose_name                = 'subnetwork'
-        ordering                    = ['id']
+        ordering                    = ['founded']
 
     code                            = models.CharField(
                                         max_length          = 8,

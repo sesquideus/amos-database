@@ -11,17 +11,32 @@ from astropy.time import Time
 from astropy import units
 
 import core.models
+from . import Station
 from meteors.models import Sighting
+
+class StatusReportManager(models.Manager):
+    def createFromPOST(self, **kwargs):
+        report = self.create(
+            timestamp       = kwargs.get('timestamp'),
+            station         = Station.objects.get(code = kwargs.get('station')),
+            status          = kwargs.get('status'),
+        )
+        return report
 
 
 class StatusReport(models.Model):
     class Meta:
         verbose_name                = 'status report'
         verbose_name_plural         = 'status reports'
+        get_latest_by               = ['timestamp']
+        indexes                     = [
+                                        models.Index(fields = ['station', 'timestamp']),
+                                    ]
+
+    objects                         = StatusReportManager()
 
     timestamp                       = models.DateTimeField(
                                         verbose_name        = 'timestamp',
-                                        auto_now            = True,
                                     )
     received                        = models.DateTimeField(
                                         verbose_name        = 'received at',
@@ -31,6 +46,7 @@ class StatusReport(models.Model):
     station                         = models.ForeignKey(
                                         'Station',
                                         on_delete           = models.CASCADE,
+                                        related_name        = 'reports',
                                     )
     status                          = models.CharField(
                                         max_length          = 64,
