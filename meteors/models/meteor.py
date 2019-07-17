@@ -75,6 +75,13 @@ class Meteor(models.Model):
                                         verbose_name        = "meteor shower",
                                         on_delete           = models.SET_NULL,
                                     )
+    subnetwork                      = models.ForeignKey(
+                                        'stations.Subnetwork',
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "subnetwork",
+                                        on_delete           = models.SET_NULL,
+                                    )
 
     beginningLatitude               = models.FloatField(
                                         null                = True,
@@ -195,3 +202,24 @@ class Meteor(models.Model):
             self.name = self.lightmaxTime.strftime('%Y%m%d-%H%M%S-%f')
 
         super().save(*args, **kwargs)
+
+    def json(self):
+        return {
+            'id':               self.id,
+            'name':             self.name,
+            'beginning': {
+                'longitude':    self.beginningLongitude,
+                'latitude':     self.beginningLatitude,
+                'altitude':     self.beginningAltitude,
+            },
+            'lightmax': {
+                'longitude':    self.lightmaxLongitude,
+                'latitude':     self.lightmaxLatitude,
+                'altitude':     self.lightmaxAltitude,
+            },
+            'end': {
+                'longitude':    self.endLongitude,
+                'latitude':     self.endLatitude,
+                'altitude':     self.endAltitude,
+            },
+        }

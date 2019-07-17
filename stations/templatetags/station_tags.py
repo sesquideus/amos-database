@@ -1,5 +1,6 @@
 import math
 import pytz
+import datetime
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -59,3 +60,17 @@ def distance(value: float):
 @mdash
 def angle(value: float):
     return f"{value:.2f}°"
+
+
+@register.filter
+def sinceDateTime(timestamp):
+    delta = (datetime.datetime.now(tz = pytz.utc) - timestamp).total_seconds()
+    if delta < 60:
+        return f"{delta}s"
+    if delta < 3600:
+        return f"{delta / 60:02.0f}m{delta % 60:02.0f}s"
+    if delta < 86400:
+        return f"{delta / 3600:02.0f}h{delta % 3600 / 60:02.0f}m"
+    if delta < 30*36400:
+        return f"{delta / 86400:02.0f}d{delta % 86400 / 3600:02.0f}h"
+    return f"{delta / 86400:.0f}d"

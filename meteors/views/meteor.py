@@ -14,6 +14,7 @@ from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from core.utils import DateParser
+from core.views import JSONDetailView, JSONListView
 
 from meteors.models import Meteor, Sighting
 from meteors.forms import DateForm
@@ -21,16 +22,11 @@ from meteors.forms import DateForm
 from stations.models import Station, Subnetwork
 
 
-class JSONResponseMixin:
-    def render_to_json_response(self, context, **kwargs):
-        return JsonResponse(context, **kwargs)
-
-
 @method_decorator(login_required, name = 'dispatch')
 class ListDateView(ListView):
-    template_name = 'meteors/list-meteors.html'
+    model               = Meteor
     context_object_name = 'meteors'
-    model = Meteor
+    template_name       = 'meteors/list-meteors.html'
 
     def get_queryset(self):
         self.time = DateParser(self.request)  
@@ -66,6 +62,13 @@ def singleJSON(request, name):
     meteor = Meteor.objects.get(name = name)
     data = serializers.serialize('json', [meteor])
     return JsonResponse(data, safe = False)
+
+
+@method_decorator(login_required, name = 'dispatch')
+class SingleViewJSON(JSONDetailView):
+    model           = Meteor
+    slug_field      = 'name'
+    slug_url_kwarg  = 'name'
 
 
 @login_required

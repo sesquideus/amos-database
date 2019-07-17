@@ -2,10 +2,18 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 from django.views.generic.detail import DetailView
+from django.views.generic.list import ListView
 
 from stations.models import Subnetwork
 
 # Create your views here.
+
+@method_decorator(login_required, name = 'dispatch')
+class StatusView(ListView):
+    model               = Subnetwork
+    context_object_name = 'subnetworks'
+    template_name       = 'stations/status.html'
+
 
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):

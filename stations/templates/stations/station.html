@@ -17,6 +17,9 @@
         <p>{{ station.address }}</p>
         <p id="location">{{ station.location }}</p>
         <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
+        {% with status=station.currentStatus %}
+            <p id="status">{{ status.short}}</p>
+        {% endwith %}
 
     <h3>Sky info</h3>
         <table>
@@ -28,26 +31,28 @@
                     <th>magnitude</th>
                 </tr>
             </thead>
-            <tr>
-                <td>Sun</td>
-                <td class="data sun" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
-                    <span class="suninfo standalone">
-                        {{ station.sunPosition.alt|floatformat:1 }}°
-                    </span>
-                </td>
-                <td class="data arrow" style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
-                    <span class="arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
-                </td>
-                <td class="data sun">
-                    <span>{{ station.sunPosition.az|floatformat:1 }}°</span>
-                </td>
-                <td class="data arrow">
-                    <span class="arrow" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
-                </td>
-                <td class="data sun">
-                    -26.74
-                </td>
-            </tr>
+            {% with sun=station.sunPosition %}
+                <tr>
+                    <td>Sun</td>
+                    <td class="data sun" style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                        <span class="suninfo standalone">
+                            {{ sun.alt|floatformat:1 }}°
+                        </span>
+                    </td>
+                    <td class="data arrow" style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                        <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
+                    </td>
+                    <td class="data sun">
+                        <span>{{ sun.az|floatformat:1 }}°</span>
+                    </td>
+                    <td class="data arrow">
+                        <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
+                    </td>
+                    <td class="data sun">
+                        -26.74
+                    </td>
+                </tr>
+            {% endwith %}
         </table>
 
     <h3>Sightings</h3>
@@ -75,18 +80,18 @@
         <table>
             <thead>
                 <tr>
-                    <th>Timestamp</th>
-                    <th>Status</th>
+                    <th>timestamp</th>
+                    <th>status</th>
                 </tr>
             </thead>
-            {% for report in station.statusreport_set.all %}
+            {% for report in station.reports.all %}
                 <tr>
                     <td>{{ report.timestamp }}</td>
                     <td>{{ report.status }}</td>
                 </tr>
             {% empty %}
-                <tr colspan="2">
-                    <td class="empty">There are no status reports for this station.</td>
+                <tr>
+                    <td class="empty" colspan="2">There are no status reports for this station.</td>
                 </tr>
             {% endfor %}
         </table>

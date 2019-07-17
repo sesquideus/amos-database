@@ -7,15 +7,6 @@ from django.views.generic.detail import DetailView
 from meteors.models import Frame
 
 
-@login_required
-def single(request, sighting, order):
-    frame = Frame.objects.filter(sighting = sighting).get(order = order)
-    context = {
-        'frame': frame,
-        'sighting': frame.sighting,
-    }
-    return render(request, 'meteors/frame.html', context)
-
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):
     model           = Frame

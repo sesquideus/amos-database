@@ -21,6 +21,7 @@ from meteors.forms import DateForm
 from meteors.models import Sighting
 from stations.models import Station
 
+
 @method_decorator(login_required, name = 'dispatch')
 class ListDateView(ListView):
     template_name = 'meteors/list-sightings.html'

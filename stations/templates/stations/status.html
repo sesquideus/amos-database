@@ -36,27 +36,31 @@
                         <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
                     </td>
                     
-                    <td class="data">
-                        <abbr class="status {{ station.currentStatus }}" title="{{ station.currentStatusTitle }}">{{ station.currentStatusTitle }}</abbr>
+                    <td class="status data">
+                        {% with status=station.currentStatus %}
+                            <abbr class="{{ status.id }}" title="{{ status.long }}">{{ status.short }}</abbr>
+                        {% endwith %}
                     </td>
                     
                     <td id="{{ station.code }}-localtime" class="time c">
                         {% timezone station.timezone %}
-                            <abbr title="{% now "Y-m-d" %}" >{% now "H:i" %}</abbr>
+                            <abbr title="{% now "Y-m-d" %}">{% now "H:i" %}</abbr>
                         {% endtimezone %}
                     </td>
 
+                    {% with sun=station.sunPosition %}
                     <td id="{{ station.code }}-sunalt"
                         class="data angle"
-                        style="background-color: {{ station.sunPosition.alt|altitudeColourBack }}; color: {{ station.sunPosition.alt|altitudeColourFront }};">
-                        {{ station.sunPosition.alt|floatformat:1 }}°
-                        <span class="sun arrow" style="transform: rotate({{ station.sunPosition.alt|multiply:-1 }}deg);">&#8594;</span>
+                        style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                        {{ sun.alt|floatformat:1 }}°
+                        <span class="sun arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
                     </td>
 
                     <td id="{{ station.code }}-sunaz" class="data">
-                        {{ station.sunPosition.az|floatformat:1 }}°
-                        <span class="sun arrow" style="transform: rotate({{ station.sunPosition.az|add:-90 }}deg);">&#8594;</span>
+                        {{ sun.az|floatformat:1 }}°
+                        <span class="sun arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
                     </td>
+                    {% endwith %}
 
                     <td class="time">
                         {% if station.lastSighting %}
@@ -67,7 +71,7 @@
                     </td>
                     <td class="time">
                         {% if station.lastSighting %}
-                            {{ station.lastSighting.timestamp|timesince }}
+                            {{ station.lastSighting.timestamp|sinceDateTime }}
                         {% else %}
                             <span class="empty">never</span>
                         {% endif %}

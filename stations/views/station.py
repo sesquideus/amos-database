@@ -5,7 +5,7 @@ import json
 from pprint import pprint as pp
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse
+from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -16,35 +16,7 @@ from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
 from stations.models import Station, Subnetwork, StatusReport
-
-# Create your views here.
-
-class JSONResponseMixin:
-    def render_to_json_response(self, context, **kwargs):
-        return JsonResponse(context, **kwargs)
-
-class JSONDetailView(JSONResponseMixin, BaseDetailView):
-    def render_to_response(self, context, **response_kwargs):
-        return self.render_to_json_response(context, **response_kwargs)
-
-@login_required
-def status(request):
-    context = {
-        'subnetworks': Subnetwork.objects.all(),
-    }
-    return render(request, 'stations/status.html', context)
-
-def station(request, code):
-    station = Station.objects.get(code = code)
-
-    context = {
-        'station': station,
-        'lastDay': station.sighting_set.filter(timestamp__gte = datetime.datetime.now(pytz.utc) - datetime.timedelta(days = 1))
-    }
-    return render(request, 'stations/station.html', context)
-
-def stationsJSON(request):
-    return JsonResponse({station.id: station.asDict() for station in Station.objects.all()})
+from core.views import JSONDetailView, JSONListView
 
 
 @method_decorator(login_required, name = 'dispatch')
@@ -56,18 +28,18 @@ class SingleView(DetailView):
 
 
 @method_decorator(login_required, name = 'dispatch')
-class JSONView(JSONDetailView):
+class SingleViewJSON(JSONDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
 
+
+@method_decorator(login_required, name = 'dispatch')
+class ListViewJSON(JSONListView):
+    model               = Station
+    context_object_name = 'stations'
+
     
-def process(request):
-    print(f"{'*' * 20} Incoming status report {'*' * 20}")
-
-    pp(request.body)
-
-    return HttpResponse('Status update received', status = 201)
 
 
 #@method_decorator(login_required, name = 'dispatch')
@@ -80,11 +52,16 @@ class APIView(View):
         print(f"{'*' * 20} Incoming status report {'*' * 20}")
         pp(request.body)
 
-        data = json.loads(request.body)
+        try:
+            data = json.loads(request.body)
 
-        report = StatusReport.objects.createFromPOST(**data)
-        report.save()
+            report = StatusReport.objects.createFromPOST(**data)
+            report.save()
 
-        response = HttpResponse('Status update received', status = 201)
+            response = HttpResponse('Status update received', status = 201)
         #response['location'] = reverse('statusUpdate', args = [report.id])
-        return response
+            return response
+
+        except JSONDecodeError:
+            print("JSON decoding error")
+            return HttpResponseBadRequest()

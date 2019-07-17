@@ -136,28 +136,31 @@ class Station(core.models.NamedModel):
     def currentStatus(self):
         try:
             lastReport = self.reports.latest()
-            print(self.name, lastReport)
         except ObjectDoesNotExist:
-            print(self.name, "Does not exist")
-            return 'noreports'
+            return {
+                'id':       'noreports',
+                'short':    "no status reports",
+                'long':     "The station has never sent any reports",
+            }
 
         if (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() > 180:
-            return 'nodata'
+            return {
+                'id':       'timeout',
+                'short':    "timeout",
+                'long':     f"The station has not sent a report since {self.reports.latest().timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+            }
         else:
-            return 'ok'
+            return {
+                'id':       'ok',
+                'short':    "OK",
+                'long':     "The station is working correctly",
+            }
 
-
-    def currentStatusTitle(self):
-        print(self.name, {
-            'ok':           "The station is working as expected",
-            'nodata':       f"The station has not sent a report since {self.reports.latest().timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
-            'noreports':    "The station has never sent any reports",
-        }[self.currentStatus()])
-        return "a"
-
-    def currentStatusText(self):
+    def json(self):
         return {
-            'ok':           "OK",
-            'nodata':       f"no data",
-            'noreports':    "no status reports",
-        }[self.currentStatus()]
+            'id':       self.id,
+            'code':     self.code,
+            'name':     self.name,
+            'status':   self.currentStatus(),
+        }
+

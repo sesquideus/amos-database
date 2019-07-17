@@ -161,6 +161,24 @@ td.c {
     text-align: center;
 }
 
+/* station status colours */
+
+td abbr {
+    font-weight: bold;
+}
+
+td abbr.timeout {
+    color: hsl(30, 100%, 50%);
+}
+
+td abbr.ok {
+    color: hsl(120, 100%, 40%);
+}
+
+td abbr.noreports {
+    color: hsl(0, 0%, 75%);
+}
+
 a.object-link {
     font-weight: bold;
 }

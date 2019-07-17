@@ -14,6 +14,7 @@ import core.models
 from . import Station
 from meteors.models import Sighting
 
+
 class StatusReportManager(models.Manager):
     def createFromPOST(self, **kwargs):
         report = self.create(
