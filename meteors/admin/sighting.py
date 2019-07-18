@@ -12,6 +12,7 @@ from .widgets import MicrosecondDateTimeWidget
 class SightingInline(admin.TabularInline):
     model = Sighting
     show_change_link = True
+    extra = 0
 
     fields = ['station', 'angularSpeed', 'lightmaxAltitude', 'lightmaxAzimuth']
     readonly_fields = ['station', 'angularSpeed', 'lightmaxMagnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'distance', 'arcLength']

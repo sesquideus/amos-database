@@ -21,6 +21,8 @@ class StatusReportManager(models.Manager):
             timestamp       = kwargs.get('timestamp'),
             station         = Station.objects.get(code = kwargs.get('station')),
             status          = kwargs.get('status'),
+            lid             = kwargs.get('lid'),
+            heating         = kwargs.get('heating'),
         )
         return report
 
@@ -32,6 +34,17 @@ class StatusReport(models.Model):
         get_latest_by               = ['timestamp']
         indexes                     = [
                                         models.Index(fields = ['station', 'timestamp']),
+                                    ]
+
+    LID_STATES                      = [
+                                        ('O', 'open'),
+                                        ('C', 'closed'),
+                                        ('P', 'problem'),
+                                    ]
+    HEATING_STATES                  = [
+                                        ('1', 'on'),
+                                        ('0', 'off'),
+                                        ('P', 'problem'),
                                     ]
 
     objects                         = StatusReportManager()
@@ -52,6 +65,30 @@ class StatusReport(models.Model):
     status                          = models.CharField(
                                         max_length          = 64,
                                     )
+    lid                             = models.CharField(
+                                        max_length          = 1,
+                                        choices             = LID_STATES,
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    heating                         = models.CharField(
+                                        max_length          = 1,
+                                        choices             = HEATING_STATES,
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    temperature                     = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    pressure                        = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    humidity                        = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                    )
 
     def __str__(self):
-        return f"{self.station.name} was {self.status} at {self.timestamp}"
+        return f"[{self.timestamp}] {self.station.code} {self.status}"

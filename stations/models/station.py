@@ -79,6 +79,12 @@ class Station(core.models.NamedModel):
                                         help_text           = "official timezone name",
                                     )
 
+    picture                         = models.ImageField(
+                                        upload_to           = 'stations/',
+                                        null                = True,
+                                        blank               = True,
+                                    )
+
 
     def __str__(self):
         return "{name} ({subnetwork})".format(
@@ -123,6 +129,9 @@ class Station(core.models.NamedModel):
             return Sighting.objects.filter(station__id = self.id).latest('timestamp')
         except ObjectDoesNotExist:
             return None
+
+    def latestStatusReports(self):
+        return self.reports.order_by('-timestamp')[:10]
 
     def location(self):
         return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.0f} m".format(

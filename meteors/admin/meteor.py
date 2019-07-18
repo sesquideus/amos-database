@@ -28,6 +28,7 @@ class MeteorAdmin(admin.ModelAdmin):
             {
                 'fields': (
                     ('name',),
+                    ('subnetwork',),
                 ),
             },
         ),
@@ -54,5 +55,5 @@ class MeteorAdmin(admin.ModelAdmin):
         return obj.sightings.count()
     sightingCount.short_description = 'sighting count'
 
-    list_display = ['name', 'lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
+    list_display = ['name', 'subnetwork', 'lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
     save_as = True

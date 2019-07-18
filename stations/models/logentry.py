@@ -14,6 +14,7 @@ class LogEntry(models.Model):
                                         blank               = True,
                                         verbose_name        = "station",
                                         help_text           = "the station in question",
+                                        related_name        = "logs",
                                         on_delete           = models.CASCADE,
                                     )
     text                            = models.TextField(

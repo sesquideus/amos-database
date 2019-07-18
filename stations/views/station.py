@@ -50,6 +50,7 @@ class APIView(View):
     
     def post(self, request):
         print(f"{'*' * 20} Incoming status report {'*' * 20}")
+        pp(request.headers)
         pp(request.body)
 
         try:
@@ -62,6 +63,6 @@ class APIView(View):
         #response['location'] = reverse('statusUpdate', args = [report.id])
             return response
 
-        except JSONDecodeError:
+        except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
