@@ -84,6 +84,9 @@
                     <th>status</th>
                     <th>lid</th>
                     <th>heating</th>
+                    <th>temperature</th>
+                    <th>pressure</th>
+                    <th>humidity</th>
                 </tr>
             </thead>
             {% for report in station.latestStatusReports %}
@@ -92,10 +95,13 @@
                     <td class="data status">{{ report.status }}</td>
                     <td class="data status">{{ report.get_lid_display }}</td>
                     <td class="data status">{{ report.get_heating_display }}</td>
+                    <td class="data">{{ report.temperature|floatformat:1 }} °C</td>
+                    <td class="data">{{ report.pressure|floatformat:0 }} Pa</td>
+                    <td class="data">{{ report.humidity|floatformat:0 }}%</td>
                 </tr>
             {% empty %}
                 <tr>
-                    <td class="empty" colspan="4">There are no status reports for this station.</td>
+                    <td class="empty" colspan="7">There are no status reports for this station.</td>
                 </tr>
             {% endfor %}
         </table>

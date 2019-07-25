@@ -23,6 +23,9 @@ class StatusReportManager(models.Manager):
             status          = kwargs.get('status'),
             lid             = kwargs.get('lid'),
             heating         = kwargs.get('heating'),
+            temperature     = kwargs.get('temperature'),
+            pressure        = kwargs.get('pressure'),
+            humidity        = kwargs.get('humidity'),
         )
         return report
 

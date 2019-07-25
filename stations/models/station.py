@@ -145,6 +145,7 @@ class Station(core.models.NamedModel):
     def currentStatus(self):
         try:
             lastReport = self.reports.latest()
+            timeSince = (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() 
         except ObjectDoesNotExist:
             return {
                 'id':       'noreports',
@@ -152,16 +153,18 @@ class Station(core.models.NamedModel):
                 'long':     "The station has never sent any reports",
             }
 
-        if (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() > 180:
+        if timeSince > 180:
             return {
                 'id':       'timeout',
                 'short':    "timeout",
+                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - self.reports.latest().timestamp).total_seconds():.0f} s",
                 'long':     f"The station has not sent a report since {self.reports.latest().timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
             }
         else:
             return {
                 'id':       'ok',
                 'short':    "OK",
+                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - self.reports.latest().timestamp).total_seconds():.0f} s",
                 'long':     "The station is working correctly",
             }
 

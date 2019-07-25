@@ -57,6 +57,7 @@ class Sighting(models.Model):
     class Meta:
         verbose_name                = "meteor sighting"
         ordering                    = ['timestamp']
+        get_latest_by               = 'timestamp'
 
     objects                         = SightingManager()
 
@@ -93,19 +94,11 @@ class Sighting(models.Model):
                                         on_delete           = models.SET_NULL,
                                     )
 
-    solarElongation                 = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "solar elongation",
-                                    )
-    lunarElongation                 = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "lunar elongation",
-                                    )
+
 
     def __str__(self):
-        return f"{self.id} ({self.timestamp} from {self.station})"
+        meteor = 'unknown meteor' if self.meteor is None else self.meteor.name
+        return f"#{self.id} ({meteor} at {self.timestamp} from {self.station})"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
@@ -158,21 +151,6 @@ class Sighting(models.Model):
         except AttributeError:
             return None
 
-    @method_decorator(noneIfError(AttributeError))
-    def distance(self):
-        obsLoc = self.station.earthLocation()
-        metLoc = self.meteor.earthLocation()
-        return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
-
-    @method_decorator(noneIfError(AttributeError))
-    def skyCoord(self):
-        return AltAz(
-            alt         = self.lightmaxFrame().altitude * units.degree,
-            az          = self.lightmaxFrame().azimuth * units.degree,
-            location    = self.station.earthLocation(),
-            obstime     = Time(self.lightmaxFrame().timestamp)
-        )
-
     def arcLength(self):
         first = self.firstFrame()
         last = self.lastFrame()
@@ -189,63 +167,3 @@ class Sighting(models.Model):
     @method_decorator(noneIfError(ObjectDoesNotExist))
     def next(self):
         return Sighting.objects.exclude(timestamp__isnull = True).filter(timestamp__gt = self.timestamp).earliest('timestamp').id
-
-    def coordAltAz(self):
-        return AltAz(obstime = Time(self.lightmaxFrame().timestamp), location = self.station.earthLocation())
-
-    def getSun(self):
-        frame = self.lightmaxFrame()
-        if frame is None or frame.timestamp is None or self.coordAltAz is None:
-            return None
-
-        return get_sun(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
-
-    def getMoon(self):
-        frame = self.lightmaxFrame()
-        if frame is None or frame.timestamp is None or self.coordAltAz is None:
-            return None
-
-        return get_moon(Time(self.lightmaxFrame().timestamp)).transform_to(self.coordAltAz())
-
-    @method_decorator(noneIfError(AttributeError, TypeError))
-    def getSolarElongation(self):
-        if self.solarElongation is None:
-            return self.computeSolarElongation()
-        else:
-            return self.solarElongation
-
-    @method_decorator(noneIfError(AttributeError, TypeError))
-    def computeSolarElongation(self):
-        return self.getSun().separation(self.skyCoord()).degree
-
-    @method_decorator(noneIfError(AttributeError, TypeError))
-    def getLunarElongation(self):
-        if self.lunarElongation is None:
-            return self.computeLunarElongation()
-        else:
-            return self.lunarElongation
-
-    @method_decorator(noneIfError(AttributeError, TypeError))
-    def computeLunarElongation(self):
-        return self.getMoon().separation(self.skyCoord()).degree
-
-    def getSunInfo(self):
-        sun = self.getSun()
-        elong = self.getSolarElongation()
-        return {
-            'coord': sun,
-            'elong': elong,
-        }
-
-    def getMoonInfo(self):
-        moon = self.getMoon()
-        elong = self.getLunarElongation()
-        return {
-            'coord': moon,
-            'elong': elong,
-        }
-
-    def save(self, *args, **kwargs):
-        self.solarElongation = self.getSolarElongation()
-        self.lunarElongation = self.getLunarElongation()
-        super().save(*args, **kwargs)

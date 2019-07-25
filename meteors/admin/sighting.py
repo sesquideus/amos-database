@@ -15,7 +15,7 @@ class SightingInline(admin.TabularInline):
     extra = 0
 
     fields = ['station', 'angularSpeed', 'lightmaxAltitude', 'lightmaxAzimuth']
-    readonly_fields = ['station', 'angularSpeed', 'lightmaxMagnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'distance', 'arcLength']
+    readonly_fields = ['station', 'angularSpeed', 'lightmaxMagnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'arcLength']
 
     
 @admin.register(Sighting)
@@ -59,21 +59,13 @@ class SightingAdmin(admin.ModelAdmin):
                 'fields': ('meteor', 'station', 'timestamp'),            
             }
         ),
-        ('Sky info', 
-            {
-                'fields': [
-                    'solarElongation',
-                    'lunarElongation',
-                ],
-            }
-        ),
         ('Images',
             {
                 'fields': ['composite'],
             }
         ),
     )
-    readonly_fields = ['lightmaxMagnitude', 'solarElongation', 'lunarElongation']
+    readonly_fields = ['lightmaxMagnitude']
 
     list_display = ['timestamp', 'meteorLink', 'stationLink', 'lightmaxMagnitude', 'frameCount', 'lightmaxAzimuth', 'lightmaxAltitude']
     list_filter = ['station']

@@ -5,7 +5,7 @@ from .views import station, subnetwork
 
 urlpatterns = [
     path('',                            subnetwork.StatusView.as_view(),    name = 'status'),
-    path('stations',                    subnetwork.StatusView.as_view(),    name = 'status'),
+    path('stations/',                   subnetwork.StatusView.as_view(),    name = 'status'),
     path('station/<slug:code>/',        station.SingleView.as_view(),       name = 'station'),
     path('station/<slug:code>/json/',   station.SingleViewJSON.as_view(),   name = 'stationJSON'),
     path('stations/status-update/',     station.APIView.as_view(),          name = 'statusUpdate'),

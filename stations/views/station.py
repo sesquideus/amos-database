@@ -66,3 +66,6 @@ class APIView(View):
         except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
+        except Exception as E:
+            print(e)
+            return HttpResponseBadRequest()

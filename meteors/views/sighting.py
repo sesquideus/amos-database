@@ -80,8 +80,8 @@ class SingleView(DetailView):
         maxLight = self.object.lightmaxFrame()
         return {
             'sighting':     self.object,
-            'moon':         self.object.getMoonInfo(),
-            'sun':          self.object.getSunInfo(),
+            'moon':         self.object.lightmaxFrame().getMoonInfo(),
+            'sun':          self.object.lightmaxFrame().getSunInfo(),
             'maxLight':     maxLight.order if maxLight else None,
         }
 

@@ -58,9 +58,13 @@
                 <meter min="-10" max="10" value="{{ sighting.lightmaxMagnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
             </td>
             <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
-            <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>
-            <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}</td>
-            <td class="data length">{{ sighting.distance|distance|default:"&mdash; " }}</td>
+            <td class="data angle">{{ sighting.lightmaxAltitude|angle }}
+                <span class="arrow" style="transform: rotate({{ sighting.lightmaxAltitude|multiply:-1 }}deg);">&#8594;</span>
+            </td>
+            <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}
+                <span class="arrow" style="transform: rotate({{ sighting.lightmaxAzimuth|add:-90 }}deg);">&#8594;</span>
+            </td>
+            <td class="data length">{{ sighting.lightmaxFrame.distance|distance|default:"&mdash; " }}</td>
         </tr>
         {% empty %}
             <tr class="empty">

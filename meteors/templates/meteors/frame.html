@@ -5,7 +5,7 @@
     <h2>Sighting <a href="{% url 'sighting' id=frame.sighting.id %}">{{ frame.sighting.id }}</a>, frame {{ frame.order }}</h2>
     <div class="controls">
         {% if frame.previous != None %}
-            <a href="{% url 'frame' sighting=frame.sighting.id order=frame.previous %}">
+            <a href="{% url 'frame' sighting=frame.sighting.id order=frame.previous.order %}">
                 <img src="{% static "pictures/previous.png" %}" alt="Previous" />
             </a>
         {% else %}
@@ -17,7 +17,7 @@
         </a>
 
         {% if frame.next != None %}
-            <a href="{% url 'frame' sighting=frame.sighting.id order=frame.next %}">
+            <a href="{% url 'frame' sighting=frame.sighting.id order=frame.next.order %}">
                 <img src="{% static "pictures/next.png" %}" alt="Next" />
             </a>
         {% else %}
@@ -29,24 +29,24 @@
 {% block page %}
     <div>
         <p>
-            {% if sighting.lightmaxTime %}
-                {{ sighting.lightmaxTime|date:"Y-m-d, l" }}
+            {% if frame.sighting.lightmaxTime %}
+                {{ frame.sighting.lightmaxTime|date:"Y-m-d, l" }}
             {% else %}
                 <span class="unknown">unknown date</span>
             {% endif %}
         </p>
         <p>
-            {% if sighting.meteor.id %}
-                Meteor <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
-                observed from <a href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
+            {% if frame.sighting.meteor.id %}
+                Meteor <a href="{% url 'meteor' name=frame.sighting.meteor.name %}">{{ frame.sighting.meteor }}</a>
+                observed from <a href="{% url 'station' code=frame.sighting.station.code %}" id="location-name">{{ frame.sighting.station.name|default_if_none:"(unknown)" }}</a>
                 by <span id="observer-name">
-                    {% if sighting.observer is None %}
+                    {% if frame.sighting.observer is None %}
                         <span class="unknown">unknown observer</span>
                     {% else %}
-                        {{ sighting.observer.name }}
+                        {{ frame.sighting.observer.name }}
                     {% endif %}
                 </span>
-                at <span id="time">{{ sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
+                at <span id="time">{{ frame.sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
@@ -59,14 +59,13 @@
             <table>
                 <thead>
                     <tr>
-                        <th colspan="3">trail</th>
+                        <th colspan="2" class="subgroup">position</th>
                     </tr>
                 </thead>
 
                 <tr>
-                    <td class="multihead" rowspan="3">max light</td>
                     <td>timestamp</td>
-                    <td class="data time">{{ frame.timestamp|safetime }}</td>
+                    <td class="data timestamp">{{ frame.timestamp|safetime }}</td>
                 </tr>
                 <tr>
                     <td>azimuth</td>
@@ -85,15 +84,15 @@
                 </thead>
                 <tr>
                     <td>apparent magnitude</td>
-                    <td class="data magnitude">{{ frame.sighting.magnitude|magnitude }}</td>
+                    <td class="data magnitude">{{ frame.magnitude|magnitude }}</td>
                 </tr>
                 <tr>
                     <td>distance to meteor centre</td>
-                    <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
+                    <td class="data length">{{ frame.distance|default_if_none:"&mdash;" }}</td>
                 </tr>
                 <tr>
                     <td>air mass</td>
-                    <td class="data airmass">{{ sighting.airMass|floatformat:2|default:"&mdash;" }}</td>
+                    <td class="data airmass">{{ frame.airMass|floatformat:2|default:"&mdash;" }}</td>
                 </tr>
             </table>
             <table>
@@ -103,32 +102,36 @@
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td class="multihead" rowspan="3">Sun</td>
-                        <td>azimuth</td>
-                        <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elevation</td>
-                        <td class="data angle altitude">{{ sun.coord.alt.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elongation</td>
-                        <td class="data angle">{{ sun.elong|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td class="multihead" rowspan="3">Moon</td>
-                        <td>azimuth</td>
-                        <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elevation</td>
-                        <td class="data angle altitude">{{ moon.coord.alt.degree|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>elongation</td>
-                        <td class="data angle">{{ moon.elong|angle }}</td>
-                    </tr>
+                    {% with sun=frame.getSunInfo %}
+                        <tr>
+                            <td class="multihead" rowspan="3">Sun</td>
+                            <td>azimuth</td>
+                            <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
+                        </tr>
+                        <tr>
+                            <td>elevation</td>
+                            <td class="data angle altitude">{{ sun.coord.alt.degree|angle }}</td>
+                        </tr>
+                        <tr>
+                            <td>elongation</td>
+                            <td class="data angle">{{ sun.elong|angle }}</td>
+                        </tr>
+                    {% endwith %}
+                    {% with moon=frame.getMoonInfo %}
+                        <tr>
+                            <td class="multihead" rowspan="3">Moon</td>
+                            <td>azimuth</td>
+                            <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
+                        </tr>
+                        <tr>
+                            <td>elevation</td>
+                            <td class="data angle altitude">{{ moon.coord.alt.degree|angle }}</td>
+                        </tr>
+                        <tr>
+                            <td>elongation</td>
+                            <td class="data angle">{{ moon.elong|angle }}</td>
+                        </tr>
+                    {% endwith %}
                 </tbody>
             </table>
         </div>
