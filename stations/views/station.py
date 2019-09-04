@@ -16,6 +16,7 @@ from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
 from stations.models import Station, Subnetwork, StatusReport
+from meteors.models import Sighting
 from core.views import JSONDetailView, JSONListView
 
 
@@ -48,19 +49,43 @@ class APIView(View):
     def get(self, request):
         return JsonResponse({'ok': 'OK'})
     
-    def post(self, request):
-        print(f"{'*' * 20} Incoming status report {'*' * 20}")
+    def post(self, request, code):
+        print(f"{'*' * 20} Incoming status report for station {code} {'*' * 20}")
         pp(request.headers)
         pp(request.body)
 
         try:
             data = json.loads(request.body)
 
-            report = StatusReport.objects.createFromPOST(**data)
+            report = StatusReport.objects.createFromPOST(code, **data)
             report.save()
 
             response = HttpResponse('Status update received', status = 201)
         #response['location'] = reverse('statusUpdate', args = [report.id])
+            return response
+
+        except json.JSONDecodeError:
+            print("JSON decoding error")
+            return HttpResponseBadRequest()
+        except Exception as E:
+            print(e)
+            return HttpResponseBadRequest()
+
+
+@method_decorator(csrf_exempt, name = 'dispatch')
+class APIViewSighting(View):
+    def post(self, request, code):
+        print(f"{'*' * 20} Incoming new sighting for station {code} {'*' * 20}")
+        pp(request.headers)
+        pp(request.body)
+
+        try:
+            data = json.loads(request.body)
+
+            sighting = Sighting.objects.createFromPOST(code, **data)
+
+            response = HttpResponse('New sighting received', status = 201)
+            response['location'] = reverse('sighting', args = [sighting.id])
             return response
 
         except json.JSONDecodeError:

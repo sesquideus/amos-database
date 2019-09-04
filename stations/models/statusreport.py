@@ -16,10 +16,10 @@ from meteors.models import Sighting
 
 
 class StatusReportManager(models.Manager):
-    def createFromPOST(self, **kwargs):
+    def createFromPOST(self, stationCode, **kwargs):
         report = self.create(
             timestamp       = kwargs.get('timestamp'),
-            station         = Station.objects.get(code = kwargs.get('station')),
+            station         = Station.objects.get(code = stationCode),
             status          = kwargs.get('status'),
             lid             = kwargs.get('lid'),
             heating         = kwargs.get('heating'),

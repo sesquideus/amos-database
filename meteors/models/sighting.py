@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 from django.db import models
+from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -11,8 +12,11 @@ from astropy.coordinates import AltAz, get_sun, get_moon
 from astropy.time import Time
 from astropy import units
 
+from pprint import pprint as pp
+
 from core.models import noneIfError
 from meteors.models import Frame
+
 
 
 class SightingManager(models.Manager):
@@ -22,11 +26,13 @@ class SightingManager(models.Manager):
     """
     def createForMeteor(self, meteor, station, **kwargs):
         print(f"Creating a sighting for meteor {meteor}, station {station}")
+        
+        Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = meteor.timestamp,
             angularSpeed        = np.random.normal(0, 30),
             meteor              = meteor,
-            station             = station,
+            station             = Station.objects.get(code = station),
         )
 
         time = meteor.timestamp
@@ -51,6 +57,34 @@ class SightingManager(models.Manager):
                 azimuth     = az0 + x * daz,
                 magnitude   = mag,
             )
+
+    """
+        Create a new Sighting from data received at the POST endpoint.
+    """
+    def createFromPOST(self, stationCode, **kwargs):
+        print(f"Creating a sighting from POST at station {stationCode}")
+        pp(kwargs)
+        
+        Station = apps.get_model('stations', 'Station')
+        sighting = self.create(
+            timestamp           = datetime.datetime.strptime(kwargs.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
+            angularSpeed        = kwargs.get('angularSpeed'),
+            meteor              = None,
+            station             = Station.objects.get(code = stationCode),
+        )
+
+        for order, frame in enumerate(kwargs.get('frames')):
+            Frame.objects.create(
+                timestamp       = datetime.datetime.strptime(frame.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
+                sighting        = sighting,
+                order           = order,
+                x               = 0,
+                y               = 0,
+                altitude        = frame.get('altitude'),
+                azimuth         = frame.get('azimuth'),
+                magnitude       = frame.get('magnitude'),
+            )
+        return sighting
 
 
 class Sighting(models.Model):
