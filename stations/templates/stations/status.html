@@ -65,7 +65,7 @@
 
                         <td class="time">
                             {% if station.lastSighting %}
-                                {{ station.lastSighting.timestamp }}
+                                <a href="{{ station.lastSighting.get_absolute_url }}">{{ station.lastSighting.timestamp }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
