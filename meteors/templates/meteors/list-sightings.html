@@ -36,7 +36,6 @@
                 <th colspan="2">magnitude</th>
                 <th>elevation</th>
                 <th>azimuth</th>
-                <th>distance</th>
             </tr>
         </thead>
         {% for sighting in sightings %}
@@ -64,11 +63,10 @@
             <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}
                 <span class="arrow" style="transform: rotate({{ sighting.lightmaxAzimuth|add:-90 }}deg);">&#8594;</span>
             </td>
-            <td class="data length">{{ sighting.lightmaxFrame.distance|distance|default:"&mdash; " }}</td>
         </tr>
         {% empty %}
             <tr class="empty">
-                <td colspan="8">There are no recorded sightings in the database.</td>
+                <td colspan="7">There are no recorded sightings in the database.</td>
             </tr>
         {% endfor %}
     </table>

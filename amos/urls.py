@@ -34,3 +34,9 @@ urlpatterns = [
 
     path('accounts/',   include(accounts.urls)),
 ] + static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)          # THIS IS FOR DEVELOPMENT ONLY
+
+if settings.DEBUG:
+    import debug_toolbar
+    urlpatterns = [
+        path('__debug__/', include(debug_toolbar.urls)),
+    ] + urlpatterns

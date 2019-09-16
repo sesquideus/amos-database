@@ -30,7 +30,7 @@
                         </td>
                     {% endif %}
                     
-                    {% with sun=station.sunPosition status=station.currentStatus %}
+                    {% with sun=station.sunPosition status=station.currentStatus lastSighting=station.lastSighting %}
                         <td class="station">
                             {{ station.code }}
                         </td>
@@ -64,15 +64,15 @@
                         </td>
 
                         <td class="time">
-                            {% if station.lastSighting %}
-                                <a href="{{ station.lastSighting.get_absolute_url }}">{{ station.lastSighting.timestamp }}</a>
+                            {% if lastSighting %}
+                                <a href="{{ lastSighting.get_absolute_url }}">{{ lastSighting.timestamp }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
                         <td class="time">
-                            {% if station.lastSighting %}
-                                {{ station.lastSighting.timestamp|sinceDateTime }}
+                            {% if lastSighting %}
+                                {{ lastSighting.timestamp|sinceDateTime }}
                             {% else %}
                                 <span class="empty">never</span>
                             {% endif %}

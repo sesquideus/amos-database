@@ -125,6 +125,7 @@ class Sighting(models.Model):
                                         'stations.Station',
                                         null                = True,
                                         verbose_name        = "station",
+                                        related_name        = 'sightings',
                                         on_delete           = models.SET_NULL,
                                     )
 

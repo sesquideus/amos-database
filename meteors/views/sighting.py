@@ -30,7 +30,7 @@ class ListDateView(ListView):
 
     def get_queryset(self):
         self.time = DateParser(self.request)  
-        return Sighting.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo)
+        return Sighting.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo).select_related('station')
 
     def get_context_data(self):
         context = super().get_context_data()

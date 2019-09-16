@@ -130,6 +130,9 @@ class Station(core.models.NamedModel):
         except ObjectDoesNotExist:
             return None
 
+    def latestSightings(self):
+        return self.sightings.order_by('-timestamp')[:10]
+
     def latestStatusReports(self):
         return self.reports.order_by('-timestamp')[:10]
 

@@ -61,7 +61,7 @@
                 <th>timestamp</th>
                 <th>magnitude</th>
             </tr>
-            {% for sighting in lastDay %}
+            {% for sighting in station.latestSightings %}
                 <tr>
                     <td class="data time"><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</td>
                     <td class="data magnitude">
