@@ -1,0 +1,5 @@
+source:         'source'
+destination:    'destination'
+days:           3
+exclude:
+    -           'detlog.csv'

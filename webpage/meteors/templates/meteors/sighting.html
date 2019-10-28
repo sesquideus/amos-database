@@ -127,14 +127,20 @@
                     {% for frame in sighting.frames.all %}
                         <tr {% if frame.order == maxLight %}class="maxLight"{% endif %}>
                             <td class="data order">
-                                <a href="{% url 'frame' sighting=sighting.id order=frame.order %}">{{ frame.order }}</a>
+                                <a href="{{ frame.get_absolute_url }}">{{ frame.order }}</a>
                             </td>
                             <td class="data time">
                                 {{ frame.timestamp|date:"H:m:s.u"|default:"&mdash;" }}
                             </td>
-                            <td class="data time">{{ frame.flightTime|floatformat:3|default:"&mdash;" }} s</td>
-                            <td class="data magnitude">{{ frame.magnitude|magnitude }}</td>
-                            <td class="data angle">{{ frame.altitude|angle }}</td>
+                            <td class="data time">
+                                {{ frame.flightTime|floatformat:3|default:"&mdash;" }} s
+                            </td>
+                            <td class="data magnitude">
+                                {{ frame.magnitude|magnitude }}
+                            </td>
+                            <td class="data angle">
+                                {{ frame.altitude|angle }}
+                            </td>
                             <td class="data angle">{{ frame.azimuth|angle }}</td>
                         </tr>
                     {% empty %}

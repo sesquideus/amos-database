@@ -1,0 +1,14 @@
+server:
+    ip:         localhost
+    port:       4805
+    timeout:    3
+
+interval:       5
+
+station:
+    id:         'SP'
+
+user:
+    name:       'amos'
+    password:   'meteorujeme'
+

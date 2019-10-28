@@ -89,8 +89,9 @@ class SingleView(DetailView):
 @login_required
 def lightCurve(request, id):
     sighting = Sighting.objects.get(id = id)
-    timestamps = [frame.flightTime() for frame in sighting.frames.all()]
-    magnitudes = [frame.magnitude for frame in sighting.frames.all()]
+    frames = sighting.frames.all()
+    timestamps = [frame.flightTime() for frame in frames]
+    magnitudes = [frame.magnitude for frame in frames]
 
     fig, ax = pyplot.subplots()
     fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
