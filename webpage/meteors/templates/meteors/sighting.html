@@ -130,10 +130,10 @@
                                 <a href="{{ frame.get_absolute_url }}">{{ frame.order }}</a>
                             </td>
                             <td class="data time">
-                                {{ frame.timestamp|date:"H:m:s.u"|default:"&mdash;" }}
+                                {{ frame.timestamp|date:"Y-m-d H:m:s.u"|default:"&mdash;" }}
                             </td>
                             <td class="data time">
-                                {{ frame.flightTime|floatformat:3|default:"&mdash;" }} s
+                                {{ frame.flight_time.total_seconds|floatformat:3|default:"&mdash;" }} s
                             </td>
                             <td class="data magnitude">
                                 {{ frame.magnitude|magnitude }}
@@ -150,6 +150,7 @@
                     {% endfor %}
                 </tbody>
             </table>
+            {{ sighting.frames.first }}{{ sighting.frames.last }}
             
             <h3>Light curve</h3>
             <img class="chart" src="{% url 'sightingLightCurve' id=sighting.id %}" alt="Light curve" />

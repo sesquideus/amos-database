@@ -1,6 +1,8 @@
 import numpy as np
 
 from django.db import models
+from django.db.models import Prefetch, Window, F, Q, Subquery, OuterRef, Min, Max
+from django.db.models.functions import Lead
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_slug
@@ -10,6 +12,7 @@ from astropy.coordinates import EarthLocation
 from astropy import units
 
 from core.models import noneIfError
+from meteors.models import Sighting
 
 
 class MeteorManager(models.Manager):
@@ -40,12 +43,44 @@ class MeteorManager(models.Manager):
         return meteor
 
 
+class MeteorQuerySet(models.QuerySet):
+    def with_sightings(self):
+        return self.prefetch_related(
+            Prefetch(
+                'sightings',
+                queryset=Sighting.objects.with_frames().order_by('timestamp'),
+            )
+        )
+
+    def with_subnetwork(self):
+        return self.select_related('subnetwork')
+
+    def with_neighbours(self):
+        return self.annotate(
+            #previous=Subquery(
+            #    Meteor.objects.filter(
+            #        timestamp__lt=OuterRef('timestamp'),
+            #    ).aggregate(
+            #        Max('timestamp'),
+            #    ),
+            #),
+            previous=Window(
+                expression=Lead('name', offset=1, default=None),
+                order_by=F('timestamp').desc(),
+            ),
+            next=Window(
+                expression=Lead('name', offset=1, default=None),
+                order_by=F('timestamp').asc(),
+            ),
+        )
+
+
 class Meteor(models.Model):
     class Meta:
         verbose_name                = "meteor"
-        ordering                    = ['lightmaxTime']
+        ordering                    = ['timestamp']
 
-    objects                         = MeteorManager()
+    objects                         = MeteorManager.from_queryset(MeteorQuerySet)()
 
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -61,6 +96,7 @@ class Meteor(models.Model):
                                     )
     timestamp                       = models.DateTimeField(
                                         verbose_name        = "timestamp",
+                                        auto_now_add        = True,
                                     )
 
     magnitude                       = models.FloatField(
@@ -146,17 +182,17 @@ class Meteor(models.Model):
                                         verbose_name        = "timestamp of trail end",
                                     )
 
-    velocityX                       = models.FloatField(
+    velocity_x                      = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "geocentric velocity at infinity, x"
                                     )
-    velocityY                       = models.FloatField(
+    velocity_y                      = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "geocentric velocity at infinity, y"
                                     )
-    velocityZ                       = models.FloatField(
+    velocity_z                      = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "geocentric velocity at infinity, z"
@@ -183,17 +219,17 @@ class Meteor(models.Model):
             result = None
         return result
 
-    @method_decorator(noneIfError(ObjectDoesNotExist))
-    def previous(self):
-        return Meteor.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').name
-
-    @method_decorator(noneIfError(ObjectDoesNotExist))
-    def next(self):
-        return Meteor.objects.filter(timestamp__gt = self.timestamp).earliest('timestamp').name
+#    @method_decorator(noneIfError(ObjectDoesNotExist))
+#    def previous(self):
+#        return Meteor.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').name
+#
+#    @method_decorator(noneIfError(ObjectDoesNotExist))
+#    def next(self):
+#        return Meteor.objects.filter(timestamp__gt = self.timestamp).earliest('timestamp').name
 
     def speed(self):
         try:
-            return np.sqrt(self.velocityX**2 + self.velocityY**2 + self.velocityZ**2)
+            return np.sqrt(self.velocity_x**2 + self.velocity_y**2 + self.velocity_z**2)
         except TypeError:
             return None
 

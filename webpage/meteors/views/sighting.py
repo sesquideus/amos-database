@@ -1,11 +1,11 @@
 import io
 import datetime
 
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
+from django.contrib.auth.decorators import login_required
 from django.views import View
 from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
@@ -76,21 +76,28 @@ class SingleView(DetailView):
     slug_url_kwarg  = 'id'
     template_name   = 'meteors/sighting.html'
 
+    def get_queryset(self, **kwargs):
+        return Sighting.objects.with_neighbours().with_frames()
+
     def get_context_data(self, **kwargs):
-        maxLight = self.object.lightmaxFrame()
         return {
             'sighting':     self.object,
-            'moon':         maxLight.getMoonInfo() if maxLight else None,
-            'sun':          maxLight.getSunInfo() if maxLight else None,
-            'maxLight':     maxLight.order if maxLight else None,
+            #'moon':         maxLight.getMoonInfo() if maxLight else None,
+            #'sun':          maxLight.getSunInfo() if maxLight else None,
+            #'maxLight':     maxLight.order if maxLight else None,
         }
 
 
 @login_required
+class LightCurveView(DetailView):
+    model = Sighting
+    slug_field = 'id'
+    slug_url_kwargs = 'id'
+
 def lightCurve(request, id):
     sighting = Sighting.objects.get(id = id)
-    frames = sighting.frames.all()
-    timestamps = [frame.flightTime() for frame in frames]
+    frames = sighting.frames.with_flight_time()
+    timestamps = [frame.flight_time.total_seconds() for frame in frames]
     magnitudes = [frame.magnitude for frame in frames]
 
     fig, ax = pyplot.subplots()

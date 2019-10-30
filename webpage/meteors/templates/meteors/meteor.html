@@ -10,7 +10,8 @@
 {% endblock headextra %}
 
 {% block pagetitle %}
-    <h2>Meteor <span class="name">{{ meteor.name }}</span></h2>
+    <h2>Meteor <span class="name">{{ meteor.name }}</span> (<span class="subnetwork">{{ meteor.subnetwork }}</span>)
+    {{ meteor.previous }}{{ meteor.next }}</h2>
     <div class="controls">
         {% if meteor.previous != None %}
             <a href="{% url 'meteor' name=meteor.previous %}">
@@ -123,12 +124,12 @@
                             <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.code }}</a>
                         </td>
                         <td class="data time">
-                            <a href="{{ sighting.get_absolute_url }}">{{ sighting.lightmaxTime|date:"H:i:s.u" }}</a>
+                            <a href="{{ sighting.get_absolute_url }}">{{ sighting.frame_lightmax.timestamp|date:"H:i:s.u" }}</a>
                         </td>
-                        <td class="data magnitude">{{ sighting.lightmaxMagnitude|magnitude }}</td>
-                        <td class="data angle">{{ sighting.lightmaxAltitude|angle }}</td>
-                        <td class="data angle">{{ sighting.lightmaxAzimuth|angle }}</td>
-                        <td class="data length">{{ sighting.distance }}</td>
+                        <td class="data magnitude">{{ sighting.frame_lightmax.magnitude|magnitude }}</td>
+                        <td class="data angle">{{ sighting.frame_lightmax.altitude|angle }}</td>
+                        <td class="data angle">{{ sighting.frame_lightmax.azimuth|angle }}</td>
+                        <td class="data length">{{ sighting.frame_lightmax.distance }}</td>
                     </tr>
                 {% empty %}
                     <tr class="empty">

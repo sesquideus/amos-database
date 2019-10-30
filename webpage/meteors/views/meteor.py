@@ -87,6 +87,9 @@ class SingleView(DetailView):
     slug_url_kwarg  = 'name'
     template_name   = 'meteors/meteor.html'
 
+    def get_object(self):
+        return Meteor.objects.with_sightings().with_neighbours().get(name=self.kwargs.get('name'))
+
 
 @method_decorator(csrf_exempt, name = 'dispatch')
 class APIView(View):

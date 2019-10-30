@@ -38,7 +38,7 @@ class MeteorAdmin(admin.ModelAdmin):
                     ('beginningTime', 'beginningLatitude', 'beginningLongitude', 'beginningAltitude'),
                     ('lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude'),
                     ('endTime', 'endLatitude', 'endLongitude', 'endAltitude'),
-                    ('velocityX', 'velocityY', 'velocityZ'),
+                    ('velocity_x', 'velocity_y', 'velocity_z'),
                 ),
             },
         ),
@@ -55,5 +55,5 @@ class MeteorAdmin(admin.ModelAdmin):
         return obj.sightings.count()
     sightingCount.short_description = 'sighting count'
 
-    list_display = ['name', 'subnetwork', 'lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
+    list_display = ['name', 'timestamp', 'subnetwork', 'lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
     save_as = True

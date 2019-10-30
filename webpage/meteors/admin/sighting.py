@@ -14,13 +14,13 @@ class SightingInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
-    fields = ['station', 'angularSpeed', 'lightmaxAltitude', 'lightmaxAzimuth']
-    readonly_fields = ['station', 'angularSpeed', 'lightmaxMagnitude', 'lightmaxAltitude', 'lightmaxAzimuth', 'arcLength']
+    fields = ['station', 'angular_speed']
+    readonly_fields = ['station', 'angular_speed']
 
     
 @admin.register(Sighting)
 class SightingAdmin(admin.ModelAdmin):
-    def meteorLink(self, sighting):
+    def meteor_link(self, sighting):
         if sighting.meteor is None:
             return mark_safe("&mdash;")
         else:
@@ -28,9 +28,9 @@ class SightingAdmin(admin.ModelAdmin):
                 url = reverse("admin:meteors_meteor_change", args = [sighting.meteor.id]),
                 title = sighting.meteor.name,
             ))
-    meteorLink.short_description = "meteor"
+    meteor_link.short_description = "meteor"
 
-    def stationLink(self, sighting):
+    def station_link(self, sighting):
         if sighting.station is None:
             return mark_safe("&mdash;")
         else:
@@ -38,7 +38,7 @@ class SightingAdmin(admin.ModelAdmin):
                 url = reverse("admin:stations_station_change", args = [sighting.station.id]),
                 title = sighting.station.name,
             ))
-    stationLink.short_description = "station"
+    station_link.short_description = "station"
 
     formfield_overrides = {
         models.DateTimeField: {
@@ -56,7 +56,7 @@ class SightingAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Identity',
             {
-                'fields': ('meteor', 'station', 'timestamp'),            
+                'fields': ('meteor', 'station', 'timestamp'),
             }
         ),
         ('Images',
@@ -65,9 +65,9 @@ class SightingAdmin(admin.ModelAdmin):
             }
         ),
     )
-    readonly_fields = ['lightmaxMagnitude']
+#    readonly_fields = ['lightmaxMagnitude']
 
-    list_display = ['timestamp', 'meteorLink', 'stationLink', 'lightmaxMagnitude', 'frameCount', 'lightmaxAzimuth', 'lightmaxAltitude']
+    list_display = ['timestamp', 'meteor_link', 'station_link']
     list_filter = ['station']
     date_hierarchy = 'timestamp'
     save_as = True

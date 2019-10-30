@@ -1,6 +1,8 @@
 import math
 
 from django.db import models
+from django.db.models import F, Q, Window
+from django.db.models.functions import Lead
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 
@@ -11,6 +13,13 @@ from astropy import units
 from core.models import noneIfError
 
 
+class FrameQuerySet(models.QuerySet):
+    def with_flight_time(self):
+        return self.annotate(
+            flight_time=(F('timestamp') - self.earliest().timestamp),
+        )
+
+
 class Frame(models.Model):
     class Meta:
         verbose_name                = "sighting frame"
@@ -19,15 +28,17 @@ class Frame(models.Model):
         constraints                 = [
                                         models.UniqueConstraint(
                                             fields          = ['sighting', 'order'],
-                                            name            = 'frameOrdering',
+                                            name            = 'frame_ordering',
                                         )
                                     ]
         indexes                     = [
                                         models.Index(
                                             fields          = ['sighting', 'order'],
-                                            name            = 'sightingOrder',
+                                            name            = 'sighting_order',
                                         )
                                     ]
+
+    objects                         = FrameQuerySet.as_manager()
 
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -61,12 +72,12 @@ class Frame(models.Model):
                                         blank               = True,
                                     )
 
-    solarElongation                 = models.FloatField(
+    solar_elongation                = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "solar elongation",
                                     )
-    lunarElongation                 = models.FloatField(
+    lunar_elongation                = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "lunar elongation",
@@ -166,12 +177,6 @@ class Frame(models.Model):
             'coord': moon,
             'elong': elong,
         }
-
-    def flightTime(self):
-        if self.timestamp is None or self.sighting.firstFrame().timestamp is None:
-            return None
-
-        return (self.timestamp - self.sighting.firstFrame().timestamp).total_seconds()
 
     def airMass(self):
         try:
