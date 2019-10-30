@@ -1,12 +1,33 @@
 [[source]]
-name = "pypi"
 url = "https://pypi.org/simple"
 verify_ssl = true
+name = "pypi"
 
 [dev-packages]
 
 [packages]
-colorama = "*"
+"jinja2" = "*"
+celery = "*"
+redis = "*"
+pipfile = "*"
+django = ">=2.2.3"
+django-admin-decorators = "*"
+pyyaml = "*"
+requests = "*"
+numpy = "*"
+django-celery-beat = "*"
+"psycopg2-binary" = "*"
+"psycopg2" = "*"
+djangorestframework = "*"
+markdown = "*"
+astropy = "*"
+"flake8" = "*"
+pillow = "*"
+matplotlib = "*"
+pygal = "*"
+pip = "*"
+dotmap = "*"
+django-debug-toolbar = "*"
 
 [requires]
 python_version = "3.7"
