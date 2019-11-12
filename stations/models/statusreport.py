@@ -11,7 +11,7 @@ from astropy.time import Time
 from astropy import units
 
 import core.models
-from . import Station
+#from stations.models.station import Station
 from meteors.models import Sighting
 
 
@@ -19,7 +19,7 @@ class StatusReportManager(models.Manager):
     def createFromPOST(self, stationCode, **kwargs):
         report = self.create(
             timestamp       = kwargs.get('timestamp'),
-            station         = Station.objects.get(code = stationCode),
+            #station         = Station.objects.get(code = stationCode),
             status          = kwargs.get('status'),
             lid             = kwargs.get('lid'),
             heating         = kwargs.get('heating'),

@@ -13,7 +13,7 @@ class LogEntry(models.Model):
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "station",
-                                        help_text           = "the station in question",
+                                        help_text           = "the station",
                                         related_name        = "logs",
                                         on_delete           = models.CASCADE,
                                     )

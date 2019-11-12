@@ -59,7 +59,7 @@ def nonedash(arg):
 
 
 @register.filter
-def sinceDateTime(timestamp):
+def since_date_time(timestamp):
     delta = (datetime.datetime.now(tz = pytz.utc) - timestamp).total_seconds()
     if delta < 60:
         return f"{delta}s"

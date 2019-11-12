@@ -14,6 +14,9 @@ class StatusView(ListView):
     context_object_name = 'subnetworks'
     template_name       = 'stations/status.html'
 
+    def get_queryset(self):
+        return Subnetwork.objects.with_full_stations().with_count()
+
 
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):

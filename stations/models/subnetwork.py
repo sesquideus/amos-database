@@ -1,14 +1,31 @@
 from django.db import models
+from django.db.models import Prefetch, Count
 from django.urls import reverse
 
 import core.models
 from .station import Station
 
 
+class SubnetworkQuerySet(models.QuerySet):
+    def with_full_stations(self):
+        return self.prefetch_related(
+            Prefetch(
+                'stations',
+                queryset=Station.objects.with_last_sighting().with_last_report(),
+                to_attr='stations_full',
+            )
+        )
+
+    def with_count(self):
+        return self.annotate(station_count=Count('stations'))
+
+
 class Subnetwork(core.models.NamedModel):
     class Meta:
         verbose_name                = 'subnetwork'
         ordering                    = ['founded']
+
+    objects                         = SubnetworkQuerySet.as_manager()
 
     code                            = models.CharField(
                                         max_length          = 8,

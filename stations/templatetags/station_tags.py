@@ -8,22 +8,22 @@ from meteors.templatetags.meteor_tags import mdash
 
 register = template.Library()
 
-def reduceAzimuth(azimuth: float, number: int):
+def reduce_azimuth(azimuth: float, number: int):
     return math.floor((azimuth % 360.0) * number / 360.0 + 0.5)
 
 
 @register.filter
-def formatAzimuth(azimuth: float):
+def format_azimuth(azimuth: float):
     return ['N', 'NNE', 'NE', 'ENE', 'E', 'ESE', 'SE', 'SSE', 'S', 'SSW', 'SW', 'WSW', 'W', 'WNW', 'NW', 'NNW'][reduceAzimuth(azimuth, 16)]
 
 
 @register.filter
-def altitudeColourFront(altitude: float):
+def altitude_colour_front(altitude: float):
     return 'white' if altitude < 0 else 'black'
 
 
 @register.filter
-def altitudeColourBack(altitude: float):
+def altitude_colour_back(altitude: float):
     if altitude < 0:
         return f"hsl(240, 50%, {altitude * 5.0 / 9.0 + 50:.0f}%);"
     if altitude < 45:
@@ -63,7 +63,7 @@ def angle(value: float):
 
 
 @register.filter
-def sinceDateTime(timestamp):
+def since_date_time(timestamp):
     delta = (datetime.datetime.now(tz = pytz.utc) - timestamp).total_seconds()
     if delta < 60:
         return f"{delta}s"

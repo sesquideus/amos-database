@@ -21,16 +21,16 @@
             </tr>
         </thead>
         {% for subnetwork in subnetworks %}
-            {% for station in subnetwork.stations.all %}
+            {% for station in subnetwork.stations_full %}
                 <tr>
                     {% if forloop.first %}
-                        <td class="multihead station" rowspan="{{ subnetwork.stations.all|length }}">{{ subnetwork.code }}</td>
-                        <td class="multihead" rowspan="{{ subnetwork.stations.all|length }}">
+                        <td class="multihead station" rowspan="{{ subnetwork.station_count }}">{{ subnetwork.code }}</td>
+                        <td class="multihead" rowspan="{{ subnetwork.station_count }}">
                             <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }}</a>
                         </td>
                     {% endif %}
                     
-                    {% with sun=station.sunPosition status=station.currentStatus lastSighting=station.lastSighting %}
+                    {% with sun=station.sun_position status=station.last_report.0 last_sighting=station.last_sighting %}
                         <td class="station">
                             {{ station.code }}
                         </td>
@@ -54,7 +54,7 @@
 
                         <td id="{{ station.code }}-sunalt"
                             class="data angle"
-                            style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                            style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
                             {{ sun.alt|floatformat:1 }}°
                             <span class="sun arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
                         </td>
@@ -64,15 +64,15 @@
                         </td>
 
                         <td class="time">
-                            {% if lastSighting %}
-                                <a href="{{ lastSighting.get_absolute_url }}">{{ lastSighting.timestamp }}</a>
+                            {% if station.last_sighting.0 %}
+                                <a href="{{ station.last_sighting.0.get_absolute_url }}">{{ station.last_sighting.0.timestamp }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
                         <td class="time">
-                            {% if lastSighting %}
-                                {{ lastSighting.timestamp|sinceDateTime }}
+                            {% if station.last_sighting.0 %}
+                                {{ station.last_sighting.0.timestamp|since_date_time }}
                             {% else %}
                                 <span class="empty">never</span>
                             {% endif %}

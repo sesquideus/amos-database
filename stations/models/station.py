@@ -1,26 +1,45 @@
-import textwrap
 import datetime
-import dotmap
 import pytz
 
 from django.db import models
+from django.db.models import Prefetch
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.validators import MinValueValidator, MaxValueValidator
 
-from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
+from astropy.coordinates import EarthLocation, AltAz, get_sun
 from astropy.time import Time
-from astropy import units
 
 import core.models
 from meteors.models import Sighting
-from . import Country
+from stations.models.statusreport import StatusReport
+
+
+class StationQuerySet(models.QuerySet):
+    def with_last_sighting(self):
+        return self.prefetch_related(
+            Prefetch(
+                'sightings',
+                queryset=Sighting.objects.order_by('station_id', '-timestamp').distinct('station_id'),
+                to_attr='last_sighting',
+            )
+        )
+
+    def with_last_report(self):
+        return self.prefetch_related(
+            Prefetch(
+                'reports',
+                queryset=StatusReport.objects.order_by('station_id', '-timestamp').distinct('station_id'),
+                to_attr='last_report',
+            )
+        )
 
 
 class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
         ordering                    = ['name']
+
+    objects                         = StationQuerySet.as_manager()
 
     code                            = models.CharField(
                                         max_length          = 8,
@@ -32,7 +51,7 @@ class Station(core.models.NamedModel):
                                         'Subnetwork',
                                         null                = True,
                                         blank               = True,
-                                        on_delete           = models.CASCADE, 
+                                        on_delete           = models.CASCADE,
                                         related_name        = 'stations',
                                     )
     country                         = models.ForeignKey(
@@ -64,13 +83,13 @@ class Station(core.models.NamedModel):
                                         blank               = True,
                                         max_length          = 256,
                                         help_text           = "printable full address",
-                                    )    
+                                    )
     founded                         = models.DateField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "founding date",
                                         help_text           = "date when the station was founded",
-                                    ) 
+                                    )
     timezone                        = models.CharField(
                                         null                = False,
                                         blank               = False,
@@ -85,7 +104,6 @@ class Station(core.models.NamedModel):
                                         blank               = True,
                                     )
 
-
     def __str__(self):
         return "{name} ({subnetwork})".format(
             name        = self.name,
@@ -95,7 +113,7 @@ class Station(core.models.NamedModel):
     def get_absolute_url(self):
         return reverse('station', kwargs = {'code': self.code})
 
-    def asDict(self):
+    def as_dict(self):
         return {
             'latitude':     self.latitude,
             'longitude':    self.longitude,
@@ -104,19 +122,19 @@ class Station(core.models.NamedModel):
             'address':      self.address,
         }
 
-    def dynamicDict(self):
+    def dynamic_dict(self):
         return {
             'sun':          self.sunPosition(),
         }
 
-    def earthLocation(self):
+    def earth_location(self):
         return EarthLocation.from_geodetic(self.longitude, self.latitude, self.altitude)
 
-    def sunPosition(self, time = None):
+    def sun_position(self, time = None):
         if time is None:
             time = datetime.datetime.now()
 
-        loc = AltAz(obstime = Time(time), location = self.earthLocation())
+        loc = AltAz(obstime = Time(time), location = self.earth_location())
         sun = get_sun(Time(time)).transform_to(loc)
 
         return {
@@ -145,15 +163,15 @@ class Station(core.models.NamedModel):
             altitude    = self.altitude,
         )
 
-    def currentStatus(self):
+    def current_status(self):
         try:
             lastReport = self.reports.latest()
             timeSince = (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() 
         except ObjectDoesNotExist:
             return {
-                'id':       'noreports',
-                'short':    "no status reports",
-                'long':     "The station has never sent any reports",
+                'id': 'noreports',
+                'short': "no status reports",
+                'long': "The station has never sent any reports",
             }
 
         if timeSince > 180:
