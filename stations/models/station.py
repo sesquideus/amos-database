@@ -2,7 +2,7 @@ import datetime
 import pytz
 
 from django.db import models
-from django.db.models import Prefetch, F
+from django.db.models import Prefetch, F, Q, OuterRef
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -28,7 +28,9 @@ class StationQuerySet(models.QuerySet):
         return self.prefetch_related(
             Prefetch(
                 'reports',
-                queryset=StatusReport.objects.order_by('station_id', '-timestamp').distinct('station_id'),
+                queryset=StatusReport.objects
+                    .order_by('station_id', '-timestamp')
+                    .distinct('station_id'),
                 to_attr='last_report',
             )
         )
@@ -38,6 +40,17 @@ class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
         ordering                    = ['name']
+        constraints                 = [
+                                        models.CheckConstraint(
+                                            check=Q(
+                                                latitude__gte=-90,
+                                                latitude__lte=90,
+                                                longitude__gte=-180,
+                                                longitude__lte=180
+                                            ),
+                                            name='coordinates',
+                                        )
+                                    ]
 
     objects                         = StationQuerySet.as_manager()
 

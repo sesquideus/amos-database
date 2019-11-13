@@ -27,6 +27,11 @@ class SingleView(DetailView):
     slug_url_kwarg  = 'code'
     template_name   = 'stations/station.html'
 
+    def get_object(self, **kwargs):
+        station = super().get_object(**kwargs)
+        station.recent_reports = StatusReport.objects.for_station(station.id)
+        return station
+
 
 @method_decorator(login_required, name = 'dispatch')
 class SingleViewJSON(JSONDetailView):

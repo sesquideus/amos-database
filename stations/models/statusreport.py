@@ -30,13 +30,18 @@ class StatusReportManager(models.Manager):
         return report
 
 
+class StatusReportQuerySet(models.QuerySet):
+    def for_station(self, station_id, count=10):
+        return self.filter(station__id=station_id).order_by('-timestamp')[:count]
+
+
 class StatusReport(models.Model):
     class Meta:
         verbose_name                = 'status report'
         verbose_name_plural         = 'status reports'
         get_latest_by               = ['timestamp']
         indexes                     = [
-                                        models.Index(fields=['station', 'timestamp']),
+                                        models.Index(fields=['timestamp', 'station']),
                                     ]
 
     LID_STATES                      = [
@@ -50,7 +55,7 @@ class StatusReport(models.Model):
                                         ('P', 'problem'),
                                     ]
 
-    objects                         = StatusReportManager()
+    objects                         = StatusReportQuerySet.as_manager()
 
     timestamp                       = models.DateTimeField(
                                         verbose_name        = 'timestamp',

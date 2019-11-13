@@ -31,15 +31,15 @@
                     <th>magnitude</th>
                 </tr>
             </thead>
-            {% with sun=station.sunPosition %}
+            {% with sun=station.sun_position %}
                 <tr>
                     <td>Sun</td>
-                    <td class="data sun" style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                    <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
                         <span class="suninfo standalone">
                             {{ sun.alt|floatformat:1 }}°
                         </span>
                     </td>
-                    <td class="data arrow" style="background-color: {{ sun.alt|altitudeColourBack }}; color: {{ sun.alt|altitudeColourFront }};">
+                    <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
                         <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
                     </td>
                     <td class="data sun">
@@ -76,7 +76,7 @@
             {% endfor %}
         </table>
 
-    <h3>Status ({{ station.reports.count }} reports total)</h3>
+    <h3>Status ({{ station.recent_reports.count }} reports total)</h3>
         <table>
             <thead>
                 <tr>
@@ -89,7 +89,7 @@
                     <th>humidity</th>
                 </tr>
             </thead>
-            {% for report in station.latestStatusReports %}
+            {% for report in station.recent_reports %}
                 <tr>
                     <td class="data timestamp">{{ report.timestamp|date:"Y-m-d H:i:s" }}</td>
                     <td class="data status">{{ report.status }}</td>
