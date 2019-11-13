@@ -30,7 +30,7 @@
                         </td>
                     {% endif %}
                     
-                    {% with sun=station.sun_position status=station.last_report.0 last_sighting=station.last_sighting %}
+                    {% with sun=station.sun_position report=station.last_report last_sighting=station.last_sighting %}
                         <td class="station">
                             {{ station.code }}
                         </td>
@@ -40,9 +40,13 @@
                         </td>
                     
                         <td class="status data">
-                            <abbr class="{{ status.id }}" title="{{ status.long }}">{{ status.short }}</abbr>
-                            {% if status.extra %}
-                                ({{ status.extra }})
+                            {% if report %}
+                                <abbr class="{{ report.0.type }}" title="{{ report.0.long }}">{{ report.0.status }}</abbr>
+                                {% if report.extra %}
+                                    ({{ report.extra }})
+                                {% endif %}
+                            {% else %}
+                                <span class="empty">No status info</span>
                             {% endif %}
                         </td>
                     

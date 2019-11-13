@@ -3,8 +3,10 @@ from django.db import models
 from django.forms import Textarea
 from .models import Country, Subnetwork, Station, LogEntry, StatusReport
 
+
 class StationInline(admin.TabularInline):
     model = Station
+
 
 class LogEntryInline(admin.TabularInline):
     model = LogEntry
@@ -21,10 +23,12 @@ class LogEntryInline(admin.TabularInline):
 class CountryAdmin(admin.ModelAdmin):
     pass
 
+
 @admin.register(Subnetwork)
 class SubnetworkAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'count']
+    list_display = ['name', 'code', 'count', 'founded']
     inlines = [StationInline]
+
 
 @admin.register(Station)
 class StationAdmin(admin.ModelAdmin):
@@ -39,7 +43,9 @@ class StationAdmin(admin.ModelAdmin):
         ),
     )
     list_display = ['name', 'code', 'address', 'subnetwork', 'latitude', 'longitude', 'altitude', 'timezone']
+    list_display_links = ['name', 'subnetwork']
     inlines = [LogEntryInline]
+
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
@@ -48,7 +54,8 @@ class LogEntryAdmin(admin.ModelAdmin):
 
     readonly_fields = ['created', 'updated']
 
+
 @admin.register(StatusReport)
 class StatusReportAdmin(admin.ModelAdmin):
-   
+    list_filter = ['station'] 
     readonly_fields = ['timestamp', 'received']

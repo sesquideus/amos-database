@@ -36,7 +36,7 @@ class StatusReport(models.Model):
         verbose_name_plural         = 'status reports'
         get_latest_by               = ['timestamp']
         indexes                     = [
-                                        models.Index(fields = ['station', 'timestamp']),
+                                        models.Index(fields=['station', 'timestamp']),
                                     ]
 
     LID_STATES                      = [

@@ -2,7 +2,7 @@ import datetime
 import pytz
 
 from django.db import models
-from django.db.models import Prefetch
+from django.db.models import Prefetch, F
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
