@@ -1,10 +1,11 @@
 from django.db import models
+
     
 class Trajectory(models.Model):
     class Meta:
         verbose_name = "heliocentric trajectory"
 
-    semiMajorAxis                   = models.FloatField(
+    semimajor_axis                  = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "semi-major axis",
@@ -19,14 +20,14 @@ class Trajectory(models.Model):
                                         blank               = True,
                                         verbose_name        = "inclination",
                                     )
-    argumentOfPerihelion            = models.FloatField(
+    argument_of_perihelion          = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "argument of perihelion",
                                     )
-    meanAnomaly                     = models.FloatField(
+    longitude_of_ascending_node     = models.FloatField(
                                         null                = True,
                                         blank               = True,
-                                        verbose_name        = "mean anomaly",
+                                        verbose_name        = "longitude of the ascending node",
                                     )
 

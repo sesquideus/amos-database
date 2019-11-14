@@ -17,11 +17,10 @@ from django.views.generic.list import ListView
 
 from stations.models import Station, Subnetwork, StatusReport
 from meteors.models import Sighting
-from core.views import JSONDetailView, JSONListView
+from core.views import JSONDetailView, JSONListView, LoginDetailView
 
 
-@method_decorator(login_required, name = 'dispatch')
-class SingleView(DetailView):
+class SingleView(LoginDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
@@ -44,8 +43,6 @@ class SingleViewJSON(JSONDetailView):
 class ListViewJSON(JSONListView):
     model               = Station
     context_object_name = 'stations'
-
-    
 
 
 #@method_decorator(login_required, name = 'dispatch')

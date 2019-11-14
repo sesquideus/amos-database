@@ -5,7 +5,7 @@ import numpy as np
 from django.db import models
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
-from django.db.models import Prefetch, F, Q, Value, Window, Min
+from django.db.models import Prefetch, F, Q, Value, Window, Min, Count, Subquery, OuterRef
 from django.db.models.functions import Coalesce, Lead
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -102,25 +102,37 @@ class SightingQuerySet(models.QuerySet):
             ),
         )
 
+    def with_station(self):
+        return self.select_related('station')
+
+    def with_meteor(self):
+        return self.select_related('meteor')
+
+    def with_frame_count(self):
+        return self.annotate(frame_count=Count('frames'))
+
     def with_frames(self):
         return self.prefetch_related(
             Prefetch(
                 'frames',
-                queryset=Frame.objects.with_flight_time(),
+                queryset=Frame.objects.all().with_flight_time(),
             )
-        ).annotate(
-            first=Value(Frame.objects.earliest('timestamp').id, output_field=models.IntegerField()),
-            frame_lightmax=Window(
-                expression=Min('frames__magnitude'),
-                partition_by=[F('frames__sighting')],
-            ),
-            last=Value(Frame.objects.latest('timestamp').id, output_field=models.IntegerField()),
         )
+        
+    def with_lightmax(self):
+        frames = Frame.objects.filter(sighting=OuterRef('id')).order_by('magnitude')
+        return self.annotate( 
+            magnitude=Subquery(frames.values('magnitude')[:1]), 
+            azimuth=Subquery(frames.values('azimuth')[:1]), 
+            altitude=Subquery(frames.values('altitude')[:1]),  
+        )                                                   
 
     def for_station(self, station_id):
-        return self.filter(
-            Q(station__id=station_id)
-        )
+        return self.filter(station__id=station_id)
+
+    def for_date(self, date):
+        return self.filter(timestamp__date=date)
+
 
 class Sighting(models.Model):
     class Meta:
@@ -172,6 +184,9 @@ class Sighting(models.Model):
         return reverse('sighting', kwargs = {'id': self.id})
 
     # frame shortcuts
+
+    def distance(self):
+        return 
 
     def arcLength(self):
         first = self.firstFrame()

@@ -29,6 +29,7 @@ pip = "*"
 dotmap = "*"
 django-debug-toolbar = "*"
 ipython = "*"
+pycycle = "*"
 
 [requires]
 python_version = "3.7"

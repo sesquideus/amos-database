@@ -207,6 +207,6 @@ class Station(core.models.NamedModel):
             'id':       self.id,
             'code':     self.code,
             'name':     self.name,
-            'status':   self.currentStatus(),
+            'status':   self.current_status(),
         }
 

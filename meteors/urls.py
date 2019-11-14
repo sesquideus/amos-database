@@ -2,7 +2,6 @@ from django.urls import path
 from .views import meteor, sighting, frame
 
 urlpatterns = [
-
     # Meteor listings
     path('meteors/',                                meteor.ListDateView.as_view(),          name = 'listMeteors'),
     path('meteors/json',                            meteor.listJSON,                        name = 'listMeteorsJSON'),

@@ -1,7 +1,10 @@
 from django.shortcuts import render
-from django.views.generic.detail import BaseDetailView
-from django.views.generic.list import BaseListView
+from django.views.generic.detail import DetailView, BaseDetailView
+from django.views.generic.list import ListView, BaseListView
+from django.contrib.auth.mixins import LoginRequiredMixin
 from django.http import JsonResponse
+
+from django.urls import reverse
 
 # Create your views here.
 
@@ -29,4 +32,8 @@ class JSONListView(BaseListView):
 
 def about(request):
     return render(request, 'core/about.html', {})
+
+
+class LoginDetailView(LoginRequiredMixin, DetailView):
+    login_url = '/login/'
 

@@ -30,7 +30,7 @@ class ListDateView(ListView):
 
     def get_queryset(self):
         self.time = DateParser(self.request)  
-        return Sighting.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo).select_related('station')
+        return Sighting.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo).with_frame_count().with_station().with_meteor().with_lightmax()
 
     def get_context_data(self):
         context = super().get_context_data()
@@ -72,12 +72,19 @@ class ListByStationView(ListDateView):
 @method_decorator(login_required, name = 'dispatch')
 class SingleView(DetailView):
     model           = Sighting
+    queryset        = Sighting.objects.with_neighbours().with_frames().with_station().with_meteor().with_lightmax()
     slug_field      = 'id'
     slug_url_kwarg  = 'id'
     template_name   = 'meteors/sighting.html'
 
-    def get_queryset(self, **kwargs):
-        return Sighting.objects.with_neighbours().with_frames()
+    def get_object(self):
+        sighting = super().get_object()
+        frames = sighting.frames
+        if frames.count() == 0:
+            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = None, None, None
+        else:
+            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = sighting.frames.order_by('timestamp')[0], sighting.frames.order_by('-timestamp')[0], sighting.frames.order_by('magnitude')[0]
+        return sighting
 
     def get_context_data(self, **kwargs):
         return {
@@ -93,12 +100,12 @@ class LightCurveView(DetailView):
     model = Sighting
     slug_field = 'id'
     slug_url_kwargs = 'id'
+    queryset = Sighting.objects.with_frames().with_lightmax()
 
 def lightCurve(request, id):
-    sighting = Sighting.objects.get(id = id)
-    frames = sighting.frames.with_flight_time()
-    timestamps = [frame.flight_time.total_seconds() for frame in frames]
-    magnitudes = [frame.magnitude for frame in frames]
+    sighting = Sighting.objects.with_frames().get(id=id)
+    timestamps = [frame.flight_time.total_seconds() for frame in sighting.frames.all()]
+    magnitudes = [frame.magnitude for frame in sighting.frames.all()]
 
     fig, ax = pyplot.subplots()
     fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
