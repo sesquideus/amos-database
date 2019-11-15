@@ -24,4 +24,3 @@ class SingleView(DetailView):
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
     template_name   = 'stations/subnetwork.html'
-

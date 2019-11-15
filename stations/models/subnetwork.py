@@ -1,5 +1,5 @@
 from django.db import models
-from django.db.models import Prefetch, Count
+from django.db.models import Prefetch, Count, F
 from django.urls import reverse
 
 import core.models
