@@ -72,10 +72,10 @@ TEMPLATES = [
                 'django.template.context_processors.request',
                 'django.contrib.auth.context_processors.auth',
                 'django.contrib.messages.context_processors.messages',
-                'core.context_processors.mainMenu',
+                'core.context_processors.main_menu',
             ],
             'debug': DEBUG,
-            'string_if_invalid': 'Invalid template variable: "%s"',
+            'string_if_invalid': '<%s>',
         },
     },
 ]

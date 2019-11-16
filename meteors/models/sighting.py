@@ -1,4 +1,5 @@
 import datetime
+import pytz
 import math
 import numpy as np
 
@@ -115,7 +116,7 @@ class SightingQuerySet(models.QuerySet):
         return self.prefetch_related(
             Prefetch(
                 'frames',
-                queryset=Frame.objects.all().with_flight_time(),
+                queryset=Frame.objects.with_flight_time(),
             )
         )
         
@@ -129,9 +130,14 @@ class SightingQuerySet(models.QuerySet):
 
     def for_station(self, station_id):
         return self.filter(station__id=station_id)
-
-    def for_date(self, date):
-        return self.filter(timestamp__date=date)
+    
+    def for_night(self, date):
+        midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
+        half_day = datetime.timedelta(hours=12)
+        return self.filter(
+            timestamp__gte=midnight - half_day,
+            timestamp__lte=midnight + half_day,
+        )
 
 
 class Sighting(models.Model):

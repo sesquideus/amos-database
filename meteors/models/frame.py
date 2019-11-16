@@ -1,7 +1,7 @@
 import math
 
 from django.db import models
-from django.db.models import F, Q, Window
+from django.db.models import F, Q, Window, Subquery, OuterRef, Min, Max, Window
 from django.db.models.functions import Lead
 from django.urls import reverse
 from django.utils.decorators import method_decorator
@@ -16,7 +16,10 @@ from core.models import noneIfError
 class FrameQuerySet(models.QuerySet):
     def with_flight_time(self):
         return self.annotate(
-            flight_time=(F('timestamp') - self.earliest().timestamp),
+            flight_time=F('timestamp') - Window( 
+                expression=Min('timestamp'), 
+                partition_by=F('sighting__id'), 
+            )
         )
 
 

@@ -29,22 +29,25 @@ class ListDateView(ListView):
     model = Sighting
 
     def get_queryset(self):
-        self.time = DateParser(self.request)  
-        return Sighting.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo).with_frame_count().with_station().with_meteor().with_lightmax()
+        if self.request.GET.get('date'):
+            self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
+        else:
+            self.date = datetime.date.today()
+        return Sighting.objects.for_night(self.date).with_frame_count().with_station().with_meteor().with_lightmax()
 
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'form':         DateForm(initial = {'datetime': self.time.midnight}),
-            'navigation':   reverse('listSightings')
+            'form':         DateForm(initial = {'date': self.date}),
+            'navigation':   reverse('list-sightings'),
+            'date':         self.date,
         })
-        context.update(self.time.context())
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('listSightings') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+            return HttpResponseRedirect(reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
         else:
             return HttpResponseBadRequest()
 
@@ -54,17 +57,17 @@ class ListByStationView(ListDateView):
     template_name = 'meteors/list-sightings-station.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(station__code = self.kwargs['stationCode'])
+        return super().get_queryset().for_station(self.kwargs['station-code'])
     
     def get_context_data(self):
         context = super().get_context_data()
-        context['station'] = Station.objects.get(code = self.kwargs['stationCode'])
+        context['station'] = Station.objects.get(code = self.kwargs['station-code'])
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('listSightingsByStation') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+            return HttpResponseRedirect(reverse('list-sightings-by-station') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
         else:
             return HttpResponseBadRequest()
 
@@ -102,7 +105,7 @@ class LightCurveView(DetailView):
     slug_url_kwargs = 'id'
     queryset = Sighting.objects.with_frames().with_lightmax()
 
-def lightCurve(request, id):
+def light_curve(request, id):
     sighting = Sighting.objects.with_frames().get(id=id)
     timestamps = [frame.flight_time.total_seconds() for frame in sighting.frames.all()]
     magnitudes = [frame.magnitude for frame in sighting.frames.all()]

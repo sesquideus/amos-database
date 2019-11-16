@@ -150,10 +150,9 @@
                     {% endfor %}
                 </tbody>
             </table>
-            {{ sighting.frames.first }}{{ sighting.frames.last }}
             
             <h3>Light curve</h3>
-            <img class="chart" src="{% url 'sightingLightCurve' id=sighting.id %}" alt="Light curve" />
+            <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
         </div>
         <div class="preview">
             {% if sighting.composite %}

@@ -1,3 +1,5 @@
+import datetime
+import pytz
 import numpy as np
 
 from django.db import models
@@ -48,7 +50,7 @@ class MeteorQuerySet(models.QuerySet):
         return self.prefetch_related(
             Prefetch(
                 'sightings',
-                queryset=Sighting.objects.with_frames().order_by('timestamp'),
+                queryset=Sighting.objects.with_frames().with_station().with_lightmax().order_by('timestamp'),
             )
         )
 
@@ -57,21 +59,36 @@ class MeteorQuerySet(models.QuerySet):
 
     def with_neighbours(self):
         return self.annotate(
-            #previous=Subquery(
-            #    Meteor.objects.filter(
-            #        timestamp__lt=OuterRef('timestamp'),
-            #    ).aggregate(
-            #        Max('timestamp'),
-            #    ),
-            #),
-            previous=Window(
-                expression=Lead('name', offset=1, default=None),
-                order_by=F('timestamp').desc(),
+            previous=Subquery(
+                Meteor.objects.filter(
+                    timestamp__lt=OuterRef('timestamp'),
+                ).order_by(
+                    '-timestamp'
+                ).values('name')[:1]
             ),
-            next=Window(
-                expression=Lead('name', offset=1, default=None),
-                order_by=F('timestamp').asc(),
+            next=Subquery(
+                Meteor.objects.filter(
+                    timestamp__gt=OuterRef('timestamp'),
+                ).order_by(
+                    'timestamp'
+                ).values('name')[:1]
             ),
+         #   previous=Window(
+         #       expression=Lead('name', offset=1, default=None),
+         #       order_by=F('timestamp').desc(),
+         #   ),
+         #   next=Window(
+         #       expression=Lead('name', offset=1, default=None),
+         #       order_by=F('timestamp').asc(),
+         #   ),
+        )
+
+    def for_night(self, date):
+        midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
+        half_day = datetime.timedelta(hours=12)
+        return self.filter(
+            timestamp__gte=midnight - half_day,
+            timestamp__lte=midnight + half_day,
         )
 
 

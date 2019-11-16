@@ -14,13 +14,13 @@
 
 {% block page %}
     <div class="navigation">
-        <a href="{{ request.path }}?date={{ date|previousDay|date:"Y-m-d" }}">&lt;&lt;</a>
+        <a href="{{ request.path }}?date={{ date|previous_day|date:"Y-m-d" }}">&lt;&lt;</a>
         <form class="date" action="{{ request.path }}" method="post">
             {% csrf_token %}
             {{ form.as_p }}
             <input type="submit" value="change">
         </form>
-        <a href="{{ request.path }}?date={{ date|nextDay|date:"Y-m-d" }}">&gt;&gt;</a>
+        <a href="{{ request.path }}?date={{ date|next_day|date:"Y-m-d" }}">&gt;&gt;</a>
     </div>
     <h3>
         {% block stationName %}All stations{% endblock %}

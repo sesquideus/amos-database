@@ -36,19 +36,6 @@ class StationQuerySet(models.QuerySet):
         )
 
 
-class StationQuerySet(models.QuerySet):
-    def with_last_sighting(self):
-        return self.prefetch_related(
-            Prefetch(
-                'sightings',
-                queryset=Sighting.objects.latest(),
-            )
-        )
-
-    def with_status_report(self):
-        return self
-
-
 class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'

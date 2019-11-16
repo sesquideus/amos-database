@@ -29,22 +29,25 @@ class ListDateView(ListView):
     template_name       = 'meteors/list-meteors.html'
 
     def get_queryset(self):
-        self.time = DateParser(self.request)  
-        return Meteor.objects.filter(timestamp__gte = self.time.timeFrom, timestamp__lte = self.time.timeTo)
+        if self.request.GET.get('date'):
+            self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
+        else:
+            self.date = datetime.date.today()
+        return Meteor.objects.with_sightings().for_night(self.date)
 
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'form':         DateForm(initial = {'datetime': self.time.midnight}),
-            'navigation':   reverse('listMeteors')
+            'form':         DateForm(initial={'date': self.date}),
+            'navigation':   reverse('list-meteors')
         })
-        context.update(self.time.context())
+#        context.update(self.time.context())
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(f"{reverse('listMeteors')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
+            return HttpResponseRedirect(f"{reverse('list-meteors')}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
         else:
             return HttpResponseBadRequest()
 

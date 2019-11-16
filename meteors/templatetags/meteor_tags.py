@@ -20,17 +20,17 @@ def mdash(func):
 
 
 @register.filter
-def previousDay(date):
+def previous_day(date):
     return date + datetime.timedelta(days = -1)
 
 
 @register.filter
-def nextDay(date):
+def next_day(date):
     return date + datetime.timedelta(days = 1)
 
 
 @register.filter
-def magnitudeColour(magnitude: float):
+def magnitude_colour(magnitude: float):
     white = 1 / (1 + math.exp(magnitude / 3))
     return "hsl(0, 0%, {:.0f}%)".format(white * 75 + 25)
 
@@ -67,6 +67,3 @@ def since_date_time(timestamp):
         return f"{delta / 60:02.0f}m{delta % 60:02.0f}s"
     if delta < 86400:
         return f"{delta / 3600:02.0f}h{delta % 3600 / 60:02.0f}m"
-
-
-

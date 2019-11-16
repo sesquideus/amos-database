@@ -13,4 +13,8 @@ class SingleView(DetailView):
     template_name   = 'meteors/frame.html'
 
     def get_object(self):
-        return Frame.objects.filter(sighting = self.kwargs['sighting']).get(order = self.kwargs['order'])
+        return Frame.objects.filter(
+            sighting=self.kwargs['sighting']
+        ).get(
+            order=self.kwargs['order']
+        )
