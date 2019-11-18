@@ -78,6 +78,10 @@
                         <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
                     </tr>
                     <tr>
+                        <td>arc length</td>
+                        <td class="data length">{{ sighting.arc_length|floatformat:2 }}°</td>
+                    </tr>
+                    <tr>
                         <td>distance to meteor centre</td>
                         <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
                     </tr>

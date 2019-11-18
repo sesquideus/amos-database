@@ -2,6 +2,7 @@
 {% load static %}
 {% load tz %}
 {% load station_tags %}
+{% load meteor_tags %}
 
 {% block pagetitle %}
     <h2>Station <span class="bold">{{ station.name }}</span> (<span class="bold">{{ station.code }}</span>)</h2>
@@ -17,11 +18,11 @@
         <p>{{ station.address }}</p>
         <p id="location">{{ station.location }}</p>
         <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
-        {% with status=station.currentStatus %}
-            <p id="status">{{ status.short}}</p>
+        {% with status=station.current_status %}
+            <p id="status">{{ status.short }}</p>
         {% endwith %}
 
-    <h3>Sky info</h3>
+    <h3>Sky at this moment</h3>
         <table>
             <thead>
                 <tr>
@@ -55,17 +56,17 @@
             {% endwith %}
         </table>
 
-    <h3>Sightings</h3>
+    <h3>Sightings ({{ station.sightings.count }} total)</h3>
         <table>
             <tr>
                 <th>timestamp</th>
                 <th>magnitude</th>
             </tr>
-            {% for sighting in station.latestSightings %}
+            {% for sighting in station.recent_sightings %}
                 <tr>
                     <td class="data time"><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</td>
                     <td class="data magnitude">
-                        {{ sighting.magnitude|stringformat:"+.2f"|default_if_none:"&mdash;" }}</td>
+                        {{ sighting.magnitude|magnitude }}</td>
                 </tr>
             {% empty %}
                 <tr>
@@ -76,7 +77,7 @@
             {% endfor %}
         </table>
 
-    <h3>Status ({{ station.recent_reports.count }} reports total)</h3>
+    <h3>Status ({{ station.reports.count }} reports total)</h3>
         <table>
             <thead>
                 <tr>
@@ -116,7 +117,7 @@
                 </tr>
             </thead>
             <tbody>
-                {% for entry in station.logs.all|slice:":10" %}
+                {% for entry in station.log_entries.all|slice:":10" %}
                     <tr>
                         <td>{{ entry.created|date:"Y-m-d" }}</td>
                         <td>{{ entry.text }}</td>

@@ -41,7 +41,7 @@
                     
                         <td class="status data">
                             {% if report %}
-                                <abbr class="{{ report.0.type }}" title="{{ report.0.long }}">{{ report.0.status }}</abbr>
+                                <abbr class="{{ report.0.type }}" title="{{ report.0.time }}">{{ report.0.status }}</abbr>
                                 {% if report.extra %}
                                     ({{ report.extra }})
                                 {% endif %}

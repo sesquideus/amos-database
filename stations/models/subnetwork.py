@@ -40,10 +40,6 @@ class Subnetwork(core.models.NamedModel):
                                         help_text           = "date when the subnetwork was founded",
                                     )
 
-    def count(self):
-        return Station.objects.filter(subnetwork = self.id).count()
-    count.short_description = 'Station count'
-
     def centre(self):
         stations = self.station_set.all()
         return {

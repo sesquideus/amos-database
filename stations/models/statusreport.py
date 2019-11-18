@@ -2,6 +2,7 @@ import textwrap
 import datetime
 import pytz
 from django.db import models
+from django.apps import apps
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
@@ -11,15 +12,22 @@ from astropy.time import Time
 from astropy import units
 
 import core.models
-#from stations.models.station import Station
 from meteors.models import Sighting
 
 
 class StatusReportManager(models.Manager):
-    def create_from_POST(self, stationCode, **kwargs):
+    def get_queryset(self):
+        return StatusReportQuerySet(
+            model=self.model,
+            using=self._db,
+            hints=self._hints,
+        )
+
+    def create_from_POST(self, code, **kwargs):
+        Station = apps.get_model('stations', 'Station')
         report = self.create(
             timestamp       = kwargs.get('timestamp'),
-            #station         = Station.objects.get(code = stationCode),
+            station         = Station.objects.get(code=code),
             status          = kwargs.get('status'),
             lid             = kwargs.get('lid'),
             heating         = kwargs.get('heating'),
@@ -31,14 +39,20 @@ class StatusReportManager(models.Manager):
 
 
 class StatusReportQuerySet(models.QuerySet):
-    def for_station(self, station_id, count=10):
-        return self.filter(station__id=station_id).order_by('-timestamp')[:count]
+    def for_station(self, station_id, *, count=10):
+        return self.filter(station__id=station_id)[:count]
+
+    def with_age(self):
+        return self.annotate(
+            age=datetime.datetime.now() - F('timestamp'),
+        )
 
 
 class StatusReport(models.Model):
     class Meta:
         verbose_name                = 'status report'
         verbose_name_plural         = 'status reports'
+        ordering                    = ['-timestamp']
         get_latest_by               = ['timestamp']
         indexes                     = [
                                         models.Index(fields=['timestamp', 'station']),
@@ -55,7 +69,7 @@ class StatusReport(models.Model):
                                         ('P', 'problem'),
                                     ]
 
-    objects                         = StatusReportQuerySet.as_manager()
+    objects                         = StatusReportManager.from_queryset(StatusReportQuerySet)()
 
     timestamp                       = models.DateTimeField(
                                         verbose_name        = 'timestamp',

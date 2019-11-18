@@ -13,8 +13,14 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    <h3>Subnetwork info</h3>
-        <p>Founded on {{ subnetwork.founded }}</p>
+    <p>
+        Founded on
+        {% if subnetwork.founded %}
+            {{ subnetwork.founded }}
+        {% else %}
+            <span class="empty">unknown date</span>
+        {% endif %}
+    </p>
 
     <h3>Stations</h3>
         <table>
@@ -38,7 +44,7 @@
                     </tr>
                 {% empty %}
                     <tr>
-                        <td class="empty" colspan="4">There are no stations in this subnetwork.</td>
+                        <td class="empty" colspan="5">There are no stations in this subnetwork.</td>
                     </tr>
                 {% endfor %}
             </tbody>

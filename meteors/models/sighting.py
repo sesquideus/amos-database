@@ -27,13 +27,20 @@ class SightingManager(models.Manager):
         Reverse observation: create a sighting from a Meteor instance in the database.
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
     """
-    def createForMeteor(self, meteor, station, **kwargs):
+    def get_queryset(self):
+        return SightingQuerySet(
+            model=self.model,
+            using=self._db,
+            hints=self._hints,
+        )
+
+    def create_for_meteor(self, meteor, station, **kwargs):
         print(f"Creating a sighting for meteor {meteor}, station {station}")
         
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = meteor.timestamp,
-            angularSpeed        = np.random.normal(0, 30),
+            angular_speed       = np.random.normal(0, 30),
             meteor              = meteor,
             station             = Station.objects.get(code = station),
         )
@@ -51,7 +58,7 @@ class SightingManager(models.Manager):
         for x in np.arange(0, cnt):
             mag = mag + np.random.random() if np.random.random() < x / cnt else mag - np.random.random()
             Frame.objects.create(
-                timestamp   = time + datetime.timedelta(seconds = x * 0.05),
+                timestamp   = time + datetime.timedelta(seconds=x * 0.05),
                 sighting    = sighting,
                 order       = x,
                 x           = np.random.randint(0, 1600),
@@ -64,16 +71,16 @@ class SightingManager(models.Manager):
     """
         Create a new Sighting from data received at the POST endpoint.
     """
-    def createFromPOST(self, stationCode, **kwargs):
-        print(f"Creating a sighting from POST at station {stationCode}")
+    def create_from_POST(self, station_code, **kwargs):
+        print(f"Creating a sighting from POST at station {station_code}")
         pp(kwargs)
         
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = datetime.datetime.strptime(kwargs.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
-            angularSpeed        = kwargs.get('angularSpeed'),
+            angular_speed       = kwargs.get('angular_speed'),
             meteor              = None,
-            station             = Station.objects.get(code = stationCode),
+            station             = Station.objects.get(code = station_code),
         )
 
         for order, frame in enumerate(kwargs.get('frames')):
@@ -128,6 +135,9 @@ class SightingQuerySet(models.QuerySet):
             altitude=Subquery(frames.values('altitude')[:1]),  
         )                                                   
 
+    def with_everything(self):
+        return self.with_station().with_meteor().with_frames().with_frame_count()
+
     def for_station(self, station_id):
         return self.filter(station__id=station_id)
     
@@ -146,7 +156,7 @@ class Sighting(models.Model):
         ordering                    = ['timestamp']
         get_latest_by               = 'timestamp'
 
-    objects                         = SightingQuerySet.as_manager()
+    objects                         = SightingManager.from_queryset(SightingQuerySet)()
 
     id                              = models.AutoField(
                                         primary_key         = True,
@@ -189,14 +199,12 @@ class Sighting(models.Model):
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})
 
-    # frame shortcuts
-
     def distance(self):
         return 
 
-    def arcLength(self):
-        first = self.firstFrame()
-        last = self.lastFrame()
+    def arc_length(self):
+        first = self.frames.earliest()
+        last = self.frames.latest()
         phi1 = math.radians(first.altitude)
         phi2 = math.radians(last.altitude)
         lambda1 = math.radians(first.azimuth)

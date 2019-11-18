@@ -30,6 +30,7 @@ dotmap = "*"
 django-debug-toolbar = "*"
 ipython = "*"
 pycycle = "*"
+sqlparse = "*"
 
 [requires]
 python_version = "3.7"

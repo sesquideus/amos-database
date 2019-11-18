@@ -28,7 +28,8 @@ class SingleView(LoginDetailView):
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.recent_reports = StatusReport.objects.for_station(station.id)
+        station.recent_reports = StatusReport.objects.for_station(station.id, count=10)
+        station.recent_sightings = Sighting.objects.for_station(station.id).with_lightmax()[:10]
         return station
 
 
@@ -59,7 +60,7 @@ class APIView(View):
         try:
             data = json.loads(request.body)
 
-            report = StatusReport.objects.createFromPOST(code, **data)
+            report = StatusReport.objects.create_from_POST(code, **data)
             report.save()
 
             response = HttpResponse('Status update received', status = 201)
@@ -69,7 +70,7 @@ class APIView(View):
         except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
-        except Exception as E:
+        except Exception as e:
             print(e)
             return HttpResponseBadRequest()
 
@@ -84,7 +85,7 @@ class APIViewSighting(View):
         try:
             data = json.loads(request.body)
 
-            sighting = Sighting.objects.createFromPOST(code, **data)
+            sighting = Sighting.objects.create_from_POST(code, **data)
 
             response = HttpResponse('New sighting received', status = 201)
             response['location'] = reverse('sighting', args = [sighting.id])
@@ -93,6 +94,6 @@ class APIViewSighting(View):
         except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
-        except Exception as E:
+        except Exception as e:
             print(e)
             return HttpResponseBadRequest()

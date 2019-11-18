@@ -33,7 +33,7 @@ class ListDateView(ListView):
             self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
         else:
             self.date = datetime.date.today()
-        return Sighting.objects.for_night(self.date).with_frame_count().with_station().with_meteor().with_lightmax()
+        return Sighting.objects.for_night(self.date).with_everything()
 
     def get_context_data(self):
         context = super().get_context_data()

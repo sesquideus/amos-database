@@ -26,7 +26,7 @@ class CountryAdmin(admin.ModelAdmin):
 
 @admin.register(Subnetwork)
 class SubnetworkAdmin(admin.ModelAdmin):
-    list_display = ['name', 'code', 'count', 'founded']
+    list_display = ['name', 'code', 'founded']
     inlines = [StationInline]
 
 

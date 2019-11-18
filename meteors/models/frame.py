@@ -111,63 +111,63 @@ class Frame(models.Model):
         return result
 
     @method_decorator(noneIfError(AttributeError))
-    def skyCoord(self):
+    def sky_coord(self):
         return AltAz(
             alt         = self.altitude * units.degree,
             az          = self.azimuth * units.degree,
-            location    = self.sighting.station.earthLocation(),
+            location    = self.sighting.station.earth_location(),
             obstime     = Time(self.timestamp),
         )
 
-    def coordAltAz(self):
+    def coord_alt_az(self):
         if self.sighting is None or self.sighting.station is None:
             return None
         else:
-            return AltAz(obstime = Time(self.timestamp), location = self.sighting.station.earthLocation())
+            return AltAz(obstime = Time(self.timestamp), location = self.sighting.station.earth_location())
 
     @method_decorator(noneIfError(AttributeError))
     def distance(self):
-        obsLoc = self.sighting.station.earthLocation()
-        metLoc = self.earthLocation()
+        obsLoc = self.sighting.station.earth_location()
+        metLoc = self.earth_location()
         return np.sqrt((obsLoc.x - metLoc.x)**2 + (obsLoc.y - metLoc.y)**2 + (obsLoc.z - metLoc.z)**2).to(units.km).round(1)
 
-    def getSun(self):
-        if self.coordAltAz() is None:
+    def get_sun(self):
+        if self.coord_alt_az() is None:
             return None
         else:
-            return get_sun(Time(self.timestamp)).transform_to(self.coordAltAz())
+            return get_sun(Time(self.timestamp)).transform_to(self.coord_alt_az())
 
-    def getMoon(self):
-        if self.coordAltAz() is None:
+    def get_moon(self):
+        if self.coord_alt_az() is None:
             return None
         else:
-            return get_moon(Time(self.timestamp)).transform_to(self.coordAltAz())
+            return get_moon(Time(self.timestamp)).transform_to(self.coord_alt_az())
 
     @method_decorator(noneIfError(AttributeError, TypeError))
-    def getSolarElongation(self):
-        if self.solarElongation is None:
-            return self.computeSolarElongation()
+    def get_solar_elongation(self):
+        if self.solar_elongation is None:
+            return self.compute_solar_elongation()
         else:
-            return self.solarElongation
+            return self.solar_elongation
 
     @method_decorator(noneIfError(AttributeError, TypeError))
-    def computeSolarElongation(self):
-        return self.getSun().separation(self.skyCoord()).degree
+    def compute_solar_elongation(self):
+        return self.get_sun().separation(self.sky_coord()).degree
 
     @method_decorator(noneIfError(AttributeError, TypeError))
-    def getLunarElongation(self):
-        if self.lunarElongation is None:
-            return self.computeLunarElongation()
+    def get_lunar_elongation(self):
+        if self.lunar_elongation is None:
+            return self.compute_lunar_elongation()
         else:
-            return self.lunarElongation
+            return self.lunar_elongation
 
     @method_decorator(noneIfError(AttributeError, TypeError))
-    def computeLunarElongation(self):
-        return self.getMoon().separation(self.skyCoord()).degree
+    def compute_lunar_elongation(self):
+        return self.get_moon().separation(self.sky_coord()).degree
 
     def getSunInfo(self):
         sun = self.getSun()
-        elong = self.getSolarElongation()
+        elong = self.get_solar_elongation()
         return {
             'coord': sun,
             'elong': elong,
@@ -175,7 +175,7 @@ class Frame(models.Model):
 
     def getMoonInfo(self):
         moon = self.getMoon()
-        elong = self.getLunarElongation()
+        elong = self.get_lunar_elongation()
         return {
             'coord': moon,
             'elong': elong,
@@ -188,6 +188,6 @@ class Frame(models.Model):
             return None
 
     def save(self, *args, **kwargs):
-        self.solarElongation = self.getSolarElongation()
-        self.lunarElongation = self.getLunarElongation()
+        self.solar_elongation = self.get_solar_elongation()
+        self.lunar_elongation = self.get_lunar_elongation()
         super().save(*args, **kwargs)

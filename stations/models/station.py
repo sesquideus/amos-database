@@ -19,7 +19,9 @@ class StationQuerySet(models.QuerySet):
         return self.prefetch_related(
             Prefetch(
                 'sightings',
-                queryset=Sighting.objects.order_by('station_id', '-timestamp').distinct('station_id'),
+                queryset=Sighting.objects
+                    .order_by('station_id', '-timestamp')
+                    .distinct('station_id'),
                 to_attr='last_sighting',
             )
         )
@@ -35,10 +37,14 @@ class StationQuerySet(models.QuerySet):
             )
         )
 
+    def with_log_entries(self):
+        return self.prefetch_related('log_entries')
+
 
 class Station(core.models.NamedModel):
     class Meta:
         verbose_name                = 'station'
+        app_label                   = 'stations'
         ordering                    = ['name']
         constraints                 = [
                                         models.CheckConstraint(
