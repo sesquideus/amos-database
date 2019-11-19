@@ -13,122 +13,167 @@
     </div>
 {% endblock pagetitle %}
 
+{% block headextra %}
+    <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
+    <script src="{% static "js/ol.js" %}"></script>
+    <script src="{% static "meteors/js/map.js" %}"></script>
+{% endblock headextra %}
+
 {% block page %}
-    <h3>Station info</h3>
-        <p>{{ station.address }}</p>
-        <p id="location">{{ station.location }}</p>
-        <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
-        {% with status=station.current_status %}
-            <p id="status">{{ status.short }}</p>
-        {% endwith %}
+    <div class="inner">
+        <div class="info">
+            <h3>Station info</h3>
+                <p>{{ station.address }}</p>
+                <p id="location">{{ station.location }}</p>
+                <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
+                {% with status=station.current_status %}
+                    <p id="status">{{ status.short }}</p>
+                {% endwith %}
 
-    <h3>Sky at this moment</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>object</th>
-                    <th colspan="2">altitude</th>
-                    <th colspan="2">azimuth</th>
-                    <th>magnitude</th>
-                </tr>
-            </thead>
-            {% with sun=station.sun_position %}
-                <tr>
-                    <td>Sun</td>
-                    <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
-                        <span class="suninfo standalone">
-                            {{ sun.alt|floatformat:1 }}°
-                        </span>
-                    </td>
-                    <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
-                        <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
-                    </td>
-                    <td class="data sun">
-                        <span>{{ sun.az|floatformat:1 }}°</span>
-                    </td>
-                    <td class="data arrow">
-                        <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
-                    </td>
-                    <td class="data sun">
-                        -26.74<sup>m</sup>
-                    </td>
-                </tr>
-            {% endwith %}
-        </table>
+            <h3>Sky at this moment</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>object</th>
+                            <th colspan="2">altitude</th>
+                            <th colspan="2">azimuth</th>
+                            <th>magnitude</th>
+                        </tr>
+                    </thead>
+                    {% with sun=station.sun_position %}
+                        <tr>
+                            <td>Sun</td>
+                            <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                                <span class="suninfo standalone">
+                                    {{ sun.alt|floatformat:1 }}°
+                                </span>
+                            </td>
+                            <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                                <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data sun">
+                                <span>{{ sun.az|floatformat:1 }}°</span>
+                            </td>
+                            <td class="data arrow">
+                                <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data sun">
+                                -26.74<sup>m</sup>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                    {% with moon=station.moon_position %}
+                        <tr>
+                            <td>Moon</td>
+                            <td class="data moon" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                                <span class="mooninfo standalone">
+                                    {{ moon.alt|floatformat:1 }}°
+                                </span>
+                            </td>
+                            <td class="data arrow" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                                <span class="arrow" style="transform: rotate({{ moon.alt|multiply:-1 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data moon">
+                                <span>{{ moon.az|floatformat:1 }}°</span>
+                            </td>
+                            <td class="data arrow">
+                                <span class="arrow" style="transform: rotate({{ moon.az|add:-90 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data moon">
+                                <span class="empty">not implemented</span>
+                            </td>
+                        </tr>
+                    {% endwith %}
 
-    <h3>Sightings ({{ station.sightings.count }} total)</h3>
-        <table>
-            <tr>
-                <th>timestamp</th>
-                <th>magnitude</th>
-            </tr>
-            {% for sighting in station.recent_sightings %}
-                <tr>
-                    <td class="data time"><a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</td>
-                    <td class="data magnitude">
-                        {{ sighting.magnitude|magnitude }}</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td colspan="2" class="empty">
-                        There are no recorded sightings from this station within last 24 hours.
-                    </td>
-                </tr>
-            {% endfor %}
-        </table>
+                </table>
 
-    <h3>Status ({{ station.reports.count }} reports total)</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>timestamp</th>
-                    <th>status</th>
-                    <th>lid</th>
-                    <th>heating</th>
-                    <th>temperature</th>
-                    <th>pressure</th>
-                    <th>humidity</th>
-                </tr>
-            </thead>
-            {% for report in station.recent_reports %}
-                <tr>
-                    <td class="data timestamp">{{ report.timestamp|date:"Y-m-d H:i:s" }}</td>
-                    <td class="data status">{{ report.status }}</td>
-                    <td class="data status">{{ report.get_lid_display }}</td>
-                    <td class="data status">{{ report.get_heating_display }}</td>
-                    <td class="data">{{ report.temperature|floatformat:1 }} °C</td>
-                    <td class="data">{{ report.pressure|floatformat:0 }} Pa</td>
-                    <td class="data">{{ report.humidity|floatformat:0 }}%</td>
-                </tr>
-            {% empty %}
-                <tr>
-                    <td class="empty" colspan="7">There are no status reports for this station.</td>
-                </tr>
-            {% endfor %}
-        </table>
-
-
-    <h3>Station log</h3>
-        <table>
-            <thead>
-                <tr>
-                    <th>date</th>
-                    <th>entry</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for entry in station.log_entries.all|slice:":10" %}
+            <h3>Sightings ({{ station.sightings.count }} total)</h3>
+                <table>
                     <tr>
-                        <td>{{ entry.created|date:"Y-m-d" }}</td>
-                        <td>{{ entry.text }}</td>
+                        <th>timestamp</th>
+                        <th>ago</th>
+                        <th>magnitude</th>
                     </tr>
-                {% empty %}
-                    <tr>
-                        <td colspan="2" class="empty">
-                            There are no log entries for this station.
-                        </td>
-                    </tr>
-                {% endfor %}
-            </tbody>
-        </table>
+                    {% for sighting in station.recent_sightings %}
+                        <tr>
+                            <td class="data time">
+                                <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</a>
+                            </td>
+                            <td class="data">
+                                {{ sighting.timestamp|since_date_time }}
+                            </td>
+                            <td class="data magnitude">
+                                {{ sighting.magnitude|magnitude }}
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td colspan="2" class="empty">
+                                There are no recorded sightings from this station.
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+            <h3>Status ({{ station.reports.count }} reports total)</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>timestamp</th>
+                            <th>status</th>
+                            <th>lid</th>
+                            <th>heating</th>
+                            <th><abbr title="temperature">T</abbr></th>
+                            <th><abbr title="atmospheric pressure">p</abbr></th>
+                            <th><abbr title="relative humidity">RH</abbr></th>
+                        </tr>
+                    </thead>
+                    {% for report in station.recent_reports %}
+                        <tr>
+                            <td class="data timestamp">{{ report.timestamp|date:"Y-m-d H:i:s" }}</td>
+                            <td class="data status">{{ report.status }}</td>
+                            <td class="data status">{{ report.get_lid_display }}</td>
+                            <td class="data status">{{ report.get_heating_display }}</td>
+                            <td class="data">{{ report.temperature|floatformat:1 }} °C</td>
+                            <td class="data">{{ report.pressure|floatformat:0 }} Pa</td>
+                            <td class="data">{{ report.humidity|floatformat:0 }}%</td>
+                        </tr>
+                    {% empty %}
+                        <tr>
+                            <td class="empty" colspan="7">There are no status reports for this station.</td>
+                        </tr>
+                    {% endfor %}
+                </table>
+
+
+            <h3>Station log</h3>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>date</th>
+                            <th>entry</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for entry in station.log_entries.all|slice:":10" %}
+                            <tr>
+                                <td>{{ entry.created|date:"Y-m-d" }}</td>
+                                <td>{{ entry.text }}</td>
+                            </tr>
+                        {% empty %}
+                            <tr>
+                                <td colspan="2" class="empty">
+                                    There are no log entries for this station.
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+        </div>
+
+        <div class="preview">
+            <div id="map" class="map"> </div>
+        </div>
+    </div>
+
 {% endblock page %}

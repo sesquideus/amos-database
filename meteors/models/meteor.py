@@ -136,64 +136,64 @@ class Meteor(models.Model):
                                         on_delete           = models.SET_NULL,
                                     )
 
-    beginningLatitude               = models.FloatField(
+    beginning_latitude              = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "latitude of trail beginning",
                                     )
-    beginningLongitude              = models.FloatField(
+    beginning_longitude             = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "longitude of trail beginning",
                                     )
-    beginningAltitude               = models.FloatField(
+    beginning_altitude              = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude of trail beginning",
                                     )
-    beginningTime                   = models.DateTimeField(
+    beginning_time                  = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "timestamp of trail beginning",
                                     )
 
-    lightmaxLatitude                = models.FloatField(
+    lightmax_latitude               = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "latitude at max light",
                                     )
-    lightmaxLongitude               = models.FloatField(
+    lightmax_longitude              = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "longitude at max light",
                                     )
-    lightmaxAltitude                = models.FloatField(
+    lightmax_altitude               = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude at max light",
                                     )
-    lightmaxTime                    = models.DateTimeField(
+    lightmax_time                   = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "timestamp at max light",
                                     )
 
-    endLatitude                     = models.FloatField(
+    end_latitude                    = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "latitude of trail end",
                                     )
-    endLongitude                    = models.FloatField(
+    end_longitude                   = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "longitude of trail end",
                                     )
-    endAltitude                     = models.FloatField(
+    end_altitude                    = models.FloatField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "altitude of trail end",
                                     )
-    endTime                         = models.DateTimeField(
+    end_time                        = models.DateTimeField(
                                         null                = True,
                                         blank               = True,
                                         verbose_name        = "timestamp of trail end",
@@ -219,19 +219,19 @@ class Meteor(models.Model):
         return self.name
 
     def get_absolute_url(self):
-        return reverse('meteor', kwargs = {'name': self.name})
+        return reverse('meteor', kwargs={'name': self.name})
 
-    def asDict(self):
+    def as_dict(self):
         return {
-            'latitude':     self.lightmaxLatitude,
-            'longitude':    self.lightmaxLongitude,
-            'altitude':     self.lightmaxAltitude,
+            'latitude':     self.lightmax_latitude,
+            'longitude':    self.lightmax_longitude,
+            'altitude':     self.lightmax_altitude,
             'magnitude':    self.magnitude,
         }
 
     def earthLocation(self):
         try:
-            result = EarthLocation.from_geodetic(self.lightmaxLongitude * units.deg, self.lightmaxLatitude * units.deg, self.lightmaxAltitude * units.m)
+            result = EarthLocation.from_geodetic(self.lightmax_longitude * units.deg, self.lightmax_latitude * units.deg, self.lightmax_altitude * units.m)
         except TypeError:
             result = None
         return result
@@ -252,7 +252,7 @@ class Meteor(models.Model):
 
     def save(self, *args, **kwargs):
         if self.name is None or self.name == "":
-            self.name = self.lightmaxTime.strftime('%Y%m%d-%H%M%S-%f')
+            self.name = self.lightmax_time.strftime('%Y%m%d-%H%M%S-%f')
 
         super().save(*args, **kwargs)
 
@@ -261,18 +261,18 @@ class Meteor(models.Model):
             'id':               self.id,
             'name':             self.name,
             'beginning': {
-                'longitude':    self.beginningLongitude,
-                'latitude':     self.beginningLatitude,
-                'altitude':     self.beginningAltitude,
+                'longitude':    self.beginning_longitude,
+                'latitude':     self.beginning_latitude,
+                'altitude':     self.beginning_altitude,
             },
             'lightmax': {
-                'longitude':    self.lightmaxLongitude,
-                'latitude':     self.lightmaxLatitude,
-                'altitude':     self.lightmaxAltitude,
+                'longitude':    self.lightmax_longitude,
+                'latitude':     self.lightmax_latitude,
+                'altitude':     self.lightmax_altitude,
             },
             'end': {
-                'longitude':    self.endLongitude,
-                'latitude':     self.endLatitude,
-                'altitude':     self.endAltitude,
+                'longitude':    self.end_longitude,
+                'latitude':     self.end_latitude,
+                'altitude':     self.end_altitude,
             },
         }

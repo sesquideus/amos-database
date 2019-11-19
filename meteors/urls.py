@@ -19,7 +19,4 @@ urlpatterns = [
     path('sighting/<slug:id>/',                     sighting.SingleView.as_view(),          name = 'sighting'),
     path('sighting/<slug:id>/light-curve',          sighting.light_curve,                   name = 'sighting-light-curve'),
     path('sighting/<slug:sighting>/<int:order>',    frame.SingleView.as_view(),             name = 'frame'),
-
-    # API views, to be tidied up
-    path('meteor/receive',                          meteor.APIView.as_view(),               name = 'receive'),
 ]

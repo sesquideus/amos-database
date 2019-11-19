@@ -28,8 +28,8 @@ class SingleView(LoginDetailView):
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.recent_reports = StatusReport.objects.for_station(station.id, count=10)
-        station.recent_sightings = Sighting.objects.for_station(station.id).with_lightmax()[:10]
+        station.recent_reports = StatusReport.objects.order_by('-timestamp').for_station(station.id)[:10]
+        station.recent_sightings = Sighting.objects.for_station(station.id).with_lightmax().order_by('-timestamp')[:10]
         return station
 
 

@@ -19,6 +19,7 @@ class LogEntryInline(admin.TabularInline):
         },
     }
 
+
 @admin.register(Country)
 class CountryAdmin(admin.ModelAdmin):
     pass

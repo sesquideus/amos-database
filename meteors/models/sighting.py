@@ -202,6 +202,12 @@ class Sighting(models.Model):
     def distance(self):
         return 
 
+    def sun_position(self):
+        return self.station.sun_position(self.timestamp)
+
+    def moon_position(self):
+        return self.station.moon_position(self.timestamp)
+
     def arc_length(self):
         first = self.frames.earliest()
         last = self.frames.latest()

@@ -6,7 +6,7 @@ from django.db.models import Prefetch, F, Q, OuterRef
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
-from astropy.coordinates import EarthLocation, AltAz, get_sun
+from astropy.coordinates import EarthLocation, AltAz, get_sun, get_moon
 from astropy.time import Time
 
 import core.models
@@ -149,29 +149,42 @@ class Station(core.models.NamedModel):
     def earth_location(self):
         return EarthLocation.from_geodetic(self.longitude, self.latitude, self.altitude)
 
-    def sun_position(self, time = None):
+    def alt_az(self, time=None):
+        if time is None:
+            time = datetime.datetime.now()
+            
+        return AltAz(
+            obstime=Time(time),
+            location=self.earth_location()
+        )
+
+    def sun_position(self, time=None):
         if time is None:
             time = datetime.datetime.now()
 
-        loc = AltAz(obstime = Time(time), location = self.earth_location())
-        sun = get_sun(Time(time)).transform_to(loc)
+        sun = get_sun(Time(time)).transform_to(self.alt_az(time))
 
         return {
             'alt':  sun.altaz.alt.degree,
             'az':   sun.altaz.az.degree,
         }
 
-    def lastSighting(self):
+    def moon_position(self, time=None):
+        if time is None:
+            time = datetime.datetime.now()
+
+        moon = get_moon(Time(time)).transform_to(self.alt_az(time))
+
+        return {
+            'alt':  moon.altaz.alt.degree,
+            'az':   moon.altaz.az.degree,
+        }
+
+    def last_sighting(self):
         try:
             return Sighting.objects.filter(station__id = self.id).latest('timestamp')
         except ObjectDoesNotExist:
             return None
-
-    def latestSightings(self):
-        return self.sightings.order_by('-timestamp')[:10]
-
-    def latestStatusReports(self):
-        return self.reports.order_by('-timestamp')[:10]
 
     def location(self):
         return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.0f} m".format(
@@ -184,8 +197,8 @@ class Station(core.models.NamedModel):
 
     def current_status(self):
         try:
-            lastReport = self.reports.latest()
-            timeSince = (datetime.datetime.now(pytz.utc) - lastReport.timestamp).total_seconds() 
+            last_report = self.reports.latest()
+            time_since = (datetime.datetime.now(pytz.utc) - last_report.timestamp).total_seconds() 
         except ObjectDoesNotExist:
             return {
                 'id': 'noreports',
@@ -193,26 +206,29 @@ class Station(core.models.NamedModel):
                 'long': "The station has never sent any reports",
             }
 
-        if timeSince > 180:
+        if time_since > 180:
             return {
                 'id':       'timeout',
                 'short':    "timeout",
-                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - self.reports.latest().timestamp).total_seconds():.0f} s",
-                'long':     f"The station has not sent a report since {self.reports.latest().timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
+                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
+                'long':     f"The station has not sent a report since {last_report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
             }
         else:
             return {
                 'id':       'ok',
                 'short':    "OK",
-                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - self.reports.latest().timestamp).total_seconds():.0f} s",
+                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
                 'long':     "The station is working correctly",
             }
 
     def json(self):
         return {
-            'id':       self.id,
-            'code':     self.code,
-            'name':     self.name,
-            'status':   self.current_status(),
+            'id': self.id,
+            'code': self.code,
+            'name': self.name,
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'altitude': self.altitude,
+            'status': self.current_status(),
         }
 

@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load static meteor_tags %}
+{% load static station_tags %}
 
 {% block pagetitle %}
     <h2>Sighting {{ sighting.id }}</h2>
@@ -93,24 +94,56 @@
                 <thead>
                     <tr>
                         <th class="subgroup">object</th>
-                        <th class="subgroup">altitude</th>
-                        <th class="subgroup">azimuth</th>
-                        <th class="subgroup">elongation</th>
+                        <th class="subgroup" colspan="2">altitude</th>
+                        <th class="subgroup" colspan="2">azimuth</th>
+                        <th class="subgroup">magnitude</th>
                     </tr>
                 </thead>
                 <tbody>
-                    <tr>
-                        <td>Sun</td>
-                        <td class="data angle altitude">{{ sun.coord.alt.degree|angle }}</td>
-                        <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
-                        <td class="data angle">{{ sun.elong|angle }}</td>
-                    </tr>
-                    <tr>
-                        <td>Moon</td>
-                        <td class="data angle altitude">{{ moon.coord.alt.degree|angle }}</td>
-                        <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
-                        <td class="data angle">{{ moon.elong|angle }}</td>
-                    </tr>
+                    {% with sun=sighting.sun_position %}
+                        <tr>
+                            <td>Sun</td>
+                            <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                                <span class="suninfo standalone">
+                                    {{ sun.alt|floatformat:1 }}°
+                                </span>
+                            </td>
+                            <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                                <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data sun">
+                                <span>{{ sun.az|floatformat:1 }}°</span>
+                            </td>
+                            <td class="data arrow">
+                                <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data sun">
+                                -26.74<sup>m</sup>
+                            </td>
+                        </tr>
+                    {% endwith %}
+                    {% with moon=sighting.moon_position %}
+                        <tr>
+                            <td>Moon</td>
+                            <td class="data moon" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                                <span class="mooninfo standalone">
+                                    {{ moon.alt|floatformat:1 }}°
+                                </span>
+                            </td>
+                            <td class="data arrow" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                                <span class="arrow" style="transform: rotate({{ moon.alt|multiply:-1 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data moon">
+                                <span>{{ moon.az|floatformat:1 }}°</span>
+                            </td>
+                            <td class="data arrow">
+                                <span class="arrow" style="transform: rotate({{ moon.az|add:-90 }}deg);">&#8594;</span>
+                            </td>
+                            <td class="data moon">
+                                <span class="empty">not implemented</span>
+                            </td>
+                        </tr>
+                    {% endwith %}
                 </tbody>
             </table>
 
@@ -134,7 +167,7 @@
                                 <a href="{{ frame.get_absolute_url }}">{{ frame.order }}</a>
                             </td>
                             <td class="data time">
-                                {{ frame.timestamp|date:"Y-m-d H:m:s.u"|default:"&mdash;" }}
+                                {{ frame.timestamp|date:"H:m:s.u"|default:"&mdash;" }}
                             </td>
                             <td class="data time">
                                 {{ frame.flight_time.total_seconds|floatformat:3|default:"&mdash;" }} s

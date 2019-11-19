@@ -12,6 +12,7 @@ createLayer = function(colour) {
 createMeteorLayer = function(meteors) {
     var layer = createLayer('red');
     var source = new ol.source.Vector();
+    console.log("Adding meteor data");
 
     for (var m in meteors) {
         meteor = meteors[m];
@@ -36,8 +37,10 @@ createStationLayer = function(stations) {
     var layer = createLayer('blue');
     var source = new ol.source.Vector();
 
+    console.log("Adding stations");
     for (var s in stations) {
         station = stations[s];
+        console.log(station);
         source.addFeature(
             new ol.Feature({
                 geometry: new ol.geom.Point(ol.proj.transform([station.longitude, station.latitude], 'EPSG:4326', 'EPSG:3857')),

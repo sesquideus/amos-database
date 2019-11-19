@@ -35,9 +35,9 @@ class MeteorAdmin(admin.ModelAdmin):
         ('Trajectory',
             {
                 'fields': (
-                    ('beginningTime', 'beginningLatitude', 'beginningLongitude', 'beginningAltitude'),
-                    ('lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude'),
-                    ('endTime', 'endLatitude', 'endLongitude', 'endAltitude'),
+                    ('beginning_time', 'beginning_latitude', 'beginning_longitude', 'beginning_altitude'),
+                    ('lightmax_time', 'lightmax_latitude', 'lightmax_longitude', 'lightmax_altitude'),
+                    ('end_time', 'end_latitude', 'end_longitude', 'end_altitude'),
                     ('velocity_x', 'velocity_y', 'velocity_z'),
                 ),
             },
@@ -49,11 +49,11 @@ class MeteorAdmin(admin.ModelAdmin):
         ),
     )
     inlines = [SightingInline]
-    date_hierarchy = 'lightmaxTime'
+    date_hierarchy = 'lightmax_time'
 
-    def sightingCount(self, obj):
+    def sighting_count(self, obj):
         return obj.sightings.count()
-    sightingCount.short_description = 'sighting count'
+    sighting_count.short_description = 'sighting count'
 
-    list_display = ['name', 'timestamp', 'subnetwork', 'lightmaxTime', 'lightmaxLatitude', 'lightmaxLongitude', 'lightmaxAltitude', 'magnitude', 'sightingCount']
+    list_display = ['name', 'timestamp', 'subnetwork', 'lightmax_time', 'lightmax_latitude', 'lightmax_longitude', 'lightmax_altitude', 'magnitude', 'sighting_count']
     save_as = True
