@@ -27,12 +27,6 @@ class SightingManager(models.Manager):
         Reverse observation: create a sighting from a Meteor instance in the database.
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
     """
-    def get_queryset(self):
-        return SightingQuerySet(
-            model=self.model,
-            using=self._db,
-            hints=self._hints,
-        )
 
     def create_for_meteor(self, meteor, station, **kwargs):
         print(f"Creating a sighting for meteor {meteor}, station {station}")
@@ -136,7 +130,7 @@ class SightingQuerySet(models.QuerySet):
         )                                                   
 
     def with_everything(self):
-        return self.with_station().with_meteor().with_frames().with_frame_count()
+        return self.with_station().with_meteor().with_frames().with_frame_count().with_lightmax()
 
     def for_station(self, station_id):
         return self.filter(station__id=station_id)

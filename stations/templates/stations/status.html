@@ -30,7 +30,7 @@
                         </td>
                     {% endif %}
                     
-                    {% with sun=station.sun_position report=station.last_report last_sighting=station.last_sighting %}
+                    {% with sun=station.sun_position report=station.last_report.0 last_sighting=station.last_sighting.0 %}
                         <td class="station">
                             {{ station.code }}
                         </td>
@@ -40,8 +40,8 @@
                         </td>
                     
                         <td class="status data">
-                            {% if report %}
-                                <abbr class="{{ report.0.type }}" title="{{ report.0.time }}">{{ report.0.status }}</abbr>
+                            {% if station.last_report.0 %}
+                                <abbr class="{{ report.type }}" title="{{ report.time }}">{{ report.status }}</abbr>
                                 {% if report.extra %}
                                     ({{ report.extra }})
                                 {% endif %}
@@ -69,14 +69,14 @@
 
                         <td class="time">
                             {% if station.last_sighting.0 %}
-                                <a href="{{ station.last_sighting.0.get_absolute_url }}">{{ station.last_sighting.0.timestamp }}</a>
+                                <a href="{{ last_sighting.get_absolute_url }}">{{ last_sighting.timestamp }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
                         <td class="time">
                             {% if station.last_sighting.0 %}
-                                {{ station.last_sighting.0.timestamp|since_date_time }}
+                                {{ last_sighting.timestamp|since_date_time }}
                             {% else %}
                                 <span class="empty">never</span>
                             {% endif %}

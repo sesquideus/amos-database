@@ -38,7 +38,7 @@ class ListDateView(ListView):
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'form':         DateForm(initial = {'date': self.date}),
+            'form':         DateForm(initial={'date': self.date}),
             'navigation':   reverse('list-sightings'),
             'date':         self.date,
         })

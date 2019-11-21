@@ -58,15 +58,23 @@ class StatusReport(models.Model):
                                         models.Index(fields=['timestamp', 'station']),
                                     ]
 
+    LID_OPEN = 'O'
+    LID_CLOSED = 'C'
+    LID_PROBLEM = 'P'
+    LID_UNKNOWN = 'U'
     LID_STATES                      = [
-                                        ('O', 'open'),
-                                        ('C', 'closed'),
-                                        ('P', 'problem'),
+                                        (LID_OPEN, 'open'),
+                                        (LID_CLOSED, 'closed'),
+                                        (LID_PROBLEM, 'problem'),
+                                        (LID_UNKNOWN, 'unknown'),
                                     ]
+    HEATING_OFF = '0'
+    HEATING_ON = '1'
+    HEATING_PROBLEM = 'P'
     HEATING_STATES                  = [
-                                        ('1', 'on'),
-                                        ('0', 'off'),
-                                        ('P', 'problem'),
+                                        (HEATING_OFF, 'off'),
+                                        (HEATING_ON, 'on'),
+                                        (HEATING_PROBLEM, 'problem'),
                                     ]
 
     objects                         = StatusReportManager.from_queryset(StatusReportQuerySet)()

@@ -44,9 +44,9 @@
                 <td class="data name"><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.name }}</a></td>
                 <td class="data time">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
                 <td class="data magnitude" style="background-color: {{ meteor.colour }}; color: {{ meteor.colourText }}">{{ meteor.magnitude|magnitude }}</td>
-                <td class="data angle">{{ meteor.lightmaxLatitude|latitude }}</td>
-                <td class="data angle">{{ meteor.lightmaxLongitude|longitude }}</td>
-                <td class="data length">{{ meteor.lightmaxAltitude|distance }} m</td>
+                <td class="data angle">{{ meteor.latitude|latitude }}</td>
+                <td class="data angle">{{ meteor.longitude|longitude }}</td>
+                <td class="data length">{{ meteor.altitude|distance }} m</td>
                 <td class="data speed">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
                 <td class="seen">
                     {% for sighting in meteor.sightings.all %}

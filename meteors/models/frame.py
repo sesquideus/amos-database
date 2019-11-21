@@ -91,18 +91,6 @@ class Frame(models.Model):
     def get_absolute_url(self):
         return reverse('frame', kwargs = {'sighting': self.sighting.id, 'order': self.order})
 
-    def previous(self):
-        try:
-            return Frame.objects.filter(sighting__id = self.sighting.id).filter(timestamp__lt = self.timestamp).latest()
-        except Frame.DoesNotExist:
-            return None
-
-    def next(self):
-        try:
-            return Frame.objects.filter(sighting__id = self.sighting.id).filter(timestamp__gt = self.timestamp).earliest()
-        except Frame.DoesNotExist:
-            return None
-
     def earthLocation(self):
         try:
             result = EarthLocation.from_geodetic(self.longitude * units.deg, self.latitude * units.deg, self.altitude * units.m)
@@ -166,7 +154,7 @@ class Frame(models.Model):
         return self.get_moon().separation(self.sky_coord()).degree
 
     def getSunInfo(self):
-        sun = self.getSun()
+        sun = self.get_sun()
         elong = self.get_solar_elongation()
         return {
             'coord': sun,
@@ -174,7 +162,7 @@ class Frame(models.Model):
         }
 
     def getMoonInfo(self):
-        moon = self.getMoon()
+        moon = self.get_moon()
         elong = self.get_lunar_elongation()
         return {
             'coord': moon,

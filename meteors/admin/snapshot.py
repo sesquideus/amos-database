@@ -2,13 +2,12 @@ from django.contrib import admin
 from django.db import models
 from django.forms.widgets import TextInput
 
-from meteors.models import Meteor
-from .sighting import SightingInline
+from meteors.models import Snapshot
 from .widgets import MicrosecondDateTimeWidget
 
 
-@admin.register(Meteor)
-class MeteorAdmin(admin.ModelAdmin):
+@admin.register(Snapshot)
+class SnapshotAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
             'widget': MicrosecondDateTimeWidget(

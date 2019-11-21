@@ -81,29 +81,15 @@
                         <th>altitude</th>
                     </tr>
                 </thead>
-                    <tr>
-                        <td>beginning</td>
-                        <td class="data time">{{ meteor.beginningTime|safetime }}</td>
-                        <td class="data">{{ meteor.beginningLatitude|latitude }}</td>
-                        <td class="data">{{ meteor.beginningLongitude|longitude }}</td>
-                        <td class="data">{{ meteor.beginningAltitude|floatformat:0 }} m</td>
-                    </tr>
-
-                    <tr>
-                        <td>max light</td>
-                        <td class="data time">{{ meteor.lightmaxTime|safetime }}</td>
-                        <td class="data">{{ meteor.lightmaxLatitude|latitude }}</td>
-                        <td class="data">{{ meteor.lightmaxLongitude|longitude }}</td>
-                        <td class="data">{{ meteor.lightmaxAltitude|floatformat:0 }} m</td>
-                    </tr>
-
-                    <tr>
-                        <td>end</td>
-                        <td class="data time">{{ meteor.endTime|safetime }}</td>
-                        <td class="data">{{ meteor.endLatitude|latitude }}</td>
-                        <td class="data">{{ meteor.endLongitude|longitude }}</td>
-                        <td class="data">{{ meteor.endAltitude|floatformat:0 }} m</td>
-                    </tr>
+                <tbody>
+                    {% for snapshot in meteor.snapshots %}
+                        <tr>
+                            <td>
+                                snapshot.number
+                            </td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
             </table>
 
             <h3>{{ meteor.sightings.count }} recorded sighting{{ meteor.sightings.count|pluralize:"s" }}</h3>

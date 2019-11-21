@@ -23,7 +23,7 @@
         <a href="{{ request.path }}?date={{ date|next_day|date:"Y-m-d" }}">&gt;&gt;</a>
     </div>
     <h3>
-        {% block stationName %}All stations{% endblock %}
+        {% block station_name %}All stations{% endblock station_name %}
     </h3>
 
     <p>{{ sightings|length }} recorded sighting{{ sightings|length|pluralize:",s" }}</p>
@@ -41,7 +41,7 @@
         </thead>
         {% for sighting in sightings %}
             <tr>
-                <td id="{{ sighting.id }}-timestamp">
+                <td class="timestamp" id="{{ sighting.id }}-timestamp">
                     <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</a>
                 </td>
                 <td class="data c {% if not sighting.meteor %} empty{% endif %}">

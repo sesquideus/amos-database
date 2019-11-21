@@ -2,7 +2,7 @@ import datetime
 import pytz
 
 from django.db import models
-from django.db.models import Prefetch, F, Q, OuterRef
+from django.db.models import Prefetch, F, Q, OuterRef, Max
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -16,23 +16,21 @@ from stations.models.statusreport import StatusReport
 
 class StationQuerySet(models.QuerySet):
     def with_last_sighting(self):
+        latest = Sighting.objects.values('station').annotate(max_id=Max('timestamp')).values_list('max_id', flat=True)
         return self.prefetch_related(
             Prefetch(
                 'sightings',
-                queryset=Sighting.objects
-                    .order_by('station_id', '-timestamp')
-                    .distinct('station_id'),
+                queryset=Sighting.objects.filter(timestamp__in=latest),
                 to_attr='last_sighting',
             )
         )
 
     def with_last_report(self):
+        latest = StatusReport.objects.values('station').annotate(max_id=Max('timestamp')).values_list('max_id', flat=True)
         return self.prefetch_related(
             Prefetch(
                 'reports',
-                queryset=StatusReport.objects
-                    .order_by('station_id', '-timestamp')
-                    .distinct('station_id'),
+                queryset=StatusReport.objects.filter(timestamp__in=latest),
                 to_attr='last_report',
             )
         )
@@ -180,12 +178,6 @@ class Station(core.models.NamedModel):
             'az':   moon.altaz.az.degree,
         }
 
-    def last_sighting(self):
-        try:
-            return Sighting.objects.filter(station__id = self.id).latest('timestamp')
-        except ObjectDoesNotExist:
-            return None
-
     def location(self):
         return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.0f} m".format(
             latitude    = self.latitude,
@@ -210,14 +202,14 @@ class Station(core.models.NamedModel):
             return {
                 'id':       'timeout',
                 'short':    "timeout",
-                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
+                'extra':    f"{(datetime.datetime.now(tz=pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
                 'long':     f"The station has not sent a report since {last_report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
             }
         else:
             return {
                 'id':       'ok',
                 'short':    "OK",
-                'extra':    f"{(datetime.datetime.now(tz = pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
+                'extra':    f"{(datetime.datetime.now(tz=pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
                 'long':     "The station is working correctly",
             }
 

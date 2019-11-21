@@ -147,6 +147,8 @@
                 </tbody>
             </table>
 
+            <h3>Light curve</h3>
+            <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
 
             <h3>Video frames ({{ sighting.frames.count }} total)</h3>
             <table>
@@ -187,9 +189,6 @@
                     {% endfor %}
                 </tbody>
             </table>
-            
-            <h3>Light curve</h3>
-            <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
         </div>
         <div class="preview">
             {% if sighting.composite %}

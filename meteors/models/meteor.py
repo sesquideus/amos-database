@@ -54,33 +54,41 @@ class MeteorQuerySet(models.QuerySet):
             )
         )
 
+    def with_snapshots(self):
+        return self.prefetch_related(
+            Prefetch(
+                'snapshots',
+                queryset=Snapshot.objects.all(),
+            )
+        )
+
     def with_subnetwork(self):
         return self.select_related('subnetwork')
 
     def with_neighbours(self):
         return self.annotate(
-            previous=Subquery(
-                Meteor.objects.filter(
-                    timestamp__lt=OuterRef('timestamp'),
-                ).order_by(
-                    '-timestamp'
-                ).values('name')[:1]
-            ),
-            next=Subquery(
-                Meteor.objects.filter(
-                    timestamp__gt=OuterRef('timestamp'),
-                ).order_by(
-                    'timestamp'
-                ).values('name')[:1]
-            ),
-         #   previous=Window(
-         #       expression=Lead('name', offset=1, default=None),
-         #       order_by=F('timestamp').desc(),
+         #   previous=Subquery(
+         #       Meteor.objects.filter(
+         #           timestamp__lt=OuterRef('timestamp'),
+         #       ).order_by(
+         #           '-timestamp'
+         #       ).values('name')[:1]
          #   ),
-         #   next=Window(
-         #       expression=Lead('name', offset=1, default=None),
-         #       order_by=F('timestamp').asc(),
+         #   next=Subquery(
+         #       Meteor.objects.filter(
+         #           timestamp__gt=OuterRef('timestamp'),
+         #       ).order_by(
+         #           'timestamp'
+         #       ).values('name')[:1]
          #   ),
+            previous=Window(
+                expression=Lead('name', offset=1, default=None),
+                order_by=F('timestamp').desc(),
+            ),
+            next=Window(
+                expression=Lead('name', offset=1, default=None),
+                order_by=F('timestamp').asc(),
+            ),
         )
 
     def for_night(self, date):
@@ -136,105 +144,11 @@ class Meteor(models.Model):
                                         on_delete           = models.SET_NULL,
                                     )
 
-    beginning_latitude              = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "latitude of trail beginning",
-                                    )
-    beginning_longitude             = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "longitude of trail beginning",
-                                    )
-    beginning_altitude              = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "altitude of trail beginning",
-                                    )
-    beginning_time                  = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "timestamp of trail beginning",
-                                    )
-
-    lightmax_latitude               = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "latitude at max light",
-                                    )
-    lightmax_longitude              = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "longitude at max light",
-                                    )
-    lightmax_altitude               = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "altitude at max light",
-                                    )
-    lightmax_time                   = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "timestamp at max light",
-                                    )
-
-    end_latitude                    = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "latitude of trail end",
-                                    )
-    end_longitude                   = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "longitude of trail end",
-                                    )
-    end_altitude                    = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "altitude of trail end",
-                                    )
-    end_time                        = models.DateTimeField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "timestamp of trail end",
-                                    )
-
-    velocity_x                      = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "geocentric velocity at infinity, x"
-                                    )
-    velocity_y                      = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "geocentric velocity at infinity, y"
-                                    )
-    velocity_z                      = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "geocentric velocity at infinity, z"
-                                    )
-
     def __str__(self):
         return self.name
 
     def get_absolute_url(self):
         return reverse('meteor', kwargs={'name': self.name})
-
-    def as_dict(self):
-        return {
-            'latitude':     self.lightmax_latitude,
-            'longitude':    self.lightmax_longitude,
-            'altitude':     self.lightmax_altitude,
-            'magnitude':    self.magnitude,
-        }
-
-    def earthLocation(self):
-        try:
-            result = EarthLocation.from_geodetic(self.lightmax_longitude * units.deg, self.lightmax_latitude * units.deg, self.lightmax_altitude * units.m)
-        except TypeError:
-            result = None
-        return result
 
 #    @method_decorator(noneIfError(ObjectDoesNotExist))
 #    def previous(self):
@@ -243,12 +157,6 @@ class Meteor(models.Model):
 #    @method_decorator(noneIfError(ObjectDoesNotExist))
 #    def next(self):
 #        return Meteor.objects.filter(timestamp__gt = self.timestamp).earliest('timestamp').name
-
-    def speed(self):
-        try:
-            return np.sqrt(self.velocity_x**2 + self.velocity_y**2 + self.velocity_z**2)
-        except TypeError:
-            return None
 
     def save(self, *args, **kwargs):
         if self.name is None or self.name == "":
