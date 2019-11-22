@@ -25,7 +25,7 @@
             <img src="{% static "pictures/edit.png" %}" alt="Edit" />
         </a>
 
-        <a href="{{ meteor.get_absolute_url }}" target="_blank">
+        <a href="{% url 'meteor-KML' name=meteor.name %}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
         
@@ -74,7 +74,7 @@
             <table>
                 <thead>
                     <tr>
-                        <th></th>
+                        <th>#</th>
                         <th>timestamp</th>
                         <th>latitude</th>
                         <th>longitude</th>
@@ -82,10 +82,28 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% for snapshot in meteor.snapshots %}
+                    {% for snapshot in meteor.snapshots.all %}
                         <tr>
-                            <td>
-                                snapshot.number
+                            <td class="data">
+                                {{ snapshot.order }}
+                            </td>
+                            <td class="data">
+                                {{ snapshot.timestamp|date:"H:i:s.u" }}
+                            </td>
+                            <td class="data">
+                                {{ snapshot.latitude|latitude }}
+                            </td>
+                            <td class="data">
+                                {{ snapshot.longitude|longitude }}
+                            </td>
+                            <td class="data">
+                                {{ snapshot.altitude }} m
+                            </td>
+                        </tr>
+                    {% empty %}
+                        <tr class="empty">
+                            <td colspan="5">
+                                No snapshots of this meteor.
                             </td>
                         </tr>
                     {% endfor %}

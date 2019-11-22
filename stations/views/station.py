@@ -64,7 +64,7 @@ class APIView(View):
             report.save()
 
             response = HttpResponse('Status update received', status = 201)
-        #response['location'] = reverse('statusUpdate', args = [report.id])
+        #response['location'] = reverse('station-add-status', args = [report.id])
             return response
 
         except json.JSONDecodeError:

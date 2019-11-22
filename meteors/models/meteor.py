@@ -150,37 +150,8 @@ class Meteor(models.Model):
     def get_absolute_url(self):
         return reverse('meteor', kwargs={'name': self.name})
 
-#    @method_decorator(noneIfError(ObjectDoesNotExist))
-#    def previous(self):
-#        return Meteor.objects.filter(timestamp__lt = self.timestamp).latest('timestamp').name
-#
-#    @method_decorator(noneIfError(ObjectDoesNotExist))
-#    def next(self):
-#        return Meteor.objects.filter(timestamp__gt = self.timestamp).earliest('timestamp').name
-
     def save(self, *args, **kwargs):
         if self.name is None or self.name == "":
             self.name = self.lightmax_time.strftime('%Y%m%d-%H%M%S-%f')
 
         super().save(*args, **kwargs)
-
-    def json(self):
-        return {
-            'id':               self.id,
-            'name':             self.name,
-            'beginning': {
-                'longitude':    self.beginning_longitude,
-                'latitude':     self.beginning_latitude,
-                'altitude':     self.beginning_altitude,
-            },
-            'lightmax': {
-                'longitude':    self.lightmax_longitude,
-                'latitude':     self.lightmax_latitude,
-                'altitude':     self.lightmax_altitude,
-            },
-            'end': {
-                'longitude':    self.end_longitude,
-                'latitude':     self.end_latitude,
-                'altitude':     self.end_altitude,
-            },
-        }

@@ -58,7 +58,7 @@ def singleKML(request, name):
     context = {
         'meteor': Meteor.objects.get(name = name)
     }
-    return render(request, 'meteors/meteor.kml', context)
+    return render(request, 'meteors/meteor.kml', context, content_type='application/vnd.google-earth.kml+xml')
 
 
 @login_required
@@ -79,7 +79,7 @@ class SingleViewJSON(JSONDetailView):
 def listJSON(request):
     meteors = {}
     for meteor in Meteor.objects.all():
-        meteors[meteor.id] = meteor.asDict()
+        meteors[meteor.id] = meteor.as_dict()
 
     return JsonResponse(meteors)
 

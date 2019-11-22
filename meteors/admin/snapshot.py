@@ -6,6 +6,14 @@ from meteors.models import Snapshot
 from .widgets import MicrosecondDateTimeWidget
 
 
+class SnapshotInline(admin.TabularInline):
+    model = Snapshot
+    show_change_link = True
+    extra = 0
+
+    fields = ['order', 'timestamp', 'latitude', 'longitude', 'altitude']
+
+
 @admin.register(Snapshot)
 class SnapshotAdmin(admin.ModelAdmin):
     formfield_overrides = {
@@ -26,18 +34,21 @@ class SnapshotAdmin(admin.ModelAdmin):
         ('Identity',
             {
                 'fields': (
-                    ('name',),
-                    ('subnetwork',),
+                    ('meteor', 'order'),
+                    ('timestamp',),
+                ),
+            },
+        ),
+        ('Position',
+            {
+                'fields': (
+                    ('latitude', 'longitude', 'altitude'),
+                    ('velocity_x', 'velocity_y', 'velocity_z'),
                 ),
             },
         ),
     )
-    inlines = [SightingInline]
     date_hierarchy = 'timestamp'
 
-    def sighting_count(self, obj):
-        return obj.sightings.count()
-    sighting_count.short_description = 'sighting count'
-
-    list_display = ['name', 'timestamp', 'subnetwork', 'sighting_count']
+    list_display = ['order', 'timestamp', 'meteor']
     save_as = True

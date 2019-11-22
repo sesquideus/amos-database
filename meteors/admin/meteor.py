@@ -4,6 +4,7 @@ from django.forms.widgets import TextInput
 
 from meteors.models import Meteor
 from .sighting import SightingInline
+from .snapshot import SnapshotInline
 from .widgets import MicrosecondDateTimeWidget
 
 
@@ -33,7 +34,7 @@ class MeteorAdmin(admin.ModelAdmin):
             },
         ),
     )
-    inlines = [SightingInline]
+    inlines = [SightingInline, SnapshotInline]
     date_hierarchy = 'timestamp'
 
     def sighting_count(self, obj):

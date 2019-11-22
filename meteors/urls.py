@@ -13,7 +13,7 @@ urlpatterns = [
     # Single meteor views
     path('meteor/<slug:name>/',                     meteor.SingleView.as_view(),            name = 'meteor'),
     path('meteor/<slug:name>/json',                 meteor.SingleViewJSON.as_view(),        name = 'meteor-JSON'),
-    path('meteor/<int:id>/path',                    meteor.singleKML,                       name = 'meteor-KML'),
+    path('meteor/<slug:name>/path',                 meteor.singleKML,                       name = 'meteor-KML'),
 
     # Single sighting views
     path('sighting/<slug:id>/',                     sighting.SingleView.as_view(),          name = 'sighting'),

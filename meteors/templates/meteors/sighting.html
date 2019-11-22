@@ -169,7 +169,7 @@
                                 <a href="{{ frame.get_absolute_url }}">{{ frame.order }}</a>
                             </td>
                             <td class="data time">
-                                {{ frame.timestamp|date:"H:m:s.u"|default:"&mdash;" }}
+                                {{ frame.timestamp|date:"H:i:s.u"|default:"&mdash;" }}
                             </td>
                             <td class="data time">
                                 {{ frame.flight_time.total_seconds|floatformat:3|default:"&mdash;" }} s

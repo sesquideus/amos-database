@@ -2,7 +2,7 @@
 <kml xmlns="http://www.opengis.net/kml/2.2">
     <Document>
         <name>Meteor {{ meteor.id }} </name>
-            <description>ID: {{ meteor.id }}<br />{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</description>
+            <description>ID: {{ meteor.name }}<br />{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</description>
             <Style id="yellowLineGreenPoly">
                 <LineStyle>
                     <color>ff00ffff</color>
@@ -21,9 +21,9 @@
                 <tessellate>1</tessellate>
                 <altitudeMode>absolute</altitudeMode>
                 <coordinates>
-                    {{ meteor.beginningLongitude }},{{ meteor.beginningLatitude }},{{ meteor.beginningAltitude }}
-                    {{ meteor.lightmaxLongitude }},{{ meteor.lightmaxLatitude }},{{ meteor.lightmaxAltitude }}
-                    {{ meteor.endLongitude }},{{ meteor.endLatitude }},{{ meteor.endAltitude }}
+                    {% for snapshot in meteor.snapshots.all %}
+                        {{ snapshot.longitude }},{{ snapshot.latitude }},{{ snapshot.altitude }}
+                    {% endfor %}
                 </coordinates>
             </LineString>
         </Placemark>

@@ -25,8 +25,8 @@ class SightingAdmin(admin.ModelAdmin):
             return mark_safe("&mdash;")
         else:
             return mark_safe('<a href="{url}">{title}</a>'.format(
-                url = reverse("admin:meteors_meteor_change", args = [sighting.meteor.id]),
-                title = sighting.meteor.name,
+                url=reverse("admin:meteors_meteor_change", args=[sighting.meteor.id]),
+                title=sighting.meteor.name,
             ))
     meteor_link.short_description = "meteor"
 
@@ -35,20 +35,20 @@ class SightingAdmin(admin.ModelAdmin):
             return mark_safe("&mdash;")
         else:
             return mark_safe('<a href="{url}">{title}</a>'.format(
-                url = reverse("admin:stations_station_change", args = [sighting.station.id]),
-                title = sighting.station.name,
+                url=reverse("admin:stations_station_change", args=[sighting.station.id]),
+                title=sighting.station.name,
             ))
     station_link.short_description = "station"
 
     formfield_overrides = {
         models.DateTimeField: {
             'widget': MicrosecondDateTimeWidget(
-                date_format = '%Y-%m-%d',
-                time_format = '%H:%M:%S.%f',
+                date_format='%Y-%m-%d',
+                time_format='%H:%M:%S.%f',
             )
         },
         models.FloatField: {
-            'widget': NumberInput(attrs = {
+            'widget': NumberInput(attrs={
                 'size': 10,
             })
         }

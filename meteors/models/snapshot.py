@@ -53,8 +53,6 @@ class Snapshot(models.Model):
                                         verbose_name        = "timestamp",
                                     )
 
-
-
     latitude                        = models.FloatField(
                                         null                = True,
                                         blank               = True,
@@ -104,3 +102,5 @@ class Snapshot(models.Model):
         except TypeError:
             return None
 
+    def __str__(self):
+        return f"Meteor {self.meteor}, snapshot {self.order}"
