@@ -14,7 +14,7 @@ class SightingInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
-    fields = ['station', 'angular_speed']
+    fields = ['station', 'timestamp', 'composite', 'angular_speed']
     readonly_fields = ['station', 'angular_speed']
 
     

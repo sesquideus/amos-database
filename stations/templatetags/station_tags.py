@@ -52,6 +52,12 @@ def longitude(value: float):
 
 @register.filter
 @mdash
+def altitude(value: float):
+    return f"{abs(value):.0f} m"
+
+
+@register.filter
+@mdash
 def distance(value: float):
     return f"{value:.0f}"
 

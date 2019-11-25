@@ -188,7 +188,7 @@ class Sighting(models.Model):
 
     def __str__(self):
         meteor = 'unknown meteor' if self.meteor is None else self.meteor.name
-        return f"#{self.id} ({meteor} at {self.timestamp} from {self.station})"
+        return f"#{self.id}: {meteor} from {self.station}"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs = {'id': self.id})

@@ -29,8 +29,8 @@
 {% block page %}
     <div>
         <p>
-            {% if frame.sighting.lightmaxTime %}
-                {{ frame.sighting.lightmaxTime|date:"Y-m-d, l" }}
+            {% if frame.timestamp %}
+                {{ frame.timestamp|date:"Y-m-d, l" }}
             {% else %}
                 <span class="unknown">unknown date</span>
             {% endif %}
@@ -46,7 +46,7 @@
                         {{ frame.sighting.observer.name }}
                     {% endif %}
                 </span>
-                at <span id="time">{{ frame.sighting.lightmaxTime|date:"Y-m-d H:i:s.u" }}</span>
+                at <span id="time">{{ frame.sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
@@ -98,37 +98,26 @@
             <table>
                 <thead>
                     <tr>
-                        <th class="group" colspan="3">sky</th>
+                        <th class="group">sky</th>
+                        <th>azimuth</th>
+                        <th>elevation</th>
+                        <th>elongation</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% with sun=frame.getSunInfo %}
                         <tr>
-                            <td class="multihead" rowspan="3">Sun</td>
-                            <td>azimuth</td>
+                            <td>Sun</td>
                             <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
-                        </tr>
-                        <tr>
-                            <td>elevation</td>
                             <td class="data angle altitude">{{ sun.coord.alt.degree|angle }}</td>
-                        </tr>
-                        <tr>
-                            <td>elongation</td>
                             <td class="data angle">{{ sun.elong|angle }}</td>
                         </tr>
                     {% endwith %}
                     {% with moon=frame.getMoonInfo %}
                         <tr>
-                            <td class="multihead" rowspan="3">Moon</td>
-                            <td>azimuth</td>
+                            <td>Moon</td>
                             <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>
-                        </tr>
-                        <tr>
-                            <td>elevation</td>
                             <td class="data angle altitude">{{ moon.coord.alt.degree|angle }}</td>
-                        </tr>
-                        <tr>
-                            <td>elongation</td>
                             <td class="data angle">{{ moon.elong|angle }}</td>
                         </tr>
                     {% endwith %}

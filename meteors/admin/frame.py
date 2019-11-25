@@ -19,15 +19,15 @@ class FrameInline(admin.TabularInline):
 
 @admin.register(Frame)
 class FrameAdmin(admin.ModelAdmin):
-    def sighting_link(self, frame):
-        if frame.sighting is None:
-            return mark_safe("&mdash;")
-        else:
-            return mark_safe('<a href="{url}">{title}</a>'.format(
-                url = reverse("admin:meteors_sighting_change", args = [frame.sighting.id]),
-                title = frame.sighting.id,
-            ))
-    sighting_link.short_description = "sighting"
+    #def sighting_link(self, frame):
+    #    if frame.sighting is None:
+    #        return mark_safe("&mdash;")
+    #    else:
+    #        return mark_safe('<a href="{url}">{title}</a>'.format(
+    #            url = reverse("admin:meteors_sighting_change", args = [frame.sighting.id]),
+    #            title = frame.sighting.id,
+    #        ))
+    #sighting_link.short_description = "sighting"
 
     formfield_overrides = {
         models.DateTimeField: {
@@ -65,7 +65,8 @@ class FrameAdmin(admin.ModelAdmin):
         ),
     )
 
-    list_display = ['__str__', 'sighting_link', 'order', 'timestamp']
-    list_filter = ['sighting']
+    list_display = ['__str__', 'sighting', 'order', 'timestamp']
+    list_display_links = ['__str__', 'sighting']
+    #list_filter = ['sighting']
     readonly_fields = ['id']
     save_as = True
