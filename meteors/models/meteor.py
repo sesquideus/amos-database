@@ -155,3 +155,8 @@ class Meteor(models.Model):
             self.name = self.lightmax_time.strftime('%Y%m%d-%H%M%S-%f')
 
         super().save(*args, **kwargs)
+
+    def as_dict(self):
+        return {
+            'id':   self.id,
+        }
