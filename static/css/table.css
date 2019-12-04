@@ -1,0 +1,119 @@
+table {
+    padding: 10px;
+    margin-bottom: 10px;
+    min-width: 540px;
+    background-color: white;
+}
+
+table.full-width {
+    width: 100%;
+}
+
+table.alternating tr:nth-child(even) {
+    background-color: hsla(0, 0%, 90%, 0.4);
+}
+
+tr {
+    padding: 5px 12px;
+    border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
+    border-collapse: collapse;
+}
+
+tr.max-light {
+    font-weight: bold;
+}
+
+td, th {
+    padding: 7px 7px;
+    vertical-align: middle;
+}
+
+th {
+    font-size: 100%;
+    background-color: hsla(180, 40%, 10%, 1);
+    color: white;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+th.subgroup {
+    background-color: hsla(200, 100%, 20%, 1);
+}
+
+th a {
+    color: white;
+}
+
+div.page table td a {
+    text-decoration: none;
+}
+
+td {
+    border-collapse: collapse;
+    white-space: nowrap;
+    width: auto;
+    vertical-align: baseline;
+}
+
+td.arrow {
+    width: 20px;
+}
+
+td.multihead {
+    vertical-align: middle;
+}
+
+td.data {
+    text-align: right; 
+}
+
+td.name {
+    text-align: center;
+}
+
+td.timestamp {
+    width: 100mm;
+}
+
+td.time {
+    text-align: center;
+}
+
+td.seen {
+    text-align: center;
+}
+
+td.station-code {
+    text-align: right;
+}
+
+td.station-name {
+    text-align: left;
+}
+
+td.status {
+    text-align: center;
+}
+
+td.c {
+    text-align: center;
+}
+
+/* station status colours */
+
+td abbr {
+    font-weight: bold;
+}
+
+td abbr.timeout {
+    color: hsl(30, 100%, 50%);
+}
+
+td abbr.ok {
+    color: hsl(120, 100%, 40%);
+}
+
+td abbr.noreports {
+    color: hsl(0, 0%, 75%);
+}
+

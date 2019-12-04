@@ -58,7 +58,7 @@ div.page div.titlebar div.controls img {
 div.page {
     padding: 20px;
     background-image: url("/static/solid.png");
-    background-color: hsl(0, 0%, 0%);
+    background-color: hsl(0, 0%, 40%);
     background-blend-mode: screen;
     min-height: calc(100vh - 88px);
     height: 100%;
@@ -75,107 +75,6 @@ h3 {
     clear: both;
 }
 
-table {
-    padding: 10px;
-    margin-bottom: 10px;
-    min-width: 540px;
-    background-color: white;
-}
-
-table.full-width {
-    width: 100%;
-}
-
-tr {
-    padding: 5px 12px;
-    border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
-    border-collapse: collapse;
-}
-
-tr:last-child {
-}
-
-tr.maxLight {
-    font-weight: bold;
-}
-
-td, th {
-    padding: 7px 7px;
-    vertical-align: middle;
-}
-
-th {
-    font-size: 100%;
-    background-color: hsla(180, 40%, 10%, 1);
-    color: white;
-    padding-left: 10px;
-    padding-right: 10px;
-}
-
-div.page table td a {
-    text-decoration: none;
-}
-
-td {
-    border-collapse: collapse;
-    white-space: nowrap;
-    width: auto;
-    vertical-align: baseline;
-}
-
-td.multihead {
-    vertical-align: middle;
-}
-
-td.data {
-    text-align: right; 
-}
-
-td.name {
-    text-align: center;
-}
-
-td.timestamp {
-    width: 100mm;
-}
-
-td.time {
-    text-align: center;
-}
-
-td.seen {
-    text-align: center;
-}
-
-td.station {
-    text-align: center;
-}
-
-td.status {
-    text-align: center;
-}
-
-td.c {
-    text-align: center;
-}
-
-/* station status colours */
-
-td abbr {
-    font-weight: bold;
-}
-
-td abbr.timeout {
-    color: hsl(30, 100%, 50%);
-}
-
-td abbr.ok {
-    color: hsl(120, 100%, 40%);
-}
-
-td abbr.noreports {
-    color: hsl(0, 0%, 75%);
-}
 
 a.object-link {
     font-weight: bold;
@@ -215,10 +114,6 @@ div.page form.date p, div.page form.date input {
 span.sun {
     padding: 0 5px;
     font-weight: bold;
-}
-
-td.arrow {
-    width: 20px;
 }
 
 span.arrow {
