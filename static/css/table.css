@@ -15,7 +15,7 @@ table.alternating tr:nth-child(even) {
 
 tr {
     padding: 5px 12px;
-    border-bottom: 1px solid hsla(0, 0%, 0%, 0.1);
+    border-bottom: 1px solid hsla(0, 0%, 10%, 0.1);
     border-collapse: collapse;
 }
 
@@ -37,7 +37,7 @@ th {
 }
 
 th.subgroup {
-    background-color: hsla(200, 100%, 20%, 1);
+    background-color: hsla(200, 20%, 30%, 1);
 }
 
 th a {
@@ -53,6 +53,11 @@ td {
     white-space: nowrap;
     width: auto;
     vertical-align: baseline;
+}
+
+td.angle {
+    width: 96px;
+    box-shadow: 0px 0px 5px 5px hsla(0, 100%, 100%, 0.5) inset;
 }
 
 td.arrow {

@@ -7,9 +7,10 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    <table class="alternating full-width">
+    <table class="alternating">
         <thead>
             <tr>
+                <th>subnetwork</th>
                 <th>code</th>
                 <th>name</th>
                 <th>status</th>
@@ -20,22 +21,22 @@
             </tr>
         </thead>
         {% for subnetwork in subnetworks %}
-            <tr>
-                <th class="subgroup" colspan="11">
-                    <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
-                </th>
-            </tr>
             {% for station in subnetwork.stations_full %}
                 <tr>
+                    {% if forloop.first %}
+                        <th class="subgroup" rowspan="{{ subnetwork.stations.count }}">
+                            <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
+                        </th>
+                    {% endif %}
                     {% with sun=station.sun_position report=station.last_report.0 last_sighting=station.last_sighting.0 %}
                         <td class="station-code">
                             {{ station.code }}
                         </td>
-                    
+
                         <td class="station-name">
                             <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
                         </td>
-                    
+
                         <td class="status data">
                             {% if station.last_report.0 %}
                                 <abbr class="{{ report.type }}" title="{{ report.time }}">{{ report.status }}</abbr>
@@ -46,7 +47,7 @@
                                 <span class="empty">no status info</span>
                             {% endif %}
                         </td>
-                    
+
                         <td id="{{ station.code }}-localtime" class="time c">
                             {% timezone station.timezone %}
                                 <abbr title="{% now "Y-m-d" %}">{% now "H:i" %}</abbr>
@@ -54,12 +55,12 @@
                         </td>
 
                         <td id="{{ station.code }}-sunalt"
-                            class="data angle"
+                            class="data angle altitude"
                             style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
                             {{ sun.alt|floatformat:1 }}°
                             <span class="sun arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
                         </td>
-                        <td id="{{ station.code }}-sunaz" class="data">
+                        <td id="{{ station.code }}-sunaz" class="data angle azimuth">
                             {{ sun.az|floatformat:1 }}°
                             <span class="sun arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
                         </td>
@@ -86,7 +87,10 @@
                 </tr>
             {% empty %}
                 <tr>
-                    <td colspan="11" class="empty">No stations are defined in this subnetwork.</td>
+                    <th class="subgroup">
+                        <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
+                    </th>
+                    <td colspan="10" class="empty">No stations are defined in this subnetwork.</td>
                 </tr>
             {% endfor %}
         {% endfor %}
