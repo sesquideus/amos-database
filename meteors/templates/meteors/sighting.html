@@ -1,4 +1,5 @@
 {% extends 'core/base.html' %}
+{% load tz %}
 {% load static meteor_tags %}
 {% load static station_tags %}
 
@@ -21,7 +22,7 @@
             <a href="{% url 'sighting' id=sighting.id %}" target="_blank">
                 <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
             </a>
-            
+
             {% if next != None %}
                 <a href="{% url 'sighting' id=next %}">
                     <img src="{% static "pictures/next.png" %}" alt="Next" />
@@ -59,8 +60,7 @@
             at <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
         </p>
     </div>
-    
-    
+
     <div class="inner">
         <div class="info">
             <table>
@@ -72,7 +72,11 @@
                 <tbody>
                     <tr>
                         <td>timestamp</td>
-                        <td class="data time ar">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}
+                        <td class="data time ar">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</td>
+                    </tr>
+                    <tr>
+                        <td>local time</td>
+                        <td class="data time ar">{% timezone sighting.station.timezone %}{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}{% endtimezone %}</td>
                     </tr>
                     <tr>
                         <td>apparent magnitude</td>

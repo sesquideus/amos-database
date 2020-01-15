@@ -3,6 +3,8 @@ import pytz
 import math
 import functools
 
+from astropy.time import Time
+
 from django import template
 from django.utils.safestring import mark_safe
 
@@ -57,6 +59,14 @@ def safetime(time):
 @register.filter
 def nonedash(arg):
     return mark_safe("&mdash;") if arg is None else arg
+
+@register.filter
+@mdash
+def solar_longitude(timestamp):
+    n = Time(timestamp).jd - 2451545.0
+    l = (280.460 + 0.9856474 * n) % 360
+    g = math.radians(357.528 + 0.9856003 * n) % 360
+    return l + 1.915 * math.sin(g) + 0.02 * math.sin(2 * g)
 
 
 @register.filter

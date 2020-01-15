@@ -1,5 +1,5 @@
 {% extends 'core/base.html' %}
-{% load staticfiles %}
+{% load static %}
 {% load station_tags %}
 {% load meteor_tags %}
 
@@ -28,7 +28,7 @@
         <a href="{% url 'meteor-KML' name=meteor.name %}" target="_blank">
             <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
         </a>
-        
+
         {% if meteor.next != None %}
             <a href="{% url 'meteor' name=meteor.next %}">
                 <img src="{% static "pictures/next.png" %}" alt="Next" />
@@ -55,16 +55,24 @@
                     <td class="data">{{ meteor.name }}</td>
                 </tr>
                 <tr>
+                    <td>timestamp</td>
+                    <td colspan="2" class="data">{{ meteor.timestamp }}</td>
+                </tr>
+                <tr>
+                    <td>solar longitude &#955;<sub>&#9737;</sub></td>
+                    <td colspan="2" class="data">{{ meteor.timestamp|solar_longitude|angle }}</td>
+                </tr>
+                <tr>
                     <td>absolute magnitude</td>
                     <td class="data meter">
-                        <meter min="-10" max="10" low="-5" optimum="0" high="5" value="{{ meteor.magnitude|multiply:-1 }}" />
+                        <meter min="-10" max="10" low="-5" optimum="0" high="5" value="{{ meteor.magnitude|multiply:-1 }}" />
                     </td>
                     <td class="data magnitude">{{ meteor.magnitude|magnitude }}</td>
                 </tr>
                 <tr>
                     <td>geocentric speed</td>
                     <td class="data meter">
-                        <meter min="0" max="75000" low="20000" optimum="65000" high="60000" value="{{ meteor.speed }}" />
+                        <meter min="0" max="75000" low="20000" optimum="65000" high="60000" value="{{ meteor.speed }}" />
                     </td>
                     <td class="data speed">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
                 </tr>
@@ -85,7 +93,7 @@
                     {% for snapshot in meteor.snapshots.all %}
                         <tr>
                             <td class="data">
-                                {{ snapshot.order }}
+                                {{ snapshot.order }}
                             </td>
                             <td class="data">
                                 {{ snapshot.timestamp|date:"H:i:s.u" }}

@@ -20,6 +20,11 @@ sup {
     vertical-align: super;
 }
 
+sub {
+    font-size: smaller;
+    vertical-align: sub;
+}
+
 div.page p {
     margin: 15px 0;
 }
