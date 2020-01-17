@@ -1,3 +1,5 @@
+import pytz
+
 from django.db import models
 from django.db.models import Prefetch, Count, F
 from django.urls import reverse
@@ -31,6 +33,13 @@ class Subnetwork(core.models.NamedModel):
                                         max_length          = 8,
                                         unique              = True,
                                         help_text           = "a simple unique code (2-4 uppercase letters)",
+                                    )
+    timezone                        = models.CharField(
+                                        null                = False,
+                                        blank               = False,
+                                        max_length          = 64,
+                                        choices             = zip(pytz.common_timezones, pytz.common_timezones),
+                                        help_text           = "official timezone name",
                                     )
 
     founded                         = models.DateField(
