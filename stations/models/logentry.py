@@ -1,4 +1,5 @@
 import textwrap
+from django.conf import settings
 from django.db import models
 
 
@@ -16,6 +17,13 @@ class LogEntry(models.Model):
                                         help_text           = "the station",
                                         related_name        = "log_entries",
                                         on_delete           = models.CASCADE,
+                                    )
+    author                          = models.ForeignKey(
+                                        settings.AUTH_USER_MODEL,
+                                        null                = True,
+                                        verbose_name        = "author of the entry",
+                                        related_name        = "log_entries",
+                                        on_delete           = models.SET_NULL,
                                     )
     text                            = models.TextField(
                                         help_text           = "text of the log entry",

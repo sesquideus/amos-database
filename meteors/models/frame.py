@@ -16,9 +16,9 @@ from core.models import noneIfError
 class FrameQuerySet(models.QuerySet):
     def with_flight_time(self):
         return self.annotate(
-            flight_time=F('timestamp') - Window( 
-                expression=Min('timestamp'), 
-                partition_by=F('sighting__id'), 
+            flight_time=F('timestamp') - Window(
+                expression=Min('timestamp'),
+                partition_by=F('sighting__id'),
             )
         )
 

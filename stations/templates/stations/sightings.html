@@ -1,0 +1,32 @@
+{% load meteor_tags %}
+{% load station_tags %}
+
+<h3>Sightings ({{ station.sightings.count }} total)</h3>
+<table>
+    <thead>
+        <tr>
+            <th>timestamp</th>
+            <th>ago</th>
+            <th>magnitude</th>
+        </tr>
+    </thead>
+    {% for sighting in station.recent_sightings %}
+        <tr>
+            <td class="data time">
+                <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</a>
+            </td>
+            <td class="data">
+                {{ sighting.timestamp|since_date_time }}
+            </td>
+            <td class="data magnitude">
+                {{ sighting.magnitude|magnitude }}
+            </td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td colspan="2" class="empty">
+                There are no recorded sightings from this station.
+            </td>
+        </tr>
+    {% endfor %}
+</table>

@@ -13,7 +13,7 @@
                 <th>subnetwork</th>
                 <th>code</th>
                 <th>name</th>
-                <th>status</th>
+                <th colspan="2">status</th>
                 <th>local time</th>
                 <th colspan="2">&#x2600;</th>
                 <th colspan="2">last sighting</th>
@@ -28,7 +28,7 @@
                             <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
                         </th>
                     {% endif %}
-                    {% with sun=station.sun_position report=station.last_report.0 last_sighting=station.last_sighting.0 %}
+                    {% with sun=station.sun_position report=station.last_report.0 status=station.get_current_status last_sighting=station.last_sighting.0 %}
                         <td class="station-code">
                             {{ station.code }}
                         </td>
@@ -38,13 +38,15 @@
                         </td>
 
                         <td class="status data">
+                            <abbr class="{{ status.code }}" title="{{ status.get_description }}">
+                                {{ status.short }}
+                            </abbr>
+                        </td>
+                        <td class="status">
                             {% if station.last_report.0 %}
-                                <abbr class="{{ report.type }}" title="{{ report.time }}">{{ report.status }}</abbr>
-                                {% if report.extra %}
-                                    ({{ report.extra }})
-                                {% endif %}
+                                {{ report.timestamp|since_date_time|default:"&mdash;" }}
                             {% else %}
-                                <span class="empty">no status info</span>
+                                &mdash;
                             {% endif %}
                         </td>
 
@@ -67,7 +69,7 @@
 
                         <td class="time">
                             {% if station.last_sighting.0 %}
-                                <a href="{{ last_sighting.get_absolute_url }}">{{ last_sighting.timestamp }}</a>
+                                <a href="{{ last_sighting.get_absolute_url }}">{{ last_sighting.timestamp|date:"Y-m-d H:i:s" }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}

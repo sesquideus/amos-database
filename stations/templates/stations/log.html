@@ -1,0 +1,28 @@
+{% load station_tags %}
+
+<h3>Station log</h3>
+<table>
+    <thead>
+        <tr>
+            <th>date</th>
+            <th>author</th>
+            <th>entry</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for entry in station.log_entries.all|slice:":10" %}
+            <tr>
+                <td class="data timestamp">{{ entry.created|date:"Y-m-d H:i" }}</td>
+                <td class="data name">{{ entry.author|default_if_none:"&mdash;" }}</td>
+                <td>{{ entry.text }}</td>
+            </tr>
+        {% empty %}
+            <tr>
+                <td colspan="2" class="empty">
+                    There are no log entries for this station.
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>
+

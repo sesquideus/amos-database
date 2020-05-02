@@ -35,7 +35,7 @@ class SubnetworkAdmin(admin.ModelAdmin):
 class StationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Properties', {
-                'fields': ('name', 'code', 'subnetwork', 'address', 'country'),
+                'fields': ('name', 'code', 'subnetwork', 'address', 'country', 'on'),
             }
         ),
         ('Geographics coordinates', {
@@ -50,8 +50,6 @@ class StationAdmin(admin.ModelAdmin):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    def has_module_permission(self, request):
-        return False
 
     readonly_fields = ['created', 'updated']
 

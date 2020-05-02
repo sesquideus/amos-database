@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/2.1/ref/settings/
 """
 
 import os
+import logging.config
+from django.utils.log import DEFAULT_LOGGING
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -25,7 +27,7 @@ SECRET_KEY = 'jv+=(x=vqpodb@ab4*11a2pm%er34be2v*8rd^4&_%)+l-m1p9'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1', '192.168.0.177', '192.168.248.145']
+ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1']
 
 INTERNAL_IPS = ['localhost', '127.0.0.1']
 
@@ -60,6 +62,33 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = 'amos.urls'
+
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'formatters': {
+        'django.server': {
+            'format': '%(asctime)s [%(levelname)-3s] %(message)s',
+            'datefmt': '%Y-%m-%d %H:%M:%S',
+        },
+    },
+    'handlers': {
+        'console': {
+            'level': 'INFO',
+            'class': 'logging.StreamHandler',
+            'formatter': 'django.server',
+        },
+        'django.server': DEFAULT_LOGGING['handlers']['django.server'],
+    },
+    'loggers': {
+        '': {
+            'level': 'INFO',
+            'handlers': ['console'],
+        },
+        'django.server': DEFAULT_LOGGING['loggers']['django.server'],
+    }
+}
 
 TEMPLATES = [
     {

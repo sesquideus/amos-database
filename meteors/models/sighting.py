@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import math
+import logging
 import numpy as np
 
 from django.db import models
@@ -20,6 +21,7 @@ from pprint import pprint as pp
 from core.models import noneIfError
 from meteors.models import Frame
 
+log = logging.getLogger(__name__)
 
 
 class SightingManager(models.Manager):
@@ -29,8 +31,8 @@ class SightingManager(models.Manager):
     """
 
     def create_for_meteor(self, meteor, station, **kwargs):
-        print(f"Creating a sighting for meteor {meteor}, station {station}")
-        
+        log.info(f"Creating a sighting for meteor {meteor}, station {station}")
+
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = meteor.timestamp,
@@ -66,9 +68,9 @@ class SightingManager(models.Manager):
         Create a new Sighting from data received at the POST endpoint.
     """
     def create_from_POST(self, station_code, **kwargs):
-        print(f"Creating a sighting from POST at station {station_code}")
-        pp(kwargs)
-        
+        log.info(f"Creating a sighting from POST at station {station_code}")
+        #pp(kwargs)
+
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = datetime.datetime.strptime(kwargs.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
@@ -120,21 +122,21 @@ class SightingQuerySet(models.QuerySet):
                 queryset=Frame.objects.with_flight_time(),
             )
         )
-        
+
     def with_lightmax(self):
         frames = Frame.objects.filter(sighting=OuterRef('id')).order_by('magnitude')
-        return self.annotate( 
-            magnitude=Subquery(frames.values('magnitude')[:1]), 
-            azimuth=Subquery(frames.values('azimuth')[:1]), 
-            altitude=Subquery(frames.values('altitude')[:1]),  
-        )                                                   
+        return self.annotate(
+            magnitude=Subquery(frames.values('magnitude')[:1]),
+            azimuth=Subquery(frames.values('azimuth')[:1]),
+            altitude=Subquery(frames.values('altitude')[:1]),
+        )
 
     def with_everything(self):
         return self.with_station().with_meteor().with_frames().with_frame_count().with_lightmax()
 
     def for_station(self, station_id):
         return self.filter(station__id=station_id)
-    
+
     def for_night(self, date):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
         half_day = datetime.timedelta(hours=12)

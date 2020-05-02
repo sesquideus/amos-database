@@ -10,12 +10,11 @@ table.full-width {
 }
 
 table.alternating tr:nth-child(even) {
-    background-color: hsla(0, 0%, 90%, 0.4);
+    background-color: hsla(0, 0%, 80%, 0.4);
 }
 
 tr {
     padding: 5px 12px;
-    border-bottom: 1px solid hsla(0, 0%, 10%, 0.1);
     border-collapse: collapse;
 }
 

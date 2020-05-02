@@ -72,11 +72,11 @@ def angle(value: float):
 def since_date_time(timestamp):
     delta = (datetime.datetime.now(tz = pytz.utc) - timestamp).total_seconds()
     if delta < 60:
-        return f"{delta}s"
+        return f"{delta:.0f}s"
     if delta < 3600:
-        return f"{delta / 60:02.0f}m{delta % 60:02.0f}s"
+        return f"{delta / 60:2.0f}m{delta % 60:02.0f}s"
     if delta < 86400:
-        return f"{delta / 3600:02.0f}h{delta % 3600 / 60:02.0f}m"
+        return f"{delta / 3600:2.0f}h{delta % 3600 / 60:02.0f}m"
     if delta < 30*36400:
-        return f"{delta / 86400:02.0f}d{delta % 86400 / 3600:02.0f}h"
+        return f"{delta / 86400:2.0f}d{delta % 86400 / 3600:02.0f}h"
     return f"{delta / 86400:.0f}d"

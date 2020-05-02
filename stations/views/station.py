@@ -1,6 +1,7 @@
 import datetime
 import pytz
 import json
+import logging
 
 from pprint import pprint as pp
 
@@ -18,6 +19,8 @@ from django.views.generic.list import ListView
 from stations.models import Station, Subnetwork, StatusReport
 from meteors.models import Sighting
 from core.views import JSONDetailView, JSONListView, LoginDetailView
+
+log = logging.getLogger(__name__)
 
 
 class SingleView(LoginDetailView):
@@ -51,11 +54,11 @@ class ListViewJSON(JSONListView):
 class APIView(View):
     def get(self, request):
         return JsonResponse({'ok': 'OK'})
-    
+
     def post(self, request, code):
-        print(f"{'*' * 20} Incoming status report for station {code} {'*' * 20}")
-        pp(request.headers)
-        pp(request.body)
+        log.info(f"Incoming status report for station {code}")
+        #pp(request.headers)
+        #pp(request.body)
 
         try:
             data = json.loads(request.body)
@@ -78,9 +81,9 @@ class APIView(View):
 @method_decorator(csrf_exempt, name = 'dispatch')
 class APIViewSighting(View):
     def post(self, request, code):
-        print(f"{'*' * 20} Incoming new sighting for station {code} {'*' * 20}")
-        pp(request.headers)
-        pp(request.body)
+        log.info(f"Incoming new sighting from station {code}")
+        #pp(request.headers)
+        #pp(request.body)
 
         try:
             data = json.loads(request.body)
@@ -92,8 +95,8 @@ class APIViewSighting(View):
             return response
 
         except json.JSONDecodeError:
-            print("JSON decoding error")
+            log.warning("JSON decoding error in the sighting")
             return HttpResponseBadRequest()
         except Exception as e:
-            print(e)
+            lor.warning(e)
             return HttpResponseBadRequest()

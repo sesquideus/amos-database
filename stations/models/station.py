@@ -13,24 +13,26 @@ import core.models
 from meteors.models import Sighting
 from stations.models.statusreport import StatusReport
 
+from stations.templatetags.station_tags import since_date_time
+
 
 class StationQuerySet(models.QuerySet):
     def with_last_sighting(self):
-        latest = Sighting.objects.values('station').annotate(max_id=Max('timestamp')).values_list('max_id', flat=True)
+        latest = Sighting.objects.order_by('station__id', '-timestamp').distinct('station__id')
         return self.prefetch_related(
             Prefetch(
                 'sightings',
-                queryset=Sighting.objects.filter(timestamp__in=latest),
+                queryset=Sighting.objects.filter(id__in=latest),
                 to_attr='last_sighting',
             )
         )
 
     def with_last_report(self):
-        latest = StatusReport.objects.values('station').annotate(max_id=Max('timestamp')).values_list('max_id', flat=True)
+        latest = StatusReport.objects.order_by('station__id', '-timestamp').distinct('station__id')
         return self.prefetch_related(
             Prefetch(
                 'reports',
-                queryset=StatusReport.objects.filter(timestamp__in=latest),
+                queryset=StatusReport.objects.filter(id__in=latest),
                 to_attr='last_report',
             )
         )
@@ -114,6 +116,11 @@ class Station(core.models.NamedModel):
                                         choices             = zip(pytz.common_timezones, pytz.common_timezones),
                                         help_text           = "official timezone name",
                                     )
+    on                              = models.BooleanField(
+                                        null                = False,
+                                        blank               = False,
+                                        default             = False,
+                                    )
 
     picture                         = models.ImageField(
                                         upload_to           = 'stations/',
@@ -150,7 +157,7 @@ class Station(core.models.NamedModel):
     def alt_az(self, time=None):
         if time is None:
             time = datetime.datetime.now()
-            
+
         return AltAz(
             obstime=Time(time),
             location=self.earth_location()
@@ -187,31 +194,20 @@ class Station(core.models.NamedModel):
             altitude    = self.altitude,
         )
 
-    def current_status(self):
+    def get_current_status(self):
+        if not self.on:
+            return StatusOff()
+
         try:
             last_report = self.reports.latest()
-            time_since = (datetime.datetime.now(pytz.utc) - last_report.timestamp).total_seconds() 
+            time_since = (datetime.datetime.now(pytz.utc) - last_report.timestamp).total_seconds()
         except ObjectDoesNotExist:
-            return {
-                'id': 'noreports',
-                'short': "no status reports",
-                'long': "The station has never sent any reports",
-            }
+            return StatusEmpty()
 
-        if time_since > 180:
-            return {
-                'id':       'timeout',
-                'short':    "timeout",
-                'extra':    f"{(datetime.datetime.now(tz=pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
-                'long':     f"The station has not sent a report since {last_report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}",
-            }
+        if time_since > 120:
+            return StatusTimeout(last_report)
         else:
-            return {
-                'id':       'ok',
-                'short':    "OK",
-                'extra':    f"{(datetime.datetime.now(tz=pytz.utc) - last_report.timestamp).total_seconds():.0f} s",
-                'long':     "The station is working correctly",
-            }
+            return StatusOK(last_report)
 
     def json(self):
         return {
@@ -224,3 +220,49 @@ class Station(core.models.NamedModel):
             'status': self.current_status(),
         }
 
+
+class Status():
+    def __init__(self, last_report=None):
+        if last_report is not None:
+            self.last_report = last_report
+
+    def age(self):
+        return datetime.datetime.now(tz=pytz.UTC) - self.last_report.timestamp
+
+
+class StatusOK(Status):
+    code = 'ok'
+    short = 'OK'
+
+    def get_description(self):
+        return f"The station is working normally. Last report on {self.last_report.timestamp.strftime('%Y-%m-%d %H:%M:%S')}."
+
+
+class StatusEmpty(Status):
+    code = 'none'
+    short = 'no reports'
+
+    def get_description(self):
+        return "The station has never sent any reports."
+
+    def age(self):
+        return None
+
+
+class StatusTimeout(Status):
+    code = 'timeout'
+    short = 'timed out'
+
+    def get_description(self):
+        timestamp = self.last_report.timestamp
+        return (f"The station seems to be offline. " +
+            f"It has not sent a report since {timestamp.strftime('%Y-%m-%d %H:%M:%S')} " +
+            f"({since_date_time(timestamp)})")
+
+
+class StatusOff(Status):
+    code = 'off'
+    short = 'off'
+
+    def get_description(self):
+        return f"The station has been turned off."

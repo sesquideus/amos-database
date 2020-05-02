@@ -7,12 +7,7 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 
-from astropy.coordinates import EarthLocation, SkyCoord, AltAz, get_sun, get_moon
-from astropy.time import Time
-from astropy import units
-
 import core.models
-from meteors.models import Sighting
 
 
 class StatusReportManager(models.Manager):
@@ -58,6 +53,15 @@ class StatusReport(models.Model):
                                         models.Index(fields=['timestamp', 'station']),
                                     ]
 
+    STATE_OBSERVING = 'O'
+    STATE_MALFUNCTION = 'M'
+    STATE_NOT_OBSERVING = 'N'
+    STATES                          = [
+                                        (STATE_OBSERVING, 'observing'),
+                                        (STATE_MALFUNCTION, 'malfunction'),
+                                        (STATE_NOT_OBSERVING, 'not observing'),
+                                    ]
+
     LID_OPEN = 'O'
     LID_CLOSED = 'C'
     LID_PROBLEM = 'P'
@@ -68,6 +72,7 @@ class StatusReport(models.Model):
                                         (LID_PROBLEM, 'problem'),
                                         (LID_UNKNOWN, 'unknown'),
                                     ]
+
     HEATING_OFF = '0'
     HEATING_ON = '1'
     HEATING_PROBLEM = 'P'
@@ -93,7 +98,10 @@ class StatusReport(models.Model):
                                         related_name        = 'reports',
                                     )
     status                          = models.CharField(
-                                        max_length          = 64,
+                                        max_length          = 1,
+                                        choices             = STATES,
+                                        null                = True,
+                                        blank               = True,
                                     )
     lid                             = models.CharField(
                                         max_length          = 1,
