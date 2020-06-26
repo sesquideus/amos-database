@@ -1,5 +1,6 @@
 {% extends 'core/base.html' %}
 {% load station_tags %}
+{% load meteor_tags %}
 {% load tz %}
 
 {% block pagetitle %}
@@ -7,6 +8,8 @@
 {% endblock pagetitle %}
 
 {% block page %}
+    It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %}, &#955;<sub>&#9737;</sub> = {{ now|solar_longitude|angle }})
+
     <table class="alternating">
         <thead>
             <tr>
