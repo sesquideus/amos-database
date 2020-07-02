@@ -22,7 +22,7 @@ from meteors.models import Sighting
 from stations.models import Station
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
 class ListDateView(ListView):
     template_name = 'meteors/list-sightings.html'
     context_object_name = 'sightings'
@@ -52,13 +52,30 @@ class ListDateView(ListView):
             return HttpResponseBadRequest()
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
+class ListLatestView(ListView):
+    template_name = 'meteors/list-sightings.html'
+    context_object_name = 'sightings'
+    model = Sighting
+
+    def get_queryset(self, limit=50):
+        return Sighting.objects.with_everything().order_by('-timestamp')[:10]
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'navigation':   reverse('list-sightings'),
+        })
+        return context
+
+
+@method_decorator(login_required, name='dispatch')
 class ListByStationView(ListDateView):
     template_name = 'meteors/list-sightings-station.html'
 
     def get_queryset(self):
         return super().get_queryset().for_station(self.kwargs['station-code'])
-    
+
     def get_context_data(self):
         context = super().get_context_data()
         context['station'] = Station.objects.get(code = self.kwargs['station-code'])
@@ -72,7 +89,7 @@ class ListByStationView(ListDateView):
             return HttpResponseBadRequest()
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
 class SingleView(DetailView):
     model           = Sighting
     queryset        = Sighting.objects.with_neighbours().with_frames().with_station().with_meteor().with_lightmax()
@@ -98,13 +115,13 @@ class SingleView(DetailView):
         }
 
 
-@login_required
 class LightCurveView(DetailView):
     model = Sighting
     slug_field = 'id'
     slug_url_kwargs = 'id'
     queryset = Sighting.objects.with_frames().with_lightmax()
 
+@login_required
 def light_curve(request, id):
     sighting = Sighting.objects.with_frames().get(id=id)
     timestamps = [frame.flight_time.total_seconds() for frame in sighting.frames.all()]
@@ -118,7 +135,7 @@ def light_curve(request, id):
     ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
     canvas = FigureCanvasAgg(fig)
     buf = io.BytesIO()
-    
+
     canvas.print_png(buf)
     response = HttpResponse(buf.getvalue(), content_type = 'image/png')
     response['Content-Length'] = str(len(response.content))

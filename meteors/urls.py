@@ -8,6 +8,7 @@ urlpatterns = [
 
     # Sighting listings
     path('sightings/',                              sighting.ListDateView.as_view(),        name = 'list-sightings'),
+    path('sightings/latest',                        sighting.ListLatestView.as_view(),      name = 'list-sightings-latest'),
     path('sightings/<slug:stationCode>/',           sighting.ListByStationView.as_view(),   name = 'list-sightings-by-station'),
 
     # Single meteor views
