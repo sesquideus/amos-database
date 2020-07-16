@@ -17,34 +17,6 @@ from core.models import noneIfError
 from meteors.models import Sighting
 
 
-class MeteorManager(models.Manager):
-    def createFromPost(self, **kwargs):
-        meteor = self.create(
-            timestamp           = kwargs.get('timestamp', None),
-            beginningLatitude   = kwargs.get('beginningLatitude', None),
-            beginningLongitude  = kwargs.get('beginningLongitude', None),
-            beginningAltitude   = kwargs.get('beginningAltitude', None),
-            beginningTime       = kwargs.get('beginningTime', None),
-
-            lightmaxLatitude    = kwargs.get('lightmaxLatitude', None),
-            lightmaxLongitude   = kwargs.get('lightmaxLongitude', None),
-            lightmaxAltitude    = kwargs.get('lightmaxAltitude', None),
-            lightmaxTime        = kwargs.get('lightmaxTime', None),
-
-            endLatitude         = kwargs.get('endLatitude', None),
-            endLongitude        = kwargs.get('endLongitude', None),
-            endAltitude         = kwargs.get('endAltitude', None),
-            endTime             = kwargs.get('endTime', None),
-
-            velocityX           = kwargs.get('velocityX', None),
-            velocityY           = kwargs.get('velocityY', None),
-            velocityZ           = kwargs.get('velocityZ', None),
-
-            magnitude           = kwargs.get('magnitude', None),
-        )
-        return meteor
-
-
 class MeteorQuerySet(models.QuerySet):
     def with_sightings(self):
         return self.prefetch_related(
@@ -105,7 +77,7 @@ class Meteor(models.Model):
         verbose_name                = "meteor"
         ordering                    = ['timestamp']
 
-    objects                         = MeteorManager.from_queryset(MeteorQuerySet)()
+    objects                         = MeteorQuerySet.as_manager()
 
     id                              = models.AutoField(
                                         primary_key         = True,

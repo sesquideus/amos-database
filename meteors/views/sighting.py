@@ -58,13 +58,14 @@ class ListLatestView(ListView):
     context_object_name = 'sightings'
     model = Sighting
 
-    def get_queryset(self, limit=50):
-        return Sighting.objects.with_everything().order_by('-timestamp')[:10]
+    def get_queryset(self):
+        limit = self.kwargs.get('limit', 10)
+        return Sighting.objects.with_everything().order_by('-timestamp')[:limit]
 
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'navigation':   reverse('list-sightings'),
+            'navigation': reverse('list-sightings'),
         })
         return context
 
@@ -74,11 +75,11 @@ class ListByStationView(ListDateView):
     template_name = 'meteors/list-sightings-station.html'
 
     def get_queryset(self):
-        return super().get_queryset().for_station(self.kwargs['station-code'])
+        return super().get_queryset().for_station(self.kwargs['station_code'])
 
     def get_context_data(self):
         context = super().get_context_data()
-        context['station'] = Station.objects.get(code = self.kwargs['station-code'])
+        context['station'] = Station.objects.get(code = self.kwargs['station_code'])
         return context
 
     def post(self, request):

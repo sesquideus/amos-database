@@ -112,7 +112,7 @@ class APIView(View):
             beginningLongitude  = request.POST.get('beginningLongitude', None),
             beginningAltitude   = request.POST.get('beginningAltitude', None),
             beginningTime       = datetime.datetime.strptime(request.POST.get('beginningTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
-            
+
             lightmaxLatitude    = request.POST.get('lightmaxLatitude', None),
             lightmaxLongitude   = request.POST.get('lightmaxLongitude', None),
             lightmaxAltitude    = request.POST.get('lightmaxAltitude', None),
