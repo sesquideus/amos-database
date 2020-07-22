@@ -52,8 +52,7 @@
             {% endif %}
         </p>
     </div>
-    
-    
+
     <div class="inner">
         <div class="info">
             <table>
@@ -92,7 +91,7 @@
                 </tr>
                 <tr>
                     <td>air mass</td>
-                    <td class="data airmass">{{ frame.airMass|floatformat:2|default:"&mdash;" }}</td>
+                    <td class="data airmass">{{ frame.air_mass|floatformat:2|default:"&mdash;" }}</td>
                 </tr>
             </table>
             <table>
@@ -105,7 +104,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    {% with sun=frame.getSunInfo %}
+                    {% with sun=frame.get_sun_info %}
                         <tr>
                             <td>Sun</td>
                             <td class="data angle azimuth">{{ sun.coord.az.degree|angle }}</td>
@@ -113,7 +112,7 @@
                             <td class="data angle">{{ sun.elong|angle }}</td>
                         </tr>
                     {% endwith %}
-                    {% with moon=frame.getMoonInfo %}
+                    {% with moon=frame.get_moon_info %}
                         <tr>
                             <td>Moon</td>
                             <td class="data angle azimuth">{{ moon.coord.az.degree|angle }}</td>

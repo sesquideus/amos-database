@@ -166,3 +166,7 @@ img.sighting.empty {
 img.chart {
     border: 1px solid black;
 }
+
+div.page a.navigation {
+    text-decoration: none;
+}

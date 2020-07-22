@@ -154,6 +154,9 @@
             <h3>Light curve</h3>
             <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
 
+            <h3>Sky visualisation</h3>
+            <img class="chart" src="{% url 'sighting-sky' id=sighting.id %}" alt="Sky visualisation" />
+
             <h3>Video frames ({{ sighting.frames.count }} total)</h3>
             <table class="alternating">
                 <thead>

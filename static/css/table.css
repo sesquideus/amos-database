@@ -67,7 +67,7 @@ td.multihead {
 }
 
 td.data {
-    text-align: right; 
+    text-align: right;
 }
 
 td.name {
@@ -94,7 +94,19 @@ td.station-name {
     text-align: left;
 }
 
+td.subnetwork {
+    text-align: center;
+}
+
+td.meteor {
+    text-align: center;
+}
+
 td.status {
+    text-align: center;
+}
+
+td.station {
     text-align: center;
 }
 
@@ -102,7 +114,7 @@ td.c {
     text-align: center;
 }
 
-/* station status colours */
+/* station status colours */
 
 td abbr {
     font-weight: bold;

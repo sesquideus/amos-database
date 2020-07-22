@@ -3,7 +3,7 @@ from django.db import models
 import functools
 # Create your models here.
 
-def noneIfError(*exceptions):
+def none_if_error(*exceptions):
     def protected(function):
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
@@ -28,6 +28,6 @@ class NamedModel(models.Model):
                                         max_length          = 64,
                                         unique              = True,
                                     )
-    
+
     def __str__(self):
         return self.name

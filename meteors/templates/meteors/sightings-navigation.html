@@ -1,0 +1,12 @@
+{% load meteor_tags %}
+{% load station_tags %}
+
+<div class="navigation">
+    <a class="navigation" href="{{ request.path }}?date={{ date|previous_day|date:"Y-m-d" }}">&lt;&lt;</a>
+    <form class="date" action="{{ request.path }}" method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <input type="submit" value="change">
+    </form>
+    <a class="navigation" href="{{ request.path }}?date={{ date|next_day|date:"Y-m-d" }}">&gt;&gt;</a>
+</div>

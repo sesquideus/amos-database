@@ -3,14 +3,12 @@ import random
 import numpy as np
 from pprint import pprint as pp
 
+import django
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.detail import DetailView
 from django.views.generic.list import ListView
 
 from core.utils import DateParser
@@ -22,25 +20,28 @@ from meteors.forms import DateForm
 from stations.models import Station, Subnetwork
 
 
-@method_decorator(login_required, name = 'dispatch')
-class ListDateView(ListView):
-    model               = Meteor
+@method_decorator(login_required, name='dispatch')
+class GenericListView(django.views.generic.list.ListView):
+    model = Meteor
     context_object_name = 'meteors'
-    template_name       = 'meteors/list-meteors.html'
+    template_name = 'meteors/list-meteors.html'
+    queryset = Meteor.objects.with_everything()
 
+
+class ListDateView(GenericListView):
     def get_queryset(self):
         if self.request.GET.get('date'):
             self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
         else:
             self.date = datetime.date.today()
-        return Meteor.objects.with_sightings().for_night(self.date)
+        return self.queryset.for_night(self.date)
 
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
             'date':         self.date,
             'form':         DateForm(initial={'date': self.date}),
-            'navigation':   reverse('list-meteors')
+            'navigation':   django.urls.reverse('list-meteors'),
         })
 #        context.update(self.time.context())
         return context
@@ -48,27 +49,34 @@ class ListDateView(ListView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(f"{reverse('list-meteors')}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
+            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors')}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
         else:
-            return HttpResponseBadRequest()
+            return django.http.HttpResponseBadRequest()
+
+
+class ListLatestView(GenericListView):
+    def get_queryset(self):
+        limit = self.kwargs.get('limit', 10)
+        return Meteor.objects.with_everything().order_by('-timestamp')[:limit]
+
 
 
 @login_required
 def singleKML(request, name):
     context = {
-        'meteor': Meteor.objects.get(name = name)
+        'meteor': Meteor.objects.get(name=name)
     }
     return render(request, 'meteors/meteor.kml', context, content_type='application/vnd.google-earth.kml+xml')
 
 
 @login_required
 def singleJSON(request, name):
-    meteor = Meteor.objects.get(name = name)
+    meteor = Meteor.objects.get(name=name)
     data = serializers.serialize('json', [meteor])
-    return JsonResponse(data, safe = False)
+    return django.http.JsonResponse(data, safe=False)
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
 class SingleViewJSON(JSONDetailView):
     model           = Meteor
     slug_field      = 'name'
@@ -81,11 +89,11 @@ def listJSON(request):
     for meteor in Meteor.objects.all():
         meteors[meteor.id] = meteor.as_dict()
 
-    return JsonResponse(meteors)
+    return django.http.JsonResponse(meteors)
 
 
-@method_decorator(login_required, name = 'dispatch')
-class SingleView(DetailView):
+@method_decorator(login_required, name='dispatch')
+class SingleView(django.views.generic.detail.DetailView):
     model           = Meteor
     slug_field      = 'name'
     slug_url_kwarg  = 'name'
@@ -95,7 +103,7 @@ class SingleView(DetailView):
         return Meteor.objects.with_sightings().with_neighbours().get(name=self.kwargs.get('name'))
 
 
-@method_decorator(csrf_exempt, name = 'dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class APIView(View):
     def get(self, request):
         return HttpResponse('result')
@@ -132,7 +140,7 @@ class APIView(View):
         meteor.save()
 
         subnetwork = random.choice(Subnetwork.objects.all())
-        stationsList = Station.objects.filter(subnetwork__id = subnetwork.id)
+        stationsList = Station.objects.filter(subnetwork__id=subnetwork.id)
         stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.2, stationsList))
 
         for station in stations:
@@ -140,6 +148,6 @@ class APIView(View):
 
         print("Meteor has been saved")
 
-        response = HttpResponse('Meteor has been accepted', status = 201)
-        response['location'] = reverse('meteor', args = [meteor.name])
+        response = django.http.HttpResponse('Meteor has been accepted', status=201)
+        response['location'] = django.urls.reverse('meteor', args=[meteor.name])
         return response

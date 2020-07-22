@@ -13,8 +13,8 @@ from django.utils.decorators import method_decorator
 from astropy.coordinates import EarthLocation
 from astropy import units
 
-from core.models import noneIfError
-from meteors.models import Sighting
+from core.models import none_if_error
+from meteors.models import Sighting, Snapshot
 
 
 class MeteorQuerySet(models.QuerySet):
@@ -36,6 +36,15 @@ class MeteorQuerySet(models.QuerySet):
 
     def with_subnetwork(self):
         return self.select_related('subnetwork')
+
+    def with_lightmax(self):
+        snapshots = Snapshot.objects.filter(meteor=OuterRef('id')).order_by('magnitude')
+        return self.annotate(
+            magnitude=Subquery(frames.values('magnitude')[:1]),
+            latitude=Subquery(frames.values('latitude')[:1]),
+            longitude=Subquery(frames.values('longitude')[:1]),
+            altitude=Subquery(frames.values('altitude')[:1]),
+        )
 
     def with_neighbours(self):
         return self.annotate(
@@ -70,6 +79,9 @@ class MeteorQuerySet(models.QuerySet):
             timestamp__gte=midnight - half_day,
             timestamp__lte=midnight + half_day,
         )
+
+    def with_everything(self):
+        return self.with_sightings().with_subnetwork().with_snapshots()
 
 
 class Meteor(models.Model):

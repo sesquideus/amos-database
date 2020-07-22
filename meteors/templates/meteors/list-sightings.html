@@ -13,69 +13,11 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    <div class="navigation">
-        <a href="{{ request.path }}?date={{ date|previous_day|date:"Y-m-d" }}">&lt;&lt;</a>
-        <form class="date" action="{{ request.path }}" method="post">
-            {% csrf_token %}
-            {{ form.as_p }}
-            <input type="submit" value="change">
-        </form>
-        <a href="{{ request.path }}?date={{ date|next_day|date:"Y-m-d" }}">&gt;&gt;</a>
-    </div>
+    {% include 'meteors/sightings-navigation.html' %}
+
     <h3>
         {% block station_name %}All stations{% endblock station_name %}
     </h3>
 
-    <p>{{ sightings|length }} recorded sighting{{ sightings|length|pluralize:",s" }}</p>
-    <table class="full-width">
-        <thead>
-            <tr>
-                <th>timestamp</th>
-                <th>meteor</th>
-                <th>station</th>
-                <th>frames</th>
-                <th colspan="2">magnitude</th>
-                <th>elevation</th>
-                <th>azimuth</th>
-            </tr>
-        </thead>
-        {% for sighting in sightings %}
-            <tr>
-                <td class="timestamp" id="{{ sighting.id }}-timestamp">
-                    <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</a>
-                </td>
-                <td class="data c {% if not sighting.meteor %} empty{% endif %}">
-                    {% if sighting.meteor %}
-                        <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
-                    {% else %}
-                        (not identified)
-                    {% endif %}
-                </td>
-                <td class="data station">
-                    <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
-                </td>
-                <td class="data count">
-                    {{ sighting.frame_count }}
-                </td>
-                <td class="r">
-                    <meter min="-10" max="10" value="{{ sighting.magnitude|multiply:-1 }}" style="background: hsl({{ sighting.magnitude }}, 50%, 100%)">{{ sighting.magnitude }}</meter>
-                </td>
-                <td class="data magnitude">
-                    {{ sighting.magnitude|magnitude }}
-                </td>
-                <td class="data angle">
-                    {{ sighting.altitude|angle }}
-                    <span class="arrow" style="transform: rotate({{ sighting.altitude|multiply:-1 }}deg);">&#8594;</span>
-                </td>
-                <td class="data angle">
-                    {{ sighting.azimuth|angle }}
-                    <span class="arrow" style="transform: rotate({{ sighting.azimuth|add:-90 }}deg);">&#8594;</span>
-                </td>
-            </tr>
-        {% empty %}
-            <tr class="empty">
-                <td colspan="7">There are no recorded sightings in the database.</td>
-            </tr>
-        {% endfor %}
-    </table>
+    {% include 'meteors/sightings-table.html' %}
 {% endblock %}

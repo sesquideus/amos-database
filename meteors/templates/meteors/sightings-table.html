@@ -1,0 +1,58 @@
+{% load meteor_tags %}
+{% load station_tags %}
+
+<p>{{ sightings|length }} recorded sighting{{ sightings|length|pluralize:",s" }}</p>
+
+<table class="full-width">
+    <thead>
+        <tr>
+            <th>timestamp</th>
+            <th>meteor</th>
+            <th>station</th>
+            <th colspan="2">frames</th>
+            <th>magnitude</th>
+            <th>elevation</th>
+            <th>azimuth</th>
+        </tr>
+    </thead>
+    {% for sighting in sightings %}
+        <tr>
+            <td class="data timestamp c" id="{{ sighting.id }}-timestamp">
+                <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</a>
+            </td>
+            <td class="data meteor {% if not sighting.meteor %}empty{% endif %}">
+                {% if sighting.meteor %}
+                    <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
+                {% else %}
+                    (not identified)
+                {% endif %}
+            </td>
+            <td class="data station">
+                <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
+            </td>
+            <td class="data count">
+                {{ sighting.frame_count }}
+            </td>
+            <td class="r">
+                {% for frame in sighting.frames.all %}<a
+                    href="{{ frame.get_absolute_url }}"
+                    style="color: hsl(0, 0%, {{ frame.magnitude|add:-10|multiply:-5 }}%); transform: scale({{frame.magnitude }});">&#9899;</a>{% endfor %}
+            </td>
+            <td class="data magnitude">
+                {{ sighting.magnitude|magnitude }}
+            </td>
+            <td class="data angle">
+                {{ sighting.altitude|angle }}
+                <span class="arrow" style="transform: rotate({{ sighting.altitude|multiply:-1 }}deg);">&#8594;</span>
+            </td>
+            <td class="data angle">
+                {{ sighting.azimuth|angle }}
+                <span class="arrow" style="transform: rotate({{ sighting.azimuth|add:-90 }}deg);">&#8594;</span>
+            </td>
+        </tr>
+    {% empty %}
+        <tr class="empty">
+            <td colspan="7">There are no recorded sightings in the database.</td>
+        </tr>
+    {% endfor %}
+</table>

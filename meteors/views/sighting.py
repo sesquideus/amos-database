@@ -1,18 +1,19 @@
 import io
 import datetime
 
+import numpy as np
+
+import django
 from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
 from django.shortcuts import render
-from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 from django.views import View
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
 
 from matplotlib import pyplot
 from matplotlib import ticker
 from matplotlib.figure import Figure
+import matplotlib
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from core.utils import DateParser
@@ -21,13 +22,17 @@ from meteors.forms import DateForm
 from meteors.models import Sighting
 from stations.models import Station
 
+matplotlib.use('Agg')
+
 
 @method_decorator(login_required, name='dispatch')
-class ListDateView(ListView):
-    template_name = 'meteors/list-sightings.html'
-    context_object_name = 'sightings'
+class GenericListView(django.views.generic.list.ListView):
     model = Sighting
+    context_object_name = 'sightings'
+    template_name = 'meteors/list-sightings.html'
 
+
+class ListDateView(GenericListView):
     def get_queryset(self):
         if self.request.GET.get('date'):
             self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
@@ -38,26 +43,21 @@ class ListDateView(ListView):
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'form':         DateForm(initial={'date': self.date}),
-            'navigation':   reverse('list-sightings'),
             'date':         self.date,
+            'form':         DateForm(initial={'date': self.date}),
+            'navigation':   django.urls.reverse('list-sightings'),
         })
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
+            return HttpResponseRedirect(django.urls.reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
         else:
             return HttpResponseBadRequest()
 
 
-@method_decorator(login_required, name='dispatch')
-class ListLatestView(ListView):
-    template_name = 'meteors/list-sightings.html'
-    context_object_name = 'sightings'
-    model = Sighting
-
+class ListLatestView(GenericListView):
     def get_queryset(self):
         limit = self.kwargs.get('limit', 10)
         return Sighting.objects.with_everything().order_by('-timestamp')[:limit]
@@ -65,12 +65,11 @@ class ListLatestView(ListView):
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'navigation': reverse('list-sightings'),
+            'navigation': django.urls.reverse('list-sightings'),
         })
         return context
 
 
-@method_decorator(login_required, name='dispatch')
 class ListByStationView(ListDateView):
     template_name = 'meteors/list-sightings-station.html'
 
@@ -79,19 +78,19 @@ class ListByStationView(ListDateView):
 
     def get_context_data(self):
         context = super().get_context_data()
-        context['station'] = Station.objects.get(code = self.kwargs['station_code'])
+        context['station'] = Station.objects.get(code=self.kwargs['station_code'])
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(reverse('list-sightings-by-station') + "?date=" + form.cleaned_data['datetime'].strftime("%Y-%m-%d"))
+            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-sightings-by-station')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
         else:
-            return HttpResponseBadRequest()
+            return django.http.HttpResponseBadRequest()
 
 
 @method_decorator(login_required, name='dispatch')
-class SingleView(DetailView):
+class DetailView(django.views.generic.detail.DetailView):
     model           = Sighting
     queryset        = Sighting.objects.with_neighbours().with_frames().with_station().with_meteor().with_lightmax()
     slug_field      = 'id'
@@ -116,28 +115,84 @@ class SingleView(DetailView):
         }
 
 
-class LightCurveView(DetailView):
-    model = Sighting
-    slug_field = 'id'
-    slug_url_kwargs = 'id'
+@method_decorator(login_required, name='dispatch')
+class DetailViewExtras(DetailView):
     queryset = Sighting.objects.with_frames().with_lightmax()
 
-@login_required
-def light_curve(request, id):
-    sighting = Sighting.objects.with_frames().get(id=id)
-    timestamps = [frame.flight_time.total_seconds() for frame in sighting.frames.all()]
-    magnitudes = [frame.magnitude for frame in sighting.frames.all()]
+    def get_object(self):
+        self.sighting = super().get_object()
+        self.timestamps = [frame.flight_time.total_seconds() for frame in self.sighting.frames.all()]
+        self.magnitudes = [frame.magnitude for frame in self.sighting.frames.all()]
+        return self.sighting
 
-    fig, ax = pyplot.subplots()
-    fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
-    fig.set_size_inches(5.38, 1.5)
-    ax.plot(timestamps, magnitudes, marker = '*')
-    ax.invert_yaxis()
-    ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
-    canvas = FigureCanvasAgg(fig)
-    buf = io.BytesIO()
 
-    canvas.print_png(buf)
-    response = HttpResponse(buf.getvalue(), content_type = 'image/png')
-    response['Content-Length'] = str(len(response.content))
-    return response
+@method_decorator(login_required, name='dispatch')
+class LightCurveView(DetailViewExtras):
+    def render_to_response(self, context, **response_kwargs):
+        fig, ax = pyplot.subplots()
+        fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
+        fig.set_size_inches(5.38, 1.5)
+        ax.plot(self.timestamps, self.magnitudes, marker = '*')
+        ax.invert_yaxis()
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
+
+        canvas = FigureCanvasAgg(fig)
+        buf = io.BytesIO()
+        canvas.print_png(buf)
+
+        response = HttpResponse(buf.getvalue(), content_type = 'image/png')
+        response['Content-Length'] = str(len(response.content))
+        return response
+
+
+@method_decorator(login_required, name='dispatch')
+class SkyView(DetailViewExtras):
+    def render_to_response(self, context, **response_kwargs):
+        #cb = figure.colorbar(scatter, extend = 'max', fraction = 0.1, pad = 0.06)
+        #cb.set_label(f"angular speed [°/s]", fontsize=16)
+        #cb.ax.tick_params(labelsize=15)
+
+        #for magnitude in [-6, -3, 0, 3, 6]:
+        #    sign = '+' if magnitude >= 0 else '\u2212'
+        #    axes.scatter([], [], c='k', alpha=0.6, s=size_formatter(magnitude), label=f'{sign}{abs(magnitude)}$^\\mathrm{{m}}$')
+        #axes.legend(scatterpoints=1, frameon=False, labelspacing=0.8, title='Apparent magnitude', loc=(-0.06, 0.8))
+
+        #figure.savefig(path, facecolor = background, dpi = 300)
+
+
+        size_formatter = lambda x: 20 * np.exp(-x / 2)
+
+        figure, axes = pyplot.subplots(subplot_kw={'projection': 'polar'})
+        figure.tight_layout(rect = (0.0, 0.0, 1.0, 1.0))
+        figure.set_size_inches(5.38, 4)
+
+        axes.tick_params(axis='x', which='major', labelsize=20)
+        axes.tick_params(axis='x', which='minor', labelsize=5)
+        axes.xaxis.set_ticks([0, np.pi / 2.0, np.pi, np.pi * 3 / 2.0])
+        axes.xaxis.set_ticks(np.linspace(0, 2 * np.pi, 25), minor=True)
+        axes.xaxis.set_ticklabels(['W', 'N', 'E', 'S'])
+        axes.yaxis.set_ticklabels([])
+        axes.yaxis.set_ticks(np.linspace(0, 90, 7))
+        axes.set_ylim(0, 90)
+        axes.set_facecolor('black')
+        axes.grid(linewidth=0.2, color='white')
+
+        frames = self.sighting.frames.all()
+        azimuths = np.radians(270 - np.array([frame.azimuth for frame in frames]))
+        altitudes = np.array([frame.altitude for frame in frames])
+        colours = np.array([frame.magnitude for frame in frames])
+        sizes = size_formatter(colours)
+
+        scatter = axes.scatter(azimuths, altitudes, c=colours, s=sizes, cmap='hot', alpha=1, linewidths=0)
+        cb = figure.colorbar(scatter, extend='max', fraction=0.1, pad=0.06)
+        cb.set_label(f"apparent magnitude", fontsize=16)
+        cb.ax.tick_params(labelsize=15)
+
+        canvas = FigureCanvasAgg(figure)
+        buf = io.BytesIO()
+        canvas.print_png(buf)
+
+        response = HttpResponse(buf.getvalue(), content_type = 'image/png')
+        response['Content-Length'] = str(len(response.content))
+
+        return response

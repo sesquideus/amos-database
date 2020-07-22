@@ -10,7 +10,7 @@ from astropy.coordinates import EarthLocation, AltAz, get_sun, get_moon
 from astropy.time import Time
 from astropy import units
 
-from core.models import noneIfError
+from core.models import none_if_error
 
 
 class FrameQuerySet(models.QuerySet):
@@ -98,7 +98,7 @@ class Frame(models.Model):
             result = None
         return result
 
-    @method_decorator(noneIfError(AttributeError))
+    @method_decorator(none_if_error(AttributeError))
     def sky_coord(self):
         return AltAz(
             alt         = self.altitude * units.degree,
@@ -113,7 +113,7 @@ class Frame(models.Model):
         else:
             return AltAz(obstime = Time(self.timestamp), location = self.sighting.station.earth_location())
 
-    @method_decorator(noneIfError(AttributeError))
+    @method_decorator(none_if_error(AttributeError))
     def distance(self):
         obsLoc = self.sighting.station.earth_location()
         metLoc = self.earth_location()
@@ -131,29 +131,29 @@ class Frame(models.Model):
         else:
             return get_moon(Time(self.timestamp)).transform_to(self.coord_alt_az())
 
-    @method_decorator(noneIfError(AttributeError, TypeError))
+    @method_decorator(none_if_error(AttributeError, TypeError))
     def get_solar_elongation(self):
         if self.solar_elongation is None:
             return self.compute_solar_elongation()
         else:
             return self.solar_elongation
 
-    @method_decorator(noneIfError(AttributeError, TypeError))
+    @method_decorator(none_if_error(AttributeError, TypeError))
     def compute_solar_elongation(self):
         return self.get_sun().separation(self.sky_coord()).degree
 
-    @method_decorator(noneIfError(AttributeError, TypeError))
+    @method_decorator(none_if_error(AttributeError, TypeError))
     def get_lunar_elongation(self):
         if self.lunar_elongation is None:
             return self.compute_lunar_elongation()
         else:
             return self.lunar_elongation
 
-    @method_decorator(noneIfError(AttributeError, TypeError))
+    @method_decorator(none_if_error(AttributeError, TypeError))
     def compute_lunar_elongation(self):
         return self.get_moon().separation(self.sky_coord()).degree
 
-    def getSunInfo(self):
+    def get_sun_info(self):
         sun = self.get_sun()
         elong = self.get_solar_elongation()
         return {
@@ -161,7 +161,7 @@ class Frame(models.Model):
             'elong': elong,
         }
 
-    def getMoonInfo(self):
+    def get_moon_info(self):
         moon = self.get_moon()
         elong = self.get_lunar_elongation()
         return {
@@ -169,11 +169,9 @@ class Frame(models.Model):
             'elong': elong,
         }
 
-    def airMass(self):
-        try:
-            return 1 / math.sin(math.radians(self.altitude))
-        except TypeError:
-            return None
+    @method_decorator(none_if_error(TypeError))
+    def air_mass(self):
+        return 1 / math.sin(math.radians(self.altitude))
 
     def save(self, *args, **kwargs):
         self.solar_elongation = self.get_solar_elongation()

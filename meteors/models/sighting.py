@@ -18,7 +18,7 @@ from astropy import units
 
 from pprint import pprint as pp
 
-from core.models import noneIfError
+from core.models import none_if_error
 from meteors.models import Frame
 
 log = logging.getLogger(__name__)
@@ -134,8 +134,8 @@ class SightingQuerySet(models.QuerySet):
     def with_everything(self):
         return self.with_station().with_meteor().with_frames().with_frame_count().with_lightmax()
 
-    def for_station(self, station_id):
-        return self.filter(station__id=station_id)
+    def for_station(self, station_code):
+        return self.filter(station__code=station_code)
 
     def for_night(self, date):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
