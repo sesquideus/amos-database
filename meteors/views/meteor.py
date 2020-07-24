@@ -1,7 +1,4 @@
 import datetime
-import random
-import numpy as np
-from pprint import pprint as pp
 
 import django
 from django.contrib.auth.decorators import login_required
@@ -9,9 +6,7 @@ from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
-from django.views.generic.list import ListView
 
-from core.utils import DateParser
 from core.views import JSONDetailView, JSONListView
 
 from meteors.models import Meteor, Sighting
@@ -39,9 +34,9 @@ class ListDateView(GenericListView):
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'date':         self.date,
-            'form':         DateForm(initial={'date': self.date}),
-            'navigation':   django.urls.reverse('list-meteors'),
+            'date': self.date,
+            'form': DateForm(initial={'date': self.date}),
+            'navigation': django.urls.reverse('list-meteors'),
         })
 #        context.update(self.time.context())
         return context
@@ -60,7 +55,6 @@ class ListLatestView(GenericListView):
         return Meteor.objects.with_everything().order_by('-timestamp')[:limit]
 
 
-
 @login_required
 def singleKML(request, name):
     context = {
@@ -72,7 +66,7 @@ def singleKML(request, name):
 @login_required
 def singleJSON(request, name):
     meteor = Meteor.objects.get(name=name)
-    data = serializers.serialize('json', [meteor])
+    data = django.core.serializers.serialize('json', [meteor])
     return django.http.JsonResponse(data, safe=False)
 
 
@@ -106,48 +100,9 @@ class SingleView(django.views.generic.detail.DetailView):
 @method_decorator(csrf_exempt, name='dispatch')
 class APIView(View):
     def get(self, request):
-        return HttpResponse('result')
+        return django.http.HttpResponse('result')
 
     def post(self, request):
         print(f"{'*' * 20} Incoming meteor {'*' * 20}")
         #pp(request.POST)
         #pp(request.FILES)
-
-        meteor = Meteor.objects.createFromPost(
-            timestamp           = datetime.datetime.strptime(request.POST.get('timestamp', None), '%Y-%m-%d %H:%M:%S.%f%z'),
-
-            beginningLatitude   = request.POST.get('beginningLatitude', None),
-            beginningLongitude  = request.POST.get('beginningLongitude', None),
-            beginningAltitude   = request.POST.get('beginningAltitude', None),
-            beginningTime       = datetime.datetime.strptime(request.POST.get('beginningTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
-
-            lightmaxLatitude    = request.POST.get('lightmaxLatitude', None),
-            lightmaxLongitude   = request.POST.get('lightmaxLongitude', None),
-            lightmaxAltitude    = request.POST.get('lightmaxAltitude', None),
-            lightmaxTime        = datetime.datetime.strptime(request.POST.get('lightmaxTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
-
-            endLatitude         = request.POST.get('endLatitude', None),
-            endLongitude        = request.POST.get('endLongitude', None),
-            endAltitude         = request.POST.get('endAltitude', None),
-            endTime             = datetime.datetime.strptime(request.POST.get('endTime', None), '%Y-%m-%d %H:%M:%S.%f%z'),
-
-            velocityX           = request.POST.get('velocityX', None),
-            velocityY           = request.POST.get('velocityY', None),
-            velocityZ           = request.POST.get('velocityZ', None),
-
-            magnitude           = request.POST.get('magnitude', None),
-        )
-        meteor.save()
-
-        subnetwork = random.choice(Subnetwork.objects.all())
-        stationsList = Station.objects.filter(subnetwork__id=subnetwork.id)
-        stations = list(filter(lambda x: np.random.uniform(0, 1) > 0.2, stationsList))
-
-        for station in stations:
-            Sighting.objects.createForMeteor(meteor, station)
-
-        print("Meteor has been saved")
-
-        response = django.http.HttpResponse('Meteor has been accepted', status=201)
-        response['location'] = django.urls.reverse('meteor', args=[meteor.name])
-        return response

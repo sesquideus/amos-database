@@ -4,16 +4,12 @@ import datetime
 import numpy as np
 
 import django
-from django.http import JsonResponse, HttpResponse, HttpResponseRedirect, HttpResponseBadRequest
-from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
-from django.views import View
 
+import matplotlib
 from matplotlib import pyplot
 from matplotlib import ticker
-from matplotlib.figure import Figure
-import matplotlib
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 from core.utils import DateParser
@@ -43,18 +39,18 @@ class ListDateView(GenericListView):
     def get_context_data(self):
         context = super().get_context_data()
         context.update({
-            'date':         self.date,
-            'form':         DateForm(initial={'date': self.date}),
-            'navigation':   django.urls.reverse('list-sightings'),
+            'date': self.date,
+            'form': DateForm(initial={'date': self.date}),
+            'navigation': django.urls.reverse('list-sightings'),
         })
         return context
 
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return HttpResponseRedirect(django.urls.reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
+            return django.http.HttpResponseRedirect(django.urls.reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
         else:
-            return HttpResponseBadRequest()
+            return django.http.HttpResponseBadRequest()
 
 
 class ListLatestView(GenericListView):
@@ -108,7 +104,7 @@ class DetailView(django.views.generic.detail.DetailView):
 
     def get_context_data(self, **kwargs):
         return {
-            'sighting':     self.object,
+            'sighting': self.object,
             #'moon':         maxLight.getMoonInfo() if maxLight else None,
             #'sun':          maxLight.getSunInfo() if maxLight else None,
             #'maxLight':     maxLight.order if maxLight else None,
@@ -130,9 +126,9 @@ class DetailViewExtras(DetailView):
 class LightCurveView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
-        fig.tight_layout(rect = (0.06, 0.08, 1.03, 1))
+        fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
         fig.set_size_inches(5.38, 1.5)
-        ax.plot(self.timestamps, self.magnitudes, marker = '*')
+        ax.plot(self.timestamps, self.magnitudes, marker='*')
         ax.invert_yaxis()
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
 
@@ -140,7 +136,7 @@ class LightCurveView(DetailViewExtras):
         buf = io.BytesIO()
         canvas.print_png(buf)
 
-        response = HttpResponse(buf.getvalue(), content_type = 'image/png')
+        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
         response['Content-Length'] = str(len(response.content))
         return response
 
@@ -159,11 +155,11 @@ class SkyView(DetailViewExtras):
 
         #figure.savefig(path, facecolor = background, dpi = 300)
 
-
-        size_formatter = lambda x: 20 * np.exp(-x / 2)
+        def size_formatter(x):
+            return 20 * np.exp(-x / 2)
 
         figure, axes = pyplot.subplots(subplot_kw={'projection': 'polar'})
-        figure.tight_layout(rect = (0.0, 0.0, 1.0, 1.0))
+        figure.tight_layout(rect=(0.0, 0.0, 1.0, 1.0))
         figure.set_size_inches(5.38, 4)
 
         axes.tick_params(axis='x', which='major', labelsize=20)
@@ -185,14 +181,14 @@ class SkyView(DetailViewExtras):
 
         scatter = axes.scatter(azimuths, altitudes, c=colours, s=sizes, cmap='hot', alpha=1, linewidths=0)
         cb = figure.colorbar(scatter, extend='max', fraction=0.1, pad=0.06)
-        cb.set_label(f"apparent magnitude", fontsize=16)
+        cb.set_label('apparent magnitude', fontsize=16)
         cb.ax.tick_params(labelsize=15)
 
         canvas = FigureCanvasAgg(figure)
         buf = io.BytesIO()
         canvas.print_png(buf)
 
-        response = HttpResponse(buf.getvalue(), content_type = 'image/png')
+        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
         response['Content-Length'] = str(len(response.content))
 
         return response
