@@ -82,7 +82,7 @@
                 </tr>
             </table>
 
-            <h3>Position</h3>
+            <h3>Snapshots</h3>
             <table>
                 <thead>
                     <tr>
@@ -91,6 +91,7 @@
                         <th>latitude</th>
                         <th>longitude</th>
                         <th>altitude</th>
+                        <th>magnitude</th>
                     </tr>
                 </thead>
                 <tbody>
@@ -110,6 +111,9 @@
                             </td>
                             <td class="data">
                                 {{ snapshot.altitude|altitude }}
+                            </td>
+                            <td class="data">
+                                {{ snapshot.magnitude|magnitude }}
                             </td>
                         </tr>
                     {% empty %}

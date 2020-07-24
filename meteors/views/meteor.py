@@ -94,7 +94,7 @@ class SingleView(django.views.generic.detail.DetailView):
     template_name   = 'meteors/meteor.html'
 
     def get_object(self):
-        return Meteor.objects.with_sightings().with_neighbours().get(name=self.kwargs.get('name'))
+        return Meteor.objects.with_everything().get(name=self.kwargs.get('name'))
 
 
 @method_decorator(csrf_exempt, name='dispatch')

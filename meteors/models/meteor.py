@@ -40,10 +40,10 @@ class MeteorQuerySet(models.QuerySet):
     def with_lightmax(self):
         snapshots = Snapshot.objects.filter(meteor=OuterRef('id')).order_by('magnitude')
         return self.annotate(
-            magnitude=Subquery(frames.values('magnitude')[:1]),
-            latitude=Subquery(frames.values('latitude')[:1]),
-            longitude=Subquery(frames.values('longitude')[:1]),
-            altitude=Subquery(frames.values('altitude')[:1]),
+            magnitudex=Subquery(snapshots.values('magnitude')[:1]),
+            latitude=Subquery(snapshots.values('latitude')[:1]),
+            longitude=Subquery(snapshots.values('longitude')[:1]),
+            altitude=Subquery(snapshots.values('altitude')[:1]),
         )
 
     def with_neighbours(self):
@@ -81,7 +81,7 @@ class MeteorQuerySet(models.QuerySet):
         )
 
     def with_everything(self):
-        return self.with_sightings().with_subnetwork().with_snapshots()
+        return self.with_sightings().with_subnetwork().with_snapshots().with_lightmax()
 
 
 class Meteor(models.Model):
