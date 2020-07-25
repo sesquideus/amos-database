@@ -13,7 +13,7 @@ class SubnetworkQuerySet(models.QuerySet):
         return self.prefetch_related(
             Prefetch(
                 'stations',
-                queryset=Station.objects.with_last_sighting().with_last_report(),
+                queryset=Station.objects.with_last_sighting().with_last_heartbeat(),
                 to_attr='stations_full',
             )
         )

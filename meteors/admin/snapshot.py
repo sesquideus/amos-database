@@ -11,7 +11,7 @@ class SnapshotInline(admin.TabularInline):
     show_change_link = True
     extra = 0
 
-    fields = ['order', 'timestamp', 'latitude', 'longitude', 'altitude']
+    fields = ['order', 'timestamp', 'latitude', 'longitude', 'altitude', 'magnitude']
 
 
 @admin.register(Snapshot)
@@ -19,8 +19,8 @@ class SnapshotAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
             'widget': MicrosecondDateTimeWidget(
-                date_format = '%Y-%m-%d',
-                time_format = '%H:%M:%S.%f',
+                date_format='%Y-%m-%d',
+                time_format='%H:%M:%S.%f',
             )
         },
         models.FloatField: {
@@ -44,6 +44,7 @@ class SnapshotAdmin(admin.ModelAdmin):
                 'fields': (
                     ('latitude', 'longitude', 'altitude'),
                     ('velocity_x', 'velocity_y', 'velocity_z'),
+                    ('magnitude',),
                 ),
             },
         ),

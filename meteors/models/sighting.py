@@ -196,7 +196,7 @@ class Sighting(models.Model):
         return reverse('sighting', kwargs = {'id': self.id})
 
     def distance(self):
-        return 
+        return 0
 
     def sun_position(self):
         return self.station.sun_position(self.timestamp)

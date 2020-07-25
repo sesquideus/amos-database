@@ -87,7 +87,7 @@ td.seen {
 }
 
 td.station-code {
-    text-align: right;
+    text-align: center;
 }
 
 td.station-name {
@@ -128,7 +128,7 @@ td abbr.ok {
     color: hsl(120, 100%, 40%);
 }
 
-td abbr.noreports {
-    color: hsl(0, 0%, 75%);
+td abbr.none {
+    color: hsl(0, 0%, 60%);
 }
 

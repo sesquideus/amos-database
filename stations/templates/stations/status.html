@@ -31,7 +31,7 @@
                             <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
                         </th>
                     {% endif %}
-                    {% with sun=station.sun_position report=station.last_report.0 status=station.get_current_status last_sighting=station.last_sighting.0 %}
+                    {% with sun=station.sun_position heartbeat=station.last_heartbeat.0 status=station.get_current_status last_sighting=station.last_sighting.0 %}
                         <td class="station-code">
                             {{ station.code }}
                         </td>
@@ -46,8 +46,10 @@
                             </abbr>
                         </td>
                         <td class="status">
-                            {% if station.last_report.0 %}
-                                {{ report.timestamp|since_date_time|default:"&mdash;" }}
+                            {% if station.last_heartbeat.0 %}
+                                <a href="{{ heartbeat.get_absolute_url }}">
+                                    {{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}
+                                </a>
                             {% else %}
                                 &mdash;
                             {% endif %}

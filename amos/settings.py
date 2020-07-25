@@ -103,6 +103,10 @@ TEMPLATES = [
                 'django.contrib.messages.context_processors.messages',
                 'core.context_processors.main_menu',
             ],
+            'builtins': [
+                'meteors.templatetags.meteor_tags',
+                'stations.templatetags.station_tags',
+            ],
             'debug': DEBUG,
             'string_if_invalid': '<%s>',
         },

@@ -26,9 +26,9 @@ def altitude_colour_front(altitude: float):
 def altitude_colour_back(altitude: float):
     if altitude < 0:
         return f"hsl(240, 50%, {altitude * 5.0 / 9.0 + 50:.0f}%);"
-    if altitude < 45:
-        return f"hsl({30 + altitude * 30.0 / 45.0:.0f}, 100%, 70%);"
-    return f"hsl(60, 100%, {70 + 20 * (altitude - 45) / 45}%);" 
+    if altitude < 30:
+        return f"hsl({30 + altitude:.0f}, 100%, 70%);"
+    return f"hsl(60, 100%, {70 + 20 * (altitude - 30) / 60}%);" 
 
 
 @register.filter
@@ -69,14 +69,33 @@ def angle(value: float):
 
 
 @register.filter
+@mdash
+def temperature(value: float):
+    return f"{value:.1f} °C"
+
+
+@register.filter
+@mdash
+def pressure(value: float):
+    return f"{value / 1000:.2f} kPa"
+
+
+@register.filter
+@mdash
+def humidity(value: float):
+    return f"{value:.0f} %"
+
+
+
+@register.filter
 def since_date_time(timestamp):
     delta = (datetime.datetime.now(tz = pytz.utc) - timestamp).total_seconds()
     if delta < 60:
         return f"{delta:.0f}s"
     if delta < 3600:
-        return f"{delta / 60:2.0f}m{delta % 60:02.0f}s"
+        return f"{delta / 60:.0f}m{delta % 60:02.0f}s"
     if delta < 86400:
-        return f"{delta / 3600:2.0f}h{delta % 3600 / 60:02.0f}m"
+        return f"{delta / 3600:.0f}h{delta % 3600 / 60:02.0f}m"
     if delta < 30*36400:
-        return f"{delta / 86400:2.0f}d{delta % 86400 / 3600:02.0f}h"
+        return f"{delta / 86400:.0f}d{delta % 86400 / 3600:02.0f}h"
     return f"{delta / 86400:.0f}d"

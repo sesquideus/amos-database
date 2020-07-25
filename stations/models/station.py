@@ -11,7 +11,7 @@ from astropy.time import Time
 
 import core.models
 from meteors.models import Sighting
-from stations.models.statusreport import StatusReport
+from stations.models.heartbeat import Heartbeat
 
 from stations.templatetags.station_tags import since_date_time
 
@@ -27,18 +27,18 @@ class StationQuerySet(models.QuerySet):
             )
         )
 
-    def with_last_report(self):
-        latest = StatusReport.objects.order_by('station__id', '-timestamp').distinct('station__id')
+    def with_last_heartbeat(self):
+        latest = Heartbeat.objects.order_by('station__id', '-timestamp').distinct('station__id')
         return self.prefetch_related(
             Prefetch(
-                'reports',
-                queryset=StatusReport.objects.filter(id__in=latest),
-                to_attr='last_report',
+                'heartbeats',
+                queryset=Heartbeat.objects.filter(id__in=latest),
+                to_attr='last_heartbeat',
             )
         )
 
-    def with_log_entries(self):
-        return self.prefetch_related('log_entries')
+    def with_log_entries(self, count=None):
+        return self.prefetch_related('log_entries')[:count]
 
 
 class Station(core.models.NamedModel):
@@ -187,27 +187,27 @@ class Station(core.models.NamedModel):
 
     def location(self):
         return "{latitude:.6f}° {latNS}, {longitude:.6f}° {lonEW}, {altitude:.0f} m".format(
-            latitude    = self.latitude,
+            latitude    = abs(self.latitude),
             latNS       = 'N' if self.latitude >= 0 else 'S',
-            longitude   = self.longitude,
+            longitude   = abs(self.longitude),
             lonEW       = 'E' if self.longitude >= 0 else 'W',
             altitude    = self.altitude,
         )
 
     def get_current_status(self):
-        if not self.on:
-            return StatusOff()
-
         try:
-            last_report = self.reports.latest()
-            time_since = (datetime.datetime.now(pytz.utc) - last_report.timestamp).total_seconds()
+            last_heartbeat = self.heartbeats.latest()
+            time_since = (datetime.datetime.now(pytz.utc) - last_heartbeat.timestamp).total_seconds()
         except ObjectDoesNotExist:
             return StatusEmpty()
 
+        if not self.on:
+            return StatusOff(last_heartbeat)
+
         if time_since > 120:
-            return StatusTimeout(last_report)
+            return StatusTimeout(last_heartbeat)
         else:
-            return StatusOK(last_report)
+            return StatusOK(last_heartbeat)
 
     def json(self):
         return {
@@ -217,7 +217,7 @@ class Station(core.models.NamedModel):
             'latitude': self.latitude,
             'longitude': self.longitude,
             'altitude': self.altitude,
-            'status': self.current_status(),
+            'status': self.get_current_status().short,
         }
 
 
@@ -228,6 +228,13 @@ class Status():
 
     def age(self):
         return datetime.datetime.now(tz=pytz.UTC) - self.last_report.timestamp
+
+    def toJSON(self):
+        return {
+            'code': self.code,
+            'short': self.short,
+            'description': self.get_description(),
+        }
 
 
 class StatusOK(Status):
@@ -251,12 +258,12 @@ class StatusEmpty(Status):
 
 class StatusTimeout(Status):
     code = 'timeout'
-    short = 'timed out'
+    short = 'timeout'
 
     def get_description(self):
         timestamp = self.last_report.timestamp
         return (f"The station seems to be offline. " +
-            f"It has not sent a report since {timestamp.strftime('%Y-%m-%d %H:%M:%S')} " +
+            f"No reports received since {timestamp.strftime('%Y-%m-%d %H:%M:%S')} " +
             f"({since_date_time(timestamp)})")
 
 
@@ -265,4 +272,4 @@ class StatusOff(Status):
     short = 'off'
 
     def get_description(self):
-        return f"The station has been turned off."
+        return f"The station has been turned off. Last report on {self.last_report.timestamp}"

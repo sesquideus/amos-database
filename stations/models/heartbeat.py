@@ -10,9 +10,9 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import core.models
 
 
-class StatusReportManager(models.Manager):
+class HeartbeatManager(models.Manager):
     def get_queryset(self):
-        return StatusReportQuerySet(
+        return HeartbeatQuerySet(
             model=self.model,
             using=self._db,
             hints=self._hints,
@@ -20,7 +20,7 @@ class StatusReportManager(models.Manager):
 
     def create_from_POST(self, code, **kwargs):
         Station = apps.get_model('stations', 'Station')
-        report = self.create(
+        heartbeat = self.create(
             timestamp       = kwargs.get('timestamp'),
             station         = Station.objects.get(code=code),
             status          = kwargs.get('status'),
@@ -30,10 +30,10 @@ class StatusReportManager(models.Manager):
             pressure        = kwargs.get('pressure'),
             humidity        = kwargs.get('humidity'),
         )
-        return report
+        return heartbeat
 
 
-class StatusReportQuerySet(models.QuerySet):
+class HeartbeatQuerySet(models.QuerySet):
     def for_station(self, station_id, *, count=10):
         return self.filter(station__id=station_id)[:count]
 
@@ -43,10 +43,10 @@ class StatusReportQuerySet(models.QuerySet):
         )
 
 
-class StatusReport(models.Model):
+class Heartbeat(models.Model):
     class Meta:
-        verbose_name                = 'status report'
-        verbose_name_plural         = 'status reports'
+        verbose_name                = 'heartbeat report'
+        verbose_name_plural         = 'heartbeat reports'
         ordering                    = ['-timestamp']
         get_latest_by               = ['timestamp']
         indexes                     = [
@@ -82,7 +82,7 @@ class StatusReport(models.Model):
                                         (HEATING_PROBLEM, 'problem'),
                                     ]
 
-    objects                         = StatusReportManager.from_queryset(StatusReportQuerySet)()
+    objects                         = HeartbeatManager.from_queryset(HeartbeatQuerySet)()
 
     timestamp                       = models.DateTimeField(
                                         verbose_name        = 'timestamp',
@@ -95,7 +95,7 @@ class StatusReport(models.Model):
     station                         = models.ForeignKey(
                                         'Station',
                                         on_delete           = models.CASCADE,
-                                        related_name        = 'reports',
+                                        related_name        = 'heartbeats',
                                     )
     status                          = models.CharField(
                                         max_length          = 1,
@@ -129,4 +129,7 @@ class StatusReport(models.Model):
                                     )
 
     def __str__(self):
-        return f"[{self.timestamp}] {self.station.code} {self.status}"
+        return f"[{self.timestamp}] {self.station.code} {self.get_status_display()}"
+
+    def get_absolute_url(self):
+        return reverse('heartbeat', kwargs = {'code': self.station.code, 'id': self.id})

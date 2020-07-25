@@ -1,0 +1,50 @@
+{% load meteor_tags %}
+{% load station_tags %}
+
+<p>{{ meteors|length }} recorded meteor{{ meteors|length|pluralize:",s" }}</p>
+
+<table class="full-width">
+    <thead>
+        <tr>
+            <th>id</th>
+            <th>timestamp</th>
+            <th>subnetwork</th>
+            <th>seen by</th>
+            <th>frames</th>
+            <th>magnitude</th>
+            <th>latitude</th>
+            <th>longitude</th>
+            <th>altitude</th>
+            <th>speed</th>
+        </tr>
+    </thead>
+    {% for meteor in meteors %}
+        <tr>
+            <td class="data name"><a href="{% url 'meteor' name=meteor.name %}">{{ meteor.name }}</a></td>
+            <td class="data time">{{ meteor.timestamp|date:"Y-m-d H:i:s.u" }}</td>
+            {% if meteor.subnetwork %}
+                <td class="data subnetwork"><a href="{% url 'subnetwork' code=meteor.subnetwork.code %}">{{ meteor.subnetwork.name }}</a></td>
+            {% else %}
+                <td class="data subnetwork empty">&mdash;</td>
+            {% endif %}
+            <td class="data seen">
+                {% for sighting in meteor.sightings.all %}
+                    <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.station.code }}</a>
+                {% empty %}
+                    <span class="empty">&mdash;</span>
+                {% endfor %}
+            </td>
+            <td class="data count">{{ meteor.snapshots.count }}</td>
+            <td class="data magnitude" style="background-color: {{ meteor.colour }}; color: {{ meteor.colour_text }}">{{ meteor.magnitude|magnitude }}</td>
+            <td class="data angle {% if not meteor.latitude %}empty{% endif %}">{{ meteor.latitude|latitude }}</td>
+            <td class="data angle {% if not meteor.longitude %}empty{% endif %}">{{ meteor.longitude|longitude }}</td>
+            <td class="data length {% if not meteor.altitude %}empty{% endif %}">{{ meteor.altitude|distance }} m</td>
+            <td class="data speed">{{ meteor.speed|floatformat:0|default_if_none:"&mdash;" }} m/s</td>
+        </tr>
+    {% empty %}
+        <tr>
+            <td class="empty" colspan="9">There are no recorded meteors in the database for this night.</td>
+        </tr>
+    {% endfor %}
+</table>
+

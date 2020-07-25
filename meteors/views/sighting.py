@@ -18,8 +18,6 @@ from meteors.forms import DateForm
 from meteors.models import Sighting
 from stations.models import Station
 
-matplotlib.use('Agg')
-
 
 @method_decorator(login_required, name='dispatch')
 class GenericListView(django.views.generic.list.ListView):
@@ -125,6 +123,7 @@ class DetailViewExtras(DetailView):
 @method_decorator(login_required, name='dispatch')
 class LightCurveView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
+        matplotlib.use('Agg')
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
         fig.set_size_inches(5.38, 1.5)

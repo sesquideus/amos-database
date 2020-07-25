@@ -1,7 +1,7 @@
 from django.contrib import admin
 from django.db import models
 from django.forms import Textarea
-from .models import Country, Subnetwork, Station, LogEntry, StatusReport
+from .models import Country, Subnetwork, Station, LogEntry, Heartbeat
 
 
 class StationInline(admin.TabularInline):
@@ -35,13 +35,11 @@ class SubnetworkAdmin(admin.ModelAdmin):
 class StationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Properties', {
-                'fields': ('name', 'code', 'subnetwork', 'address', 'country', 'on'),
-            }
-        ),
+            'fields': ('name', 'code', 'subnetwork', 'address', 'country', 'on'),
+        }),
         ('Geographics coordinates', {
-                'fields': ('latitude', 'longitude', 'altitude', 'timezone'),
-            }
-        ),
+            'fields': ('latitude', 'longitude', 'altitude', 'timezone'),
+        }),
     )
     list_display = ['name', 'code', 'address', 'subnetwork', 'latitude', 'longitude', 'altitude', 'timezone']
     list_display_links = ['name', 'subnetwork']
@@ -50,11 +48,10 @@ class StationAdmin(admin.ModelAdmin):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-
     readonly_fields = ['created', 'updated']
 
 
-@admin.register(StatusReport)
-class StatusReportAdmin(admin.ModelAdmin):
-    list_filter = ['station'] 
+@admin.register(Heartbeat)
+class HeartbeatAdmin(admin.ModelAdmin):
+    list_filter = ['station', 'timestamp']
     readonly_fields = ['timestamp', 'received']

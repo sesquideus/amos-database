@@ -1,0 +1,46 @@
+{% extends 'core/base.html' %}
+{% load static %}
+{% load tz %}
+{% load station_tags %}
+
+{% block pagetitle %}
+    <h2>Heartbeat</h2>
+    <div class="controls">
+        <a href="{% url 'admin:stations_heartbeat_change' report.id %}">
+            <img class="" src="{% static 'pictures/edit.png' %}" />
+        </a>
+    </div>
+{% endblock pagetitle %}
+
+{% block page %}
+    <p>
+        From station <a href="{{ report.station.get_absolute_url }}">{{ report.station.name }}</a> (<span class="bold">{{ report.station.code }}</span>),
+        received at {{ report.timestamp }}
+    </p>
+
+    <h3>Stations</h3>
+        <table>
+            <thead>
+                <tr>
+                    <th>timestamp</th>
+                    <th>ago</th>
+                    <th>lid</th>
+                    <th>temperature</th>
+                    <th>pressure</th>
+                    <th>humidity</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="data status">{{ report.timestamp }}</td>
+                    <td class="data time">{{ report.timestamp|since_date_time }}</td>
+                    <td class="data status">{{ report.get_lid_display }}</td>
+                    <td class="data">{{ report.temperature|temperature }}</td>
+                    <td class="data">{{ report.pressure|pressure }}</td>
+                    <td class="data">{{ report.humidity|humidity }}</td>
+                </tr>
+            </tbody>
+        </table>
+
+{% endblock page %}
+

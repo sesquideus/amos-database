@@ -16,7 +16,7 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
-from stations.models import Station, Subnetwork, StatusReport
+from stations.models import Station, Subnetwork, Heartbeat
 from meteors.models import Sighting
 from core.views import JSONDetailView, JSONListView, LoginDetailView
 
@@ -31,7 +31,7 @@ class SingleView(LoginDetailView):
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.recent_reports = StatusReport.objects.order_by('-timestamp').for_station(station.id)[:10]
+        station.recent_reports = Heartbeat.objects.order_by('-timestamp').for_station(station.id)[:10]
         station.recent_sightings = Sighting.objects.for_station(station.id).with_lightmax().order_by('-timestamp')[:10]
         return station
 
@@ -51,23 +51,23 @@ class ListViewJSON(JSONListView):
 
 #@method_decorator(login_required, name = 'dispatch')
 @method_decorator(csrf_exempt, name = 'dispatch')
-class APIView(View):
+class APIViewHeartbeat(View):
     def get(self, request):
         return JsonResponse({'ok': 'OK'})
 
     def post(self, request, code):
-        log.info(f"Incoming status report for station {code}")
+        log.info(f"Incoming heartbeat for station {code}")
         #pp(request.headers)
         #pp(request.body)
 
         try:
             data = json.loads(request.body)
 
-            report = StatusReport.objects.create_from_POST(code, **data)
+            report = Heartbeat.objects.create_from_POST(code, **data)
             report.save()
 
-            response = HttpResponse('Status update received', status = 201)
-        #response['location'] = reverse('station-add-status', args = [report.id])
+            response = HttpResponse('Heartbeat received', status = 201)
+        #response['location'] = reverse('station-receive-heartbeat', args = [report.id])
             return response
 
         except json.JSONDecodeError:

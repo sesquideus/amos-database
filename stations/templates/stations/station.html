@@ -30,10 +30,10 @@
                     <p id="status">{{ status.short }}</p>
                 {% endwith %}
 
-            {% include "stations/sky.html" %}
-            {% include "stations/sightings.html" %}
-            {% include "stations/reports.html" %}
-            {% include "stations/log.html" %}
+            {% include "stations/station-sky.html" %}
+            {% include "stations/station-sightings.html" %}
+            {% include "stations/station-heartbeats.html" %}
+            {% include "stations/station-log.html" %}
         </div>
 
         <div class="preview">

@@ -1,10 +1,11 @@
 import datetime
+import math
 import pytz
 import numpy as np
 
 from django.db import models
 from django.db.models import Prefetch, Window, F, Q, Subquery, OuterRef, Min, Max
-from django.db.models.functions import Lead
+from django.db.models.functions import Lead, Sqrt
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import validate_slug
@@ -38,12 +39,19 @@ class MeteorQuerySet(models.QuerySet):
         return self.select_related('subnetwork')
 
     def with_lightmax(self):
-        snapshots = Snapshot.objects.filter(meteor=OuterRef('id')).order_by('magnitude')
+        snapshots = Snapshot.objects.filter(meteor=OuterRef('id'))
+        by_magnitude = snapshots.order_by('magnitude')
+        by_timestamp = snapshots.order_by('timestamp')
+        x = Subquery(by_timestamp.values('velocity_x')[:1])
+        y = Subquery(by_timestamp.values('velocity_y')[:1])
+        z = Subquery(by_timestamp.values('velocity_z')[:1])
+
         return self.annotate(
-            magnitudex=Subquery(snapshots.values('magnitude')[:1]),
-            latitude=Subquery(snapshots.values('latitude')[:1]),
-            longitude=Subquery(snapshots.values('longitude')[:1]),
-            altitude=Subquery(snapshots.values('altitude')[:1]),
+            magnitude=Subquery(by_magnitude.values('magnitude')[:1]),
+            latitude=Subquery(by_magnitude.values('latitude')[:1]),
+            longitude=Subquery(by_magnitude.values('longitude')[:1]),
+            altitude=Subquery(by_magnitude.values('altitude')[:1]),
+            speed=Sqrt(x*x + y*y + z*z),
         )
 
     def with_neighbours(self):
@@ -108,11 +116,6 @@ class Meteor(models.Model):
                                         auto_now_add        = True,
                                     )
 
-    magnitude                       = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "absolute magnitude",
-                                    )
     source                          = models.ForeignKey(
                                         'Shower',
                                         null                = True,

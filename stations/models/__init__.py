@@ -1,5 +1,5 @@
 from .country import Country
 from .subnetwork import Subnetwork
 from .station import Station
-from .statusreport import StatusReport
+from .heartbeat import Heartbeat
 from .logentry import LogEntry
