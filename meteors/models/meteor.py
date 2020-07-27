@@ -39,19 +39,16 @@ class MeteorQuerySet(models.QuerySet):
         return self.select_related('subnetwork')
 
     def with_lightmax(self):
-        snapshots = Snapshot.objects.filter(meteor=OuterRef('id'))
+        snapshots = Snapshot.objects.filter(meteor=OuterRef('id')).with_speed()
         by_magnitude = snapshots.order_by('magnitude')
         by_timestamp = snapshots.order_by('timestamp')
-        x = Subquery(by_timestamp.values('velocity_x')[:1])
-        y = Subquery(by_timestamp.values('velocity_y')[:1])
-        z = Subquery(by_timestamp.values('velocity_z')[:1])
 
         return self.annotate(
             magnitude=Subquery(by_magnitude.values('magnitude')[:1]),
             latitude=Subquery(by_magnitude.values('latitude')[:1]),
             longitude=Subquery(by_magnitude.values('longitude')[:1]),
             altitude=Subquery(by_magnitude.values('altitude')[:1]),
-            speed=Sqrt(x*x + y*y + z*z),
+            speed=by_timestamp.values('speed')[:1],
         )
 
     def with_neighbours(self):

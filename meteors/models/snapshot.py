@@ -1,19 +1,26 @@
-import datetime
-import pytz
+import numpy as np
 
 from django.db import models
+from django.db.models import F, Window, Min
+from django.db.models.functions import Sqrt
 
 
 class SnapshotManager(models.Manager):
-    pass 
+    pass
+
 
 class SnapshotQuerySet(models.QuerySet):
     def with_flight_time(self):
         return self.annotate(
-            flight_time=F('timestamp') - Window( 
-                expression=Min('timestamp'), 
-                partition_by=F('meteor__id'), 
+            flight_time=F('timestamp') - Window(
+                expression=Min('timestamp'),
+                partition_by=F('meteor__id'),
             )
+        )
+
+    def with_speed(self):
+        return self.annotate(
+            speed=Sqrt(F('velocity_x') * F('velocity_x') + F('velocity_y') * F('velocity_y') + F('velocity_z') * F('velocity_z'))
         )
 
 
