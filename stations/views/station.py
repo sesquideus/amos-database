@@ -31,8 +31,8 @@ class SingleView(LoginDetailView):
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.recent_reports = Heartbeat.objects.order_by('-timestamp').for_station(station.id)[:10]
-        station.recent_sightings = Sighting.objects.for_station(station.id).with_lightmax().order_by('-timestamp')[:10]
+        station.recent_heartbeats = Heartbeat.objects.order_by('-timestamp').for_station(station.id)[:10]
+        station.recent_sightings = Sighting.objects.order_by('-timestamp').for_station(station.id).with_lightmax().with_station()[:10]
         return station
 
 

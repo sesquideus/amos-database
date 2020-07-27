@@ -1,12 +1,12 @@
+import django
+
 from django.shortcuts import render
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView, BaseListView
 from django.contrib.auth.mixins import LoginRequiredMixin
-from django.http import JsonResponse
 
 from django.urls import reverse
 
-# Create your views here.
 
 class JSONDetailView(BaseDetailView):
     def get_context_data(self, **kwargs):
@@ -16,7 +16,7 @@ class JSONDetailView(BaseDetailView):
             raise NotImplementedError(f"Model {self.model.__name__} does not provide a json() method")
 
     def render_to_response(self, context, **response_kwargs):
-        return JsonResponse(context, **response_kwargs)
+        return django.http.JsonResponse(context, **response_kwargs)
 
 
 class JSONListView(BaseListView):
@@ -27,7 +27,7 @@ class JSONListView(BaseListView):
             raise NotImplementedError(f"Model {self.model.__name__} does not provide a json() method")
 
     def render_to_response(self, context, **response_kwargs):
-        return JsonResponse(context, **response_kwargs)
+        return django.http.JsonResponse(context, **response_kwargs)
 
 
 def about(request):
@@ -37,3 +37,6 @@ def about(request):
 class LoginDetailView(LoginRequiredMixin, DetailView):
     login_url = '/login/'
 
+
+class LoginListView(LoginRequiredMixin, ListView):
+    login_url = '/login/'

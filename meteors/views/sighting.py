@@ -8,10 +8,12 @@ from django.utils.decorators import method_decorator
 from django.contrib.auth.decorators import login_required
 
 import matplotlib
+matplotlib.use('Agg')
 from matplotlib import pyplot
 from matplotlib import ticker
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
+import core.views
 from core.utils import DateParser
 
 from meteors.forms import DateForm
@@ -19,8 +21,7 @@ from meteors.models import Sighting
 from stations.models import Station
 
 
-@method_decorator(login_required, name='dispatch')
-class GenericListView(django.views.generic.list.ListView):
+class GenericListView(core.views.LoginListView):
     model = Sighting
     context_object_name = 'sightings'
     template_name = 'meteors/list-sightings.html'
@@ -123,7 +124,6 @@ class DetailViewExtras(DetailView):
 @method_decorator(login_required, name='dispatch')
 class LightCurveView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
-        matplotlib.use('Agg')
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
         fig.set_size_inches(5.38, 1.5)
@@ -134,6 +134,7 @@ class LightCurveView(DetailViewExtras):
         canvas = FigureCanvasAgg(fig)
         buf = io.BytesIO()
         canvas.print_png(buf)
+        pyplot.close(fig)
 
         response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
         response['Content-Length'] = str(len(response.content))
@@ -143,29 +144,18 @@ class LightCurveView(DetailViewExtras):
 @method_decorator(login_required, name='dispatch')
 class SkyView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
-        #cb = figure.colorbar(scatter, extend = 'max', fraction = 0.1, pad = 0.06)
-        #cb.set_label(f"angular speed [°/s]", fontsize=16)
-        #cb.ax.tick_params(labelsize=15)
-
-        #for magnitude in [-6, -3, 0, 3, 6]:
-        #    sign = '+' if magnitude >= 0 else '\u2212'
-        #    axes.scatter([], [], c='k', alpha=0.6, s=size_formatter(magnitude), label=f'{sign}{abs(magnitude)}$^\\mathrm{{m}}$')
-        #axes.legend(scatterpoints=1, frameon=False, labelspacing=0.8, title='Apparent magnitude', loc=(-0.06, 0.8))
-
-        #figure.savefig(path, facecolor = background, dpi = 300)
-
         def size_formatter(x):
             return 20 * np.exp(-x / 2)
 
         figure, axes = pyplot.subplots(subplot_kw={'projection': 'polar'})
         figure.tight_layout(rect=(0.0, 0.0, 1.0, 1.0))
-        figure.set_size_inches(5.38, 4)
+        figure.set_size_inches(5.38, 5.38)
 
         axes.tick_params(axis='x', which='major', labelsize=20)
         axes.tick_params(axis='x', which='minor', labelsize=5)
         axes.xaxis.set_ticks([0, np.pi / 2.0, np.pi, np.pi * 3 / 2.0])
         axes.xaxis.set_ticks(np.linspace(0, 2 * np.pi, 25), minor=True)
-        axes.xaxis.set_ticklabels(['W', 'N', 'E', 'S'])
+        axes.xaxis.set_ticklabels([])
         axes.yaxis.set_ticklabels([])
         axes.yaxis.set_ticks(np.linspace(0, 90, 7))
         axes.set_ylim(0, 90)
@@ -173,8 +163,8 @@ class SkyView(DetailViewExtras):
         axes.grid(linewidth=0.2, color='white')
 
         frames = self.sighting.frames.all()
-        azimuths = np.radians(270 - np.array([frame.azimuth for frame in frames]))
-        altitudes = np.array([frame.altitude for frame in frames])
+        azimuths = np.radians(90 + np.array([frame.azimuth for frame in frames]))
+        altitudes = np.array(90 - np.array([frame.altitude for frame in frames]))
         colours = np.array([frame.magnitude for frame in frames])
         sizes = size_formatter(colours)
 
@@ -186,6 +176,7 @@ class SkyView(DetailViewExtras):
         canvas = FigureCanvasAgg(figure)
         buf = io.BytesIO()
         canvas.print_png(buf)
+        pyplot.close(figure)
 
         response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
         response['Content-Length'] = str(len(response.content))

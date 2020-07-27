@@ -11,25 +11,39 @@ from django.utils.safestring import mark_safe
 register = template.Library()
 
 
-def mdash(func):
-    @functools.wraps(func)
+def mdash(function):
+    @functools.wraps(function)
     def wrapper(arg):
-        if arg is None:
+        if arg == '':
             return mark_safe("&mdash;")
         else:
-            return func(arg)
+            return function(arg)
 
     return wrapper
 
 
+def none_if_error(*exceptions):
+    def protected(function):
+        @functools.wraps(function)
+        def wrapper(*args, **kwargs):
+            try:
+                return function(*args, **kwargs)
+            except exceptions as e:
+                print(f"Caught exception {e.__class__.__name__} ({e}) and returning None for {function.__name__}")
+                return None
+        return wrapper
+
+    return protected
+
+
 @register.filter
 def previous_day(date):
-    return date + datetime.timedelta(days = -1)
+    return date + datetime.timedelta(days=-1)
 
 
 @register.filter
 def next_day(date):
-    return date + datetime.timedelta(days = 1)
+    return date + datetime.timedelta(days=1)
 
 
 @register.filter
@@ -40,18 +54,21 @@ def magnitude_colour(magnitude: float):
 
 @register.filter
 @mdash
+@none_if_error(ValueError)
 def magnitude(mag):
     return mark_safe(f"{mag:+.2f}<sup>m</sup>")
 
 
 @register.filter
 @mdash
+@none_if_error(ValueError)
 def angle(ang):
     return mark_safe(f"{ang:.2f}°")
 
 
 @register.filter
 @mdash
+@none_if_error(AttributeError)
 def safetime(time):
     return time.strftime("%H:%M:%S.%f")
 
@@ -59,6 +76,7 @@ def safetime(time):
 @register.filter
 def nonedash(arg):
     return mark_safe("&mdash;") if arg is None else arg
+
 
 @register.filter
 @mdash

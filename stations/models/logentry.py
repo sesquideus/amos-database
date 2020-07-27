@@ -38,5 +38,5 @@ class LogEntry(models.Model):
     def __str__(self):
         return "[{}] {}".format(
             self.created.strftime('%Y-%m-%d %H:%M:%S'),
-            textwrap.shorten(self.text, 50, placeholder = '...'),
+            textwrap.shorten(self.text, 50, placeholder='...'),
         )

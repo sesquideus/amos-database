@@ -108,7 +108,7 @@ TEMPLATES = [
                 'stations.templatetags.station_tags',
             ],
             'debug': DEBUG,
-            'string_if_invalid': '<%s>',
+#            'string_if_invalid': '<<%s>>',
         },
     },
 ]

@@ -6,9 +6,9 @@
 {% block pagetitle %}
     <h2>Sighting {{ sighting.id }}</h2>
     <div class="controls">
-        {% with previous=sighting.previous next=sighting.next %}
-            {% if previous != None %}
-                <a href="{% url 'sighting' id=previous %}">
+        {% with previous=sighting.get_previous_by_timestamp next=sighting.get_next_by_timestamp %}
+            {% if previous %}
+                <a href="{% url 'sighting' id=previous.id %}">
                     <img src="{% static "pictures/previous.png" %}" alt="Previous" />
                 </a>
             {% else %}
@@ -23,8 +23,8 @@
                 <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
             </a>
 
-            {% if next != None %}
-                <a href="{% url 'sighting' id=next %}">
+            {% if next %}
+                <a href="{% url 'sighting' id=next.id %}">
                     <img src="{% static "pictures/next.png" %}" alt="Next" />
                 </a>
             {% else %}
@@ -77,6 +77,10 @@
                     <tr>
                         <td>local time</td>
                         <td class="data time ar">{% timezone sighting.station.timezone %}{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}{% endtimezone %}</td>
+                    </tr>
+                    <tr>
+                        <td>duration</td>
+                        <td class="data">{{ sighting.frames.last.flight_time.total_seconds|floatformat:3 }} s</td>
                     </tr>
                     <tr>
                         <td>apparent magnitude</td>

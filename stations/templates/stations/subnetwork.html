@@ -4,7 +4,7 @@
 {% load station_tags %}
 
 {% block pagetitle %}
-    <h2>Subnetwork <span class="bold">{{ subnetwork.name }}</span> (<span class="bold">{{ subnetwork.code }}</span>)</h2>
+    <h2>Subnetwork <span class="bold">{{ subnetwork.name }}</span> (<span class="bold">{{ subnetwork.code }}</span>)</h2>
     <div class="controls">
         <a href="{% url 'admin:stations_subnetwork_change' subnetwork.id %}">
             <img class="" src="{% static 'pictures/edit.png' %}" />

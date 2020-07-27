@@ -38,7 +38,7 @@ class SightingManager(models.Manager):
             timestamp           = meteor.timestamp,
             angular_speed       = np.random.normal(0, 30),
             meteor              = meteor,
-            station             = Station.objects.get(code = station),
+            station             = Station.objects.get(code=station),
         )
 
         time = meteor.timestamp
@@ -134,8 +134,8 @@ class SightingQuerySet(models.QuerySet):
     def with_everything(self):
         return self.with_station().with_meteor().with_frames().with_frame_count().with_lightmax()
 
-    def for_station(self, station_code):
-        return self.filter(station__code=station_code)
+    def for_station(self, station_id):
+        return self.filter(station__id=station_id)
 
     def for_night(self, date):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
@@ -193,7 +193,7 @@ class Sighting(models.Model):
         return f"#{self.id}: {meteor} from {self.station}"
 
     def get_absolute_url(self):
-        return reverse('sighting', kwargs = {'id': self.id})
+        return reverse('sighting', kwargs={'id': self.id})
 
     def distance(self):
         return 0

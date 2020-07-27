@@ -37,7 +37,7 @@ class StationQuerySet(models.QuerySet):
             )
         )
 
-    def with_log_entries(self, count=None):
+    def with_log_entries(self, count=12):
         return self.prefetch_related('log_entries')[:count]
 
 
@@ -148,7 +148,7 @@ class Station(core.models.NamedModel):
 
     def dynamic_dict(self):
         return {
-            'sun':          self.sunPosition(),
+            'sun':          self.sun_position(),
         }
 
     def earth_location(self):

@@ -98,7 +98,7 @@
                     {% for snapshot in meteor.snapshots.all %}
                         <tr>
                             <td class="data">
-                                {{ snapshot.order }}
+                                <a href="{% url 'snapshot' meteor=meteor.name order=snapshot.order %}">{{ snapshot.order }}</a>
                             </td>
                             <td class="data">
                                 {{ snapshot.timestamp|date:"H:i:s.u" }}

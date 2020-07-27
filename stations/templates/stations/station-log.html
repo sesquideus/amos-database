@@ -18,11 +18,14 @@
             </tr>
         {% empty %}
             <tr>
-                <td colspan="2" class="empty">
+                <td colspan="3" class="data c empty">
                     There are no log entries for this station.
                 </td>
             </tr>
         {% endfor %}
+            <tr>
+                <td colspan="3" class="c admin"><a href="{% url 'admin:stations_logentry_add' %}?station={{ station.id }}&author={{ request.user.id }}">+ add new log entry</a></td>
+            </tr>
     </tbody>
 </table>
 

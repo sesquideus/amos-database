@@ -3,17 +3,17 @@ import django
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator
 
-from meteors.models import Frame
+from meteors.models import Snapshot
 
 
 @method_decorator(login_required, name = 'dispatch')
 class DetailView(django.views.generic.detail.DetailView):
-    model           = Frame
-    template_name   = 'meteors/frame.html'
+    model           = Snapshot
+    template_name   = 'meteors/snapshot.html'
 
     def get_object(self):
-        return Frame.objects.filter(
-            sighting__id=self.kwargs['sighting']
+        return Snapshot.objects.filter(
+            meteor__name=self.kwargs['meteor']
         ).get(
             order=self.kwargs['order']
         )
