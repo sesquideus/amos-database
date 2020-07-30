@@ -98,5 +98,5 @@ class APIViewSighting(View):
             log.warning("JSON decoding error in the sighting")
             return HttpResponseBadRequest()
         except Exception as e:
-            lor.warning(e)
+            log.warning(e)
             return HttpResponseBadRequest()
