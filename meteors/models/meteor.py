@@ -48,7 +48,7 @@ class MeteorQuerySet(models.QuerySet):
             latitude=Subquery(by_magnitude.values('latitude')[:1]),
             longitude=Subquery(by_magnitude.values('longitude')[:1]),
             altitude=Subquery(by_magnitude.values('altitude')[:1]),
-            speed=by_timestamp.values('speed')[:1],
+            speed=Subquery(by_timestamp.values('speed')[:1]),
         )
 
     def with_neighbours(self):
@@ -81,8 +81,8 @@ class MeteorQuerySet(models.QuerySet):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
         half_day = datetime.timedelta(hours=12)
         return self.filter(
-            timestamp__gte=midnight - half_day,
-            timestamp__lte=midnight + half_day,
+            timestamp__gte=(midnight - half_day),
+            timestamp__lte=(midnight + half_day),
         )
 
     def with_everything(self):
@@ -134,13 +134,7 @@ class Meteor(models.Model):
     def get_absolute_url(self):
         return reverse('meteor', kwargs={'name': self.name})
 
-    def save(self, *args, **kwargs):
-        if self.name is None or self.name == "":
-            self.name = self.lightmax_time.strftime('%Y%m%d-%H%M%S-%f')
-
-        super().save(*args, **kwargs)
-
     def as_dict(self):
         return {
-            'id':   self.id,
+            'id': self.id,
         }

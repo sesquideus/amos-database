@@ -1,8 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
-{% load tz %}
-{% load station_tags %}
-{% load meteor_tags %}
+{% load tz static meteor_tags station_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -11,33 +8,7 @@
 {% endblock headextra %}
 
 {% block pagetitle %}
-    <h2>Meteor <span class="name">{{ meteor.name }}</span> (<span class="subnetwork">{{ meteor.subnetwork }}</span>)</h2>
-
-    <div class="controls">
-        {% if meteor.previous != None %}
-            <a href="{% url 'meteor' name=meteor.previous %}">
-                <img src="{% static "pictures/previous.png" %}" alt="Previous" />
-            </a>
-        {% else %}
-            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first meteor" />
-        {% endif %}
-
-        <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">
-            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
-        </a>
-
-        <a href="{% url 'meteor-KML' name=meteor.name %}" target="_blank">
-            <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
-        </a>
-
-        {% if meteor.next != None %}
-            <a href="{% url 'meteor' name=meteor.next %}">
-                <img src="{% static "pictures/next.png" %}" alt="Next" />
-            </a>
-        {% else %}
-            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
-        {% endif %}
-    </div>
+    {% include 'meteors/controls.html' %}
 {% endblock pagetitle %}
 
 {% block page %}
@@ -78,7 +49,7 @@
                 </tr>
                 <tr>
                     <td>geocentric speed</td>
-                    <td class="data speed">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
+                    <td class="data speed {% if not meteor.speed %}empty{% endif %}">{{ meteor.speed|floatformat:0|default:"&mdash;" }} m/s</td>
                 </tr>
             </table>
 

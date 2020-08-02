@@ -2,24 +2,29 @@ import datetime
 
 import django
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.mixins import LoginRequiredMixin
 from django.shortcuts import render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
-from core.views import JSONDetailView, JSONListView
+from core.views import JSONDetailView
 
-from meteors.models import Meteor, Sighting
+from meteors.models import Meteor
 from meteors.forms import DateForm
 
-from stations.models import Station, Subnetwork
 
-
-class GenericListView(LoginRequiredMixin, django.views.generic.list.ListView):
+class GenericListView(django.contrib.auth.mixins.LoginRequiredMixin, django.views.generic.list.ListView):
     model = Meteor
     context_object_name = 'meteors'
     template_name = 'meteors/list-meteors.html'
+    queryset = Meteor.objects.with_everything()
+
+
+class GenericDetailView(django.contrib.auth.mixins.LoginRequiredMixin, django.views.generic.detail.DetailView):
+    model = Meteor
+    slug_field = 'name'
+    slug_url_kwarg = 'name'
+    template_name = 'meteors/meteor.html'
     queryset = Meteor.objects.with_everything()
 
 
@@ -55,15 +60,8 @@ class ListLatestView(GenericListView):
         return Meteor.objects.with_everything().order_by('-timestamp')[:limit]
 
 
-@method_decorator(login_required, name='dispatch')
-class DetailView(django.views.generic.detail.DetailView):
-    model           = Meteor
-    slug_field      = 'name'
-    slug_url_kwarg  = 'name'
-    template_name   = 'meteors/meteor.html'
-
-    def get_object(self):
-        return Meteor.objects.with_everything().get(name=self.kwargs.get('name'))
+class DetailView(GenericDetailView):
+    pass
 
 
 @method_decorator(login_required, name='dispatch')
@@ -71,7 +69,6 @@ class DetailViewJSON(JSONDetailView):
     model           = Meteor
     slug_field      = 'name'
     slug_url_kwarg  = 'name'
-
 
 
 @method_decorator(csrf_exempt, name='dispatch')

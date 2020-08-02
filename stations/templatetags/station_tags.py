@@ -4,7 +4,7 @@ import datetime
 from django import template
 from django.utils.safestring import mark_safe
 
-from meteors.templatetags.meteor_tags import mdash
+from meteors.templatetags.meteor_tags import mdash, empty_on_error
 
 register = template.Library()
 
@@ -38,6 +38,7 @@ def multiply(value: float, factor: float):
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def latitude(value: float):
     ns = 'N' if value > 0 else 'S'
     return f"{abs(value):.6f}° {ns}"
@@ -45,6 +46,7 @@ def latitude(value: float):
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def longitude(value: float):
     ew = 'E' if value > 0 else 'W'
     return f"{abs(value):.6f}° {ew}"
@@ -52,39 +54,51 @@ def longitude(value: float):
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def altitude(value: float):
     return f"{abs(value):.0f} m"
 
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def distance(value: float):
-    return f"{value:.0f}"
+    return f"{value:.0f} m"
 
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def angle(value: float):
     return f"{value:.2f}°"
 
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def temperature(value: float):
     return f"{value:.1f} °C"
 
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def pressure(value: float):
     return f"{value / 1000:.2f} kPa"
 
 
 @register.filter
 @mdash
+@empty_on_error(ValueError, TypeError)
 def humidity(value: float):
     return f"{value:.0f} %"
 
+
+@register.filter
+@mdash
+@empty_on_error(ValueError, TypeError)
+def speed(value: float):
+    return f"{value:.0f} m/s"
 
 
 @register.filter

@@ -14,7 +14,7 @@ register = template.Library()
 def mdash(function):
     @functools.wraps(function)
     def wrapper(arg):
-        if arg == '':
+        if arg == None:
             return mark_safe("&mdash;")
         else:
             return function(arg)
@@ -22,14 +22,14 @@ def mdash(function):
     return wrapper
 
 
-def none_if_error(*exceptions):
+def empty_on_error(*exceptions):
     def protected(function):
         @functools.wraps(function)
         def wrapper(*args, **kwargs):
             try:
                 return function(*args, **kwargs)
             except exceptions as e:
-                print(f"Caught exception {e.__class__.__name__} ({e}) and returning None for {function.__name__}")
+                print(f"Caught exception {e.__class__.__name__} ({e}) and returning '' for {function.__name__}")
                 return None
         return wrapper
 
@@ -54,21 +54,21 @@ def magnitude_colour(magnitude: float):
 
 @register.filter
 @mdash
-@none_if_error(ValueError)
+@empty_on_error(ValueError, TypeError)
 def magnitude(mag):
     return mark_safe(f"{mag:+.2f}<sup>m</sup>")
 
 
 @register.filter
 @mdash
-@none_if_error(ValueError)
+@empty_on_error(ValueError)
 def angle(ang):
     return mark_safe(f"{ang:.2f}°")
 
 
 @register.filter
 @mdash
-@none_if_error(AttributeError)
+@empty_on_error(AttributeError)
 def safetime(time):
     return time.strftime("%H:%M:%S.%f")
 

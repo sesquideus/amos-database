@@ -6,7 +6,7 @@ from django.utils.decorators import method_decorator
 from meteors.models import Snapshot
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
 class DetailView(django.views.generic.detail.DetailView):
     model           = Snapshot
     template_name   = 'meteors/snapshot.html'
