@@ -1,7 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
-{% load meteor_tags %}
-{% load station_tags %}
+{% load static meteor_tags station_tags %}
 
 {% block headextra %}
     <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
@@ -14,10 +12,11 @@
 {% endblock %}
 
 {% block page %}
-    {% include 'meteors/navigation.html' %}
+    {% include 'meteors/navigation/date.html' %}
+    {% include 'meteors/navigation/subnetworks.html' %}
 
     <h3>
-        {{ meteors|length }} meteors
+        {% block subnetwork_name %}{{ meteors|length }} meteors{% endblock subnetwork_name %}
     </h3>
 
     {% include 'meteors/meteors-table.html' %}

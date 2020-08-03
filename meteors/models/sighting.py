@@ -112,16 +112,13 @@ class SightingQuerySet(models.QuerySet):
     def with_meteor(self):
         return self.select_related('meteor')
 
-    def with_frame_count(self):
-        return self.annotate(frame_count=Count('frames'))
-
     def with_frames(self):
         return self.prefetch_related(
             Prefetch(
                 'frames',
                 queryset=Frame.objects.with_flight_time(),
             )
-        )
+        ).annotate(frame_count=Count('frames'))
 
     def with_lightmax(self):
         frames = Frame.objects.filter(sighting=OuterRef('id')).order_by('magnitude')
@@ -132,10 +129,10 @@ class SightingQuerySet(models.QuerySet):
         )
 
     def with_everything(self):
-        return self.with_station().with_meteor().with_frames().with_frame_count().with_lightmax()
+        return self.with_station().with_meteor().with_frames().with_lightmax()
 
-    def for_station(self, station_id):
-        return self.filter(station__id=station_id)
+    def for_station(self, station_code):
+        return self.filter(station__code=station_code)
 
     def for_night(self, date):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)

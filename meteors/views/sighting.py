@@ -18,13 +18,20 @@ from core.utils import DateParser
 
 from meteors.forms import DateForm
 from meteors.models import Sighting
-from stations.models import Station
+from stations.models import Station, Subnetwork
 
 
 class GenericListView(core.views.LoginListView):
     model = Sighting
     context_object_name = 'sightings'
     template_name = 'meteors/list-sightings.html'
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'subnetworks': Subnetwork.objects.with_stations(),
+        })
+        return context
 
 
 class ListDateView(GenericListView):

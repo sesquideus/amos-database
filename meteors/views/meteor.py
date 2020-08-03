@@ -12,12 +12,21 @@ from core.views import JSONDetailView
 from meteors.models import Meteor
 from meteors.forms import DateForm
 
+from stations.models import Subnetwork
+
 
 class GenericListView(django.contrib.auth.mixins.LoginRequiredMixin, django.views.generic.list.ListView):
     model = Meteor
     context_object_name = 'meteors'
     template_name = 'meteors/list-meteors.html'
     queryset = Meteor.objects.with_everything()
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context.update({
+            'subnetworks': Subnetwork.objects.with_stations(),
+        })
+        return context
 
 
 class GenericDetailView(django.contrib.auth.mixins.LoginRequiredMixin, django.views.generic.detail.DetailView):
@@ -59,6 +68,24 @@ class ListLatestView(GenericListView):
         limit = self.kwargs.get('limit', 10)
         return Meteor.objects.with_everything().order_by('-timestamp')[:limit]
 
+
+class ListBySubnetworkView(ListDateView):
+    template_name = 'meteors/list-meteors-subnetwork.html'
+
+    def get_queryset(self):
+        return super().get_queryset().for_subnetwork(self.kwargs['subnetwork_code'])
+
+    def get_context_data(self):
+        context = super().get_context_data()
+        context['subnetwork'] = Subnetwork.objects.get(code=self.kwargs['subnetwork_code'])
+        return context
+
+    def post(self, request):
+        form = DateForm(request.POST)
+        if form.is_valid():
+            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors-by-subnetwork')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
+        else:
+            return django.http.HttpResponseBadRequest()
 
 class DetailView(GenericDetailView):
     pass

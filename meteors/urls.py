@@ -5,6 +5,7 @@ from .views import meteor, sighting, frame, snapshot
 urlpatterns = [
     # Meteor listings
     path('meteors/',                                                meteor.ListDateView.as_view(),              name='list-meteors'),
+    path('meteors/<slug:subnetwork_code>/',                         meteor.ListBySubnetworkView.as_view(),      name='list-meteors-by-subnetwork'),
     path('meteors/json',                                            meteor.listJSON,                            name='list-meteors-JSON'),
 
     # Single meteor views

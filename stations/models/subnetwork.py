@@ -18,6 +18,13 @@ class SubnetworkQuerySet(models.QuerySet):
             )
         )
 
+    def with_stations(self):
+        return self.prefetch_related(
+            Prefetch(
+                'stations',
+            )
+        )
+
     def with_count(self):
         return self.annotate(station_count=Count('stations'))
 

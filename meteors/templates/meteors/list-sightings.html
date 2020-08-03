@@ -1,7 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
-{% load meteor_tags %}
-{% load station_tags %}
+{% load static meteor_tags station_tags %}
 
 {% block pagetitle %}
     <h2>Sightings</h2>
@@ -13,7 +11,8 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    {% include 'meteors/navigation.html' %}
+    {% include 'meteors/navigation/date.html' %}
+    {% include 'meteors/navigation/stations.html' %}
 
     <h3>
         {% block station_name %}All stations{% endblock station_name %}

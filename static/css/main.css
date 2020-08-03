@@ -166,6 +166,15 @@ img.chart {
     border: 1px solid black;
 }
 
+div.page div.navigation {
+    width: 100%;
+    text-align: center;
+}
+
+div.centered {
+    display: inline-block;
+}
+
 div.page a.navigation {
     text-decoration: none;
 }

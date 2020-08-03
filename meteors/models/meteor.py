@@ -85,6 +85,9 @@ class MeteorQuerySet(models.QuerySet):
             timestamp__lte=(midnight + half_day),
         )
 
+    def for_subnetwork(self, subnetwork_code):
+        return self.filter(subnetwork__code=subnetwork_code)
+
     def with_everything(self):
         return self.with_sightings().with_subnetwork().with_snapshots().with_lightmax()
 
