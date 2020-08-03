@@ -54,7 +54,8 @@ class ListDateView(GenericListView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return django.http.HttpResponseRedirect(django.urls.reverse('list-sightings') + "?date=" + form.cleaned_data['date'].strftime("%Y-%m-%d"))
+            url = django.urls.reverse('list-sightings')
+            return django.http.HttpResponseRedirect(f"{url}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
         else:
             return django.http.HttpResponseBadRequest()
 
@@ -83,10 +84,11 @@ class ListByStationView(ListDateView):
         context['station'] = Station.objects.get(code=self.kwargs['station_code'])
         return context
 
-    def post(self, request):
+    def post(self, request, station_code):
         form = DateForm(request.POST)
         if form.is_valid():
-            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-sightings-by-station')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
+            url = django.urls.reverse('list-sightings-by-station', kwargs={'station_code': station_code})
+            return django.http.HttpResponseRedirect(f"{url}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
         else:
             return django.http.HttpResponseBadRequest()
 

@@ -13,6 +13,7 @@ body {
     padding: 0px;
     margin: 0px;
     min-height: 100vh;
+    overflow-y: scroll;
 }
 
 sup {
@@ -173,6 +174,19 @@ div.page div.navigation {
 
 div.centered {
     display: inline-block;
+}
+
+div.navigation div.subnetwork {
+    display: inline-block;
+}
+
+div.subnetwork a {
+    display: inline-block;
+    background-color: blue;
+    font-size: 20pt;
+    padding: 5px;
+    text-decoration: none;
+    color: white;
 }
 
 div.page a.navigation {
