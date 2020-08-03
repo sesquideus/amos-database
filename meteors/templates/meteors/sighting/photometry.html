@@ -1,0 +1,36 @@
+{% load tz static meteor_tags station_tags %}
+
+<table>
+    <thead>
+        <tr>
+            <th class="group" colspan="2">photometry</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>timestamp</td>
+            <td class="data time ar">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</td>
+        </tr>
+        <tr>
+            <td>local time</td>
+            <td class="data time ar">{% timezone sighting.station.timezone %}{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}{% endtimezone %}</td>
+        </tr>
+        <tr>
+            <td>duration</td>
+            <td class="data">{{ sighting.frames.last.flight_time.total_seconds|floatformat:3 }} s</td>
+        </tr>
+        <tr>
+            <td>apparent magnitude</td>
+            <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
+        </tr>
+        <tr>
+            <td>arc length</td>
+            <td class="data length">{{ sighting.arc_length|floatformat:2 }}°</td>
+        </tr>
+        <tr>
+            <td>distance to meteor centre</td>
+            <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
+        </tr>
+    </tbody>
+</table>
+

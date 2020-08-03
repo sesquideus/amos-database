@@ -1,0 +1,60 @@
+{% load tz static meteor_tags station_tags %}
+
+<h3>Sky info</h3>
+<table>
+    <thead>
+        <tr>
+            <th class="subgroup">object</th>
+            <th class="subgroup" colspan="2">altitude</th>
+            <th class="subgroup" colspan="2">azimuth</th>
+            <th class="subgroup">magnitude</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% with sun=sighting.sun_position %}
+            <tr>
+                <td>Sun</td>
+                <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                    <span class="suninfo standalone">
+                        {{ sun.alt|floatformat:1 }}°
+                    </span>
+                </td>
+                <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
+                    <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
+                </td>
+                <td class="data sun">
+                    <span>{{ sun.az|floatformat:1 }}°</span>
+                </td>
+                <td class="data arrow">
+                    <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
+                </td>
+                <td class="data sun">
+                    -26.74<sup>m</sup>
+                </td>
+            </tr>
+        {% endwith %}
+        {% with moon=sighting.moon_position %}
+            <tr>
+                <td>Moon</td>
+                <td class="data moon" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                    <span class="mooninfo standalone">
+                        {{ moon.alt|floatformat:1 }}°
+                    </span>
+                </td>
+                <td class="data arrow" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
+                    <span class="arrow" style="transform: rotate({{ moon.alt|multiply:-1 }}deg);">&#8594;</span>
+                </td>
+                <td class="data moon">
+                    <span>{{ moon.az|floatformat:1 }}°</span>
+                </td>
+                <td class="data arrow">
+                    <span class="arrow" style="transform: rotate({{ moon.az|add:-90 }}deg);">&#8594;</span>
+                </td>
+                <td class="data moon">
+                    <span class="empty">not implemented</span>
+                </td>
+            </tr>
+        {% endwith %}
+    </tbody>
+</table>
+

@@ -61,97 +61,8 @@
 
     <div class="inner">
         <div class="info">
-            <table>
-                <thead>
-                    <tr>
-                        <th class="group" colspan="2">photometry</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td>timestamp</td>
-                        <td class="data time ar">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</td>
-                    </tr>
-                    <tr>
-                        <td>local time</td>
-                        <td class="data time ar">{% timezone sighting.station.timezone %}{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}{% endtimezone %}</td>
-                    </tr>
-                    <tr>
-                        <td>duration</td>
-                        <td class="data">{{ sighting.frames.last.flight_time.total_seconds|floatformat:3 }} s</td>
-                    </tr>
-                    <tr>
-                        <td>apparent magnitude</td>
-                        <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>
-                    </tr>
-                    <tr>
-                        <td>arc length</td>
-                        <td class="data length">{{ sighting.arc_length|floatformat:2 }}°</td>
-                    </tr>
-                    <tr>
-                        <td>distance to meteor centre</td>
-                        <td class="data length">{{ sighting.distance|default_if_none:"&mdash;" }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <h3>Sky info</h3>
-            <table>
-                <thead>
-                    <tr>
-                        <th class="subgroup">object</th>
-                        <th class="subgroup" colspan="2">altitude</th>
-                        <th class="subgroup" colspan="2">azimuth</th>
-                        <th class="subgroup">magnitude</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% with sun=sighting.sun_position %}
-                        <tr>
-                            <td>Sun</td>
-                            <td class="data sun" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
-                                <span class="suninfo standalone">
-                                    {{ sun.alt|floatformat:1 }}°
-                                </span>
-                            </td>
-                            <td class="data arrow" style="background-color: {{ sun.alt|altitude_colour_back }}; color: {{ sun.alt|altitude_colour_front }};">
-                                <span class="arrow" style="transform: rotate({{ sun.alt|multiply:-1 }}deg);">&#8594;</span>
-                            </td>
-                            <td class="data sun">
-                                <span>{{ sun.az|floatformat:1 }}°</span>
-                            </td>
-                            <td class="data arrow">
-                                <span class="arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
-                            </td>
-                            <td class="data sun">
-                                -26.74<sup>m</sup>
-                            </td>
-                        </tr>
-                    {% endwith %}
-                    {% with moon=sighting.moon_position %}
-                        <tr>
-                            <td>Moon</td>
-                            <td class="data moon" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
-                                <span class="mooninfo standalone">
-                                    {{ moon.alt|floatformat:1 }}°
-                                </span>
-                            </td>
-                            <td class="data arrow" style="background-color: {{ moon.alt|altitude_colour_back }}; color: {{ moon.alt|altitude_colour_front }};">
-                                <span class="arrow" style="transform: rotate({{ moon.alt|multiply:-1 }}deg);">&#8594;</span>
-                            </td>
-                            <td class="data moon">
-                                <span>{{ moon.az|floatformat:1 }}°</span>
-                            </td>
-                            <td class="data arrow">
-                                <span class="arrow" style="transform: rotate({{ moon.az|add:-90 }}deg);">&#8594;</span>
-                            </td>
-                            <td class="data moon">
-                                <span class="empty">not implemented</span>
-                            </td>
-                        </tr>
-                    {% endwith %}
-                </tbody>
-            </table>
+            {% include 'meteors/sighting/photometry.html' %}
+            {% include 'meteors/sighting/sky-info.html' %}
 
             <h3>Light curve</h3>
             <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
@@ -159,45 +70,7 @@
             <h3>Sky visualisation</h3>
             <img class="chart" src="{% url 'sighting-sky' id=sighting.id %}" alt="Sky visualisation" />
 
-            <h3>Video frames ({{ sighting.frames.count }} total)</h3>
-            <table class="alternating">
-                <thead>
-                    <tr>
-                        <th>#</th>
-                        <th>timestamp</th>
-                        <th>time</th>
-                        <th>magnitude</th>
-                        <th>altitude</th>
-                        <th>azimuth</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for frame in sighting.frames.all %}
-                        <tr {% if frame.order == maxLight %}class="maxLight"{% endif %}>
-                            <td class="data order">
-                                <a href="{{ frame.get_absolute_url }}">{{ frame.order }}</a>
-                            </td>
-                            <td class="data time">
-                                {{ frame.timestamp|date:"H:i:s.u"|default:"&mdash;" }}
-                            </td>
-                            <td class="data time">
-                                {{ frame.flight_time.total_seconds|floatformat:3|default:"&mdash;" }} s
-                            </td>
-                            <td class="data magnitude">
-                                {{ frame.magnitude|magnitude }}
-                            </td>
-                            <td class="data angle">
-                                {{ frame.altitude|angle }}
-                            </td>
-                            <td class="data angle">{{ frame.azimuth|angle }}</td>
-                        </tr>
-                    {% empty %}
-                        <tr class="empty">
-                            <td colspan="6">There are no recorded video frames for this sighting.</td>
-                        </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+            {% include 'meteors/sighting/video-frames.html' %}
         </div>
         <div class="preview">
             {% if sighting.composite %}
@@ -209,6 +82,4 @@
             {% endif %}
         </div>
     </div>
-
-    
 {% endblock %}
