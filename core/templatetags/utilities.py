@@ -1,4 +1,7 @@
 import functools
+import django
+
+register = django.template.Library()
 
 
 def mdash(function):
@@ -26,9 +29,9 @@ def empty_on_error(*exceptions):
     return protected
 
 
-def graceful():
+def graceful(function):
     @functools.wraps(function)
-    def wrapper(function):
-        return register.filter(mdash(empty_on_error(function)))
+    def wrapper(arg):
+        return mdash(empty_on_error(TypeError, ValueError))(arg)
 
     return wrapper

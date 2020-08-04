@@ -36,7 +36,6 @@ class SightingManager(models.Manager):
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = meteor.timestamp,
-            angular_speed       = np.random.normal(0, 30),
             meteor              = meteor,
             station             = Station.objects.get(code=station),
         )
@@ -74,7 +73,6 @@ class SightingManager(models.Manager):
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = datetime.datetime.strptime(kwargs.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
-            angular_speed       = kwargs.get('angular_speed'),
             meteor              = None,
             station             = Station.objects.get(code = station_code),
         )

@@ -6,85 +6,76 @@ import pytz
 from astropy.time import Time
 from django.utils.safestring import mark_safe
 
-from .utilities import mdash, empty_on_error
+from .utilities import mdash, empty_on_error, graceful
 
 register = django.template.Library()
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def latitude(value: float):
     ns = 'N' if value > 0 else 'S'
     return f"{abs(value):.6f}° {ns}"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def longitude(value: float):
     ew = 'E' if value > 0 else 'W'
     return f"{abs(value):.6f}° {ew}"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def altitude(value: float):
     return f"{abs(value):.0f} m"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def distance(value: float):
     return f"{value:.0f} m"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def temperature(value: float):
     return f"{value:.1f} °C"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def pressure(value: float):
     return f"{value / 1000:.2f} kPa"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def humidity(value: float):
     return f"{value:.0f} %"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def speed(value: float):
     return f"{value:.0f} m/s"
 
 
 @register.filter
-@mdash
-@empty_on_error(ValueError, TypeError)
+@graceful
 def magnitude(mag):
     return mark_safe(f"{mag:+.2f}<sup>m</sup>")
 
 
 @register.filter
-@mdash
+@graceful
 @empty_on_error(ValueError)
 def angle(ang):
     return mark_safe(f"{ang:.2f}°")
 
 
 @register.filter
-@mdash
+@graceful
 def solar_longitude(timestamp):
     n = Time(timestamp).jd - 2451545.0
     l = (280.460 + 0.9856474 * n) % 360
