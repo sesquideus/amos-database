@@ -1,5 +1,3 @@
-{% load meteor_tags station_tags %}
-
 <div class="navigation">
     {% for subnetwork in subnetworks %}
         {% if subnetwork.stations.all and not forloop.first %}|{% endif %}

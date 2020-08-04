@@ -1,7 +1,5 @@
 {% extends 'core/base.html' %}
-{% load static %}
-{% load tz %}
-{% load station_tags %}
+{% load static quantities %}
 
 {% block pagetitle %}
     <h2>Subnetwork <span class="bold">{{ subnetwork.name }}</span> (<span class="bold">{{ subnetwork.code }}</span>)</h2>
@@ -40,7 +38,7 @@
                         <td class="data station-name"><a href="{{ station.get_absolute_url }}">{{ station.name }}</a></td>
                         <td class="data">{{ station.latitude|latitude }}</td>
                         <td class="data">{{ station.longitude|longitude }}</td>
-                        <td class="data">{{ station.altitude|floatformat:0 }} m</td>
+                        <td class="data">{{ station.altitude|distance }}</td>
                     </tr>
                 {% empty %}
                     <tr>

@@ -1,5 +1,3 @@
-{% load meteor_tags station_tags %}
-
 <div class="navigation">
     {% for subnetwork in subnetworks %}
         <a href="{% url 'list-meteors-by-subnetwork' subnetwork.code %}">{{ subnetwork.name }}</a>

@@ -2,6 +2,7 @@ import datetime
 import pytz
 import json
 import logging
+import django
 
 from pprint import pprint as pp
 
@@ -27,7 +28,7 @@ class SingleView(LoginDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
-    template_name   = 'stations/station.html'
+    template_name   = 'stations/station/main.html'
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
@@ -53,7 +54,7 @@ class ListViewJSON(JSONListView):
 @method_decorator(csrf_exempt, name = 'dispatch')
 class APIViewHeartbeat(View):
     def get(self, request):
-        return JsonResponse({'ok': 'OK'})
+        return django.http.JsonResponse({'ok': 'OK'})
 
     def post(self, request, code):
         log.info(f"Incoming heartbeat for station {code}")

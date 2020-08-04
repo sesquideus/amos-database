@@ -104,8 +104,8 @@ TEMPLATES = [
                 'core.context_processors.main_menu',
             ],
             'builtins': [
-                'meteors.templatetags.meteor_tags',
-                'stations.templatetags.station_tags',
+                'core.templatetags.quantities',
+                'core.templatetags.styles',
             ],
             'debug': DEBUG,
 #            'string_if_invalid': '<<%s>>',

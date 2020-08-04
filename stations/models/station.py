@@ -13,7 +13,7 @@ import core.models
 from meteors.models import Sighting
 from stations.models.heartbeat import Heartbeat
 
-from stations.templatetags.station_tags import since_date_time
+from core.templatetags.quantities import since_date_time
 
 
 class StationQuerySet(models.QuerySet):

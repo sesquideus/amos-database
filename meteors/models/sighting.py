@@ -126,6 +126,7 @@ class SightingQuerySet(models.QuerySet):
             magnitude=Subquery(frames.values('magnitude')[:1]),
             azimuth=Subquery(frames.values('azimuth')[:1]),
             altitude=Subquery(frames.values('altitude')[:1]),
+            angular_speed=Subquery(frames.values('angular_speed')[:1]),
         )
 
     def with_everything(self):

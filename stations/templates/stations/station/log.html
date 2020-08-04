@@ -1,7 +1,7 @@
-{% load station_tags %}
+{% load quantities %}
 
 <h3>Station log</h3>
-<table>
+<table class="full-width alternating">
     <thead>
         <tr>
             <th>date</th>
@@ -12,20 +12,13 @@
     <tbody>
         {% for entry in station.log_entries.all|slice:":10" %}
             <tr>
-                <td class="data timestamp">{{ entry.created|date:"Y-m-d H:i:s" }}</td>
+                <td class="data c timestamp">{{ entry.created|date:"Y-m-d H:i:s" }}</td>
                 <td class="data name">{{ entry.author|default_if_none:"&mdash;" }}</td>
                 <td class="data text">{{ entry.text }}</td>
             </tr>
-        {% empty %}
-            <tr>
-                <td colspan="3" class="data c empty">
-                    There are no log entries for this station.
-                </td>
-            </tr>
         {% endfor %}
-            <tr>
-                <td colspan="3" class="c admin"><a href="{% url 'admin:stations_logentry_add' %}?station={{ station.id }}&author={{ request.user.id }}">+ add new log entry</a></td>
-            </tr>
+        <tr>
+            <td colspan="3" class="c admin"><a href="{% url 'admin:stations_logentry_add' %}?station={{ station.id }}&author={{ request.user.id }}">+ add new log entry</a></td>
+        </tr>
     </tbody>
 </table>
-

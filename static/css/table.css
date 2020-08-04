@@ -78,6 +78,12 @@ td.timestamp {
     width: 100mm;
 }
 
+td.text {
+    width: 100%;
+    text-align: left;
+    overflow: ellipsis;
+}
+
 td.time {
     text-align: center;
 }
