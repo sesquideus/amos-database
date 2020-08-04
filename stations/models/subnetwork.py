@@ -64,4 +64,4 @@ class Subnetwork(core.models.NamedModel):
         }
 
     def get_absolute_url(self):
-        return reverse('subnetwork', kwargs = {'code': self.code})
+        return reverse('subnetwork', kwargs={'code': self.code})

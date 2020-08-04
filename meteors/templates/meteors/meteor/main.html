@@ -1,0 +1,26 @@
+{% extends 'core/base.html' %}
+{% load tz static meteor_tags station_tags %}
+
+{% block headextra %}
+    <link rel="stylesheet" type="text/css" href="{% static "js/ol.css" %}" />
+    <script src="{% static "js/ol.js" %}"></script>
+    <script src="{% static "meteors/js/map.js" %}"></script>
+{% endblock headextra %}
+
+{% block pagetitle %}
+    {% include 'meteors/controls.html' %}
+{% endblock pagetitle %}
+
+{% block page %}
+    <div class="inner">
+        <div class="info">
+            {% include 'meteors/meteor/properties.html' %}
+            {% include 'meteors/meteor/snapshots.html' %}
+            {% include 'meteors/meteor/sightings.html' %}
+        </div>
+
+        <div class="preview">
+            <div id="map" class="map"> </div>
+        </div>
+    </div>
+{% endblock %}

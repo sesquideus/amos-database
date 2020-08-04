@@ -33,7 +33,7 @@ class GenericDetailView(django.contrib.auth.mixins.LoginRequiredMixin, django.vi
     model = Meteor
     slug_field = 'name'
     slug_url_kwarg = 'name'
-    template_name = 'meteors/meteor.html'
+    template_name = 'meteors/meteor/main.html'
     queryset = Meteor.objects.with_everything()
 
 
@@ -52,7 +52,6 @@ class ListDateView(GenericListView):
             'form': DateForm(initial={'date': self.date}),
             'navigation': django.urls.reverse('list-meteors'),
         })
-#        context.update(self.time.context())
         return context
 
     def post(self, request):
@@ -87,6 +86,7 @@ class ListBySubnetworkView(ListDateView):
         else:
             return django.http.HttpResponseBadRequest()
 
+
 class DetailView(GenericDetailView):
     pass
 
@@ -97,16 +97,6 @@ class DetailViewJSON(JSONDetailView):
     slug_field      = 'name'
     slug_url_kwarg  = 'name'
 
-
-@method_decorator(csrf_exempt, name='dispatch')
-class APIView(View):
-    def get(self, request):
-        return django.http.HttpResponse('result')
-
-    def post(self, request):
-        print(f"{'*' * 20} Incoming meteor {'*' * 20}")
-        #pp(request.POST)
-        #pp(request.FILES)
 
 
 @login_required

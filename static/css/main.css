@@ -86,6 +86,10 @@ a.object-link {
     font-weight: bold;
 }
 
+a {
+    text-decoration: none;
+}
+
 span.name {
     font-weight: bold;
 }
@@ -178,15 +182,6 @@ div.centered {
 
 div.navigation div.subnetwork {
     display: inline-block;
-}
-
-div.subnetwork a {
-    display: inline-block;
-    background-color: blue;
-    font-size: 20pt;
-    padding: 5px;
-    text-decoration: none;
-    color: white;
 }
 
 div.page a.navigation {

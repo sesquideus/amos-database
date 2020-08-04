@@ -13,18 +13,21 @@ class SnapshotInline(admin.TabularInline):
 
     fields = ['order', 'timestamp', 'latitude', 'longitude', 'altitude', 'magnitude']
 
+    formfield_overrides = {
+        models.DateTimeField: {
+            'widget': MicrosecondDateTimeWidget(),
+        },
+    }
+
 
 @admin.register(Snapshot)
 class SnapshotAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
-            'widget': MicrosecondDateTimeWidget(
-                date_format='%Y-%m-%d',
-                time_format='%H:%M:%S.%f',
-            )
+            'widget': MicrosecondDateTimeWidget(),
         },
         models.FloatField: {
-            'widget': TextInput(attrs = {
+            'widget': TextInput(attrs={
                 'style': 'width: 80px;',
                 'class': 'narrow',
             })

@@ -2,10 +2,11 @@
 
 <div class="navigation">
     {% for subnetwork in subnetworks %}
+        {% if subnetwork.stations.all and not forloop.first %}|{% endif %}
         {% for station in subnetwork.stations.all %}
             <div class="subnetwork">
                 <a href="{% url 'list-sightings-by-station' station.code %}">{{ station.code }}</a>
             </div>
-        {% endfor %}{% if subnetwork.stations.all and not forloop.last %}|{% endif %}
+        {% endfor %}
     {% endfor %}
 </div>

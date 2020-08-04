@@ -1,0 +1,40 @@
+{% load tz meteor_tags station_tags %}
+
+<h3>Properties</h3>
+<table>
+    <thead>
+        <tr>
+            <th class="group" colspan="2">generic attributes</th>
+        </tr>
+    </thead>
+    <tr>
+        <td>name</td>
+        <td class="data">{{ meteor.name }}</td>
+    </tr>
+    <tr>
+        <td>timestamp</td>
+        <td class="data">{{ meteor.timestamp }}</td>
+    </tr>
+    <tr>
+        <td>local time</td>
+        <td class="data">
+            {% if meteor.subnetwork is None %}
+                ?
+            {% else %}
+                {% timezone meteor.subnetwork.timezone %}{{ meteor.timestamp|date:"Y-m-d H:i:s" }}{% endtimezone %}
+            {% endif %}
+        </td>
+    </tr>
+    <tr>
+        <td>solar longitude &#955;<sub>&#9737;</sub></td>
+        <td class="data">{{ meteor.timestamp|solar_longitude|angle }}</td>
+    </tr>
+    <tr>
+        <td>absolute magnitude</td>
+        <td class="data magnitude">{{ meteor.magnitude|magnitude }}</td>
+    </tr>
+    <tr>
+        <td>geocentric speed</td>
+        <td class="data speed {% if not meteor.speed %}empty{% endif %}">{{ meteor.speed|speed }}</td>
+    </tr>
+</table>

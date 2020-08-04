@@ -12,13 +12,10 @@ from .widgets import MicrosecondDateTimeWidget
 class MeteorAdmin(admin.ModelAdmin):
     formfield_overrides = {
         models.DateTimeField: {
-            'widget': MicrosecondDateTimeWidget(
-                date_format = '%Y-%m-%d',
-                time_format = '%H:%M:%S.%f',
-            )
+            'widget': MicrosecondDateTimeWidget(),
         },
         models.FloatField: {
-            'widget': TextInput(attrs = {
+            'widget': TextInput(attrs={
                 'style': 'width: 80px;',
                 'class': 'narrow',
             })

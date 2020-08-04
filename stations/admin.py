@@ -41,7 +41,8 @@ class StationAdmin(admin.ModelAdmin):
             'fields': ('latitude', 'longitude', 'altitude', 'timezone'),
         }),
     )
-    list_display = ['name', 'code', 'address', 'subnetwork', 'latitude', 'longitude', 'altitude', 'timezone']
+    list_display = ['name', 'code', 'address', 'subnetwork', 'on', 'latitude', 'longitude', 'altitude', 'timezone']
+    list_editable = ['on']
     list_display_links = ['name', 'subnetwork']
     inlines = [LogEntryInline]
 

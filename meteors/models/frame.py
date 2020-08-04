@@ -74,6 +74,11 @@ class Frame(models.Model):
                                         null                = True,
                                         blank               = True,
                                     )
+    angular_speed                   = models.FloatField(
+                                        null                = True,
+                                        blank               = True,
+                                        verbose_name        = "observed angular speed [°/s]",
+                                    )
 
     solar_elongation                = models.FloatField(
                                         null                = True,

@@ -31,10 +31,7 @@ class FrameAdmin(admin.ModelAdmin):
 
     formfield_overrides = {
         models.DateTimeField: {
-            'widget': MicrosecondDateTimeWidget(
-                date_format = '%Y-%m-%d',
-                time_format = '%H:%M:%S.%f',
-            )
+            'widget': MicrosecondDateTimeWidget(),
         },
         models.FloatField: {
             'widget': NumberInput(attrs = {

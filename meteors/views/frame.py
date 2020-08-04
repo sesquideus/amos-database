@@ -9,7 +9,7 @@ from meteors.models import Frame
 @method_decorator(login_required, name='dispatch')
 class DetailView(django.views.generic.detail.DetailView):
     model           = Frame
-    template_name   = 'meteors/frame.html'
+    template_name   = 'meteors/frame/main.html'
 
     def get_object(self):
         return Frame.objects.filter(

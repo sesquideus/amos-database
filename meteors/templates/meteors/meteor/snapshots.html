@@ -1,0 +1,43 @@
+<h3>Snapshots</h3>
+<table>
+    <thead>
+        <tr>
+            <th>#</th>
+            <th>timestamp</th>
+            <th>latitude</th>
+            <th>longitude</th>
+            <th>altitude</th>
+            <th>magnitude</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for snapshot in meteor.snapshots.all %}
+            <tr>
+                <td class="data">
+                    <a href="{% url 'snapshot' meteor=meteor.name order=snapshot.order %}">{{ snapshot.order }}</a>
+                </td>
+                <td class="data">
+                    {{ snapshot.timestamp|date:"H:i:s.u" }}
+                </td>
+                <td class="data">
+                    {{ snapshot.latitude|latitude }}
+                </td>
+                <td class="data">
+                    {{ snapshot.longitude|longitude }}
+                </td>
+                <td class="data">
+                    {{ snapshot.altitude|altitude }}
+                </td>
+                <td class="data">
+                    {{ snapshot.magnitude|magnitude }}
+                </td>
+            </tr>
+        {% empty %}
+            <tr class="empty">
+                <td class="data c empty" colspan="6">
+                    No snapshots of this meteor.
+                </td>
+            </tr>
+        {% endfor %}
+    </tbody>
+</table>

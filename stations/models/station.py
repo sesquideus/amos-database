@@ -118,7 +118,6 @@ class Station(core.models.NamedModel):
                                     )
     on                              = models.BooleanField(
                                         null                = False,
-                                        blank               = False,
                                         default             = False,
                                     )
 

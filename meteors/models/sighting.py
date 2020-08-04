@@ -165,11 +165,6 @@ class Sighting(models.Model):
                                         blank               = True,
                                     )
 
-    angular_speed                   = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "observed angular speed [°/s]",
-                                    )
     meteor                          = models.ForeignKey(
                                         'Meteor',
                                         null                = True,
@@ -191,9 +186,6 @@ class Sighting(models.Model):
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs={'id': self.id})
-
-    def distance(self):
-        return 0
 
     def sun_position(self):
         return self.station.sun_position(self.timestamp)

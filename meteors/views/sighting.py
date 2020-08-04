@@ -96,10 +96,10 @@ class ListByStationView(ListDateView):
 @method_decorator(login_required, name='dispatch')
 class DetailView(django.views.generic.detail.DetailView):
     model           = Sighting
-    queryset        = Sighting.objects.with_neighbours().with_frames().with_station().with_meteor().with_lightmax()
+    queryset        = Sighting.objects.with_neighbours().with_everything()
     slug_field      = 'id'
     slug_url_kwarg  = 'id'
-    template_name   = 'meteors/sighting.html'
+    template_name   = 'meteors/sighting/main.html'
 
     def get_object(self):
         sighting = super().get_object()
