@@ -63,20 +63,19 @@ def speed(value: float):
 
 @register.filter
 @graceful
-def magnitude(mag):
-    return mark_safe(f"{mag:+.2f}<sup>m</sup>")
+def magnitude(value: float):
+    return mark_safe(f"{value:+.2f}<sup>m</sup>")
 
 
 @register.filter
 @graceful
-@empty_on_error(ValueError)
-def angle(ang):
-    return mark_safe(f"{ang:.2f}°")
+def angle(value: float):
+    return mark_safe(f"{value:.2f}°")
 
 
 @register.filter
 @graceful
-def solar_longitude(timestamp):
+def solar_longitude(timestamp: datetime.datetime):
     n = Time(timestamp).jd - 2451545.0
     l = (280.460 + 0.9856474 * n) % 360
     g = math.radians(357.528 + 0.9856003 * n) % 360

@@ -32,6 +32,6 @@ def empty_on_error(*exceptions):
 def graceful(function):
     @functools.wraps(function)
     def wrapper(arg):
-        return mdash(empty_on_error(TypeError, ValueError))(arg)
+        return mdash(empty_on_error(TypeError, ValueError)(function))(arg)
 
     return wrapper
