@@ -34,8 +34,8 @@ class HeartbeatManager(models.Manager):
 
 
 class HeartbeatQuerySet(models.QuerySet):
-    def for_station(self, station_id, *, count=10):
-        return self.filter(station__id=station_id)[:count]
+    def for_station(self, station_code, *, count=10):
+        return self.filter(station__code=station_code)[:count]
 
     def with_age(self):
         return self.annotate(
