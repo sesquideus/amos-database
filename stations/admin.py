@@ -49,7 +49,7 @@ class StationAdmin(admin.ModelAdmin):
 
 @admin.register(LogEntry)
 class LogEntryAdmin(admin.ModelAdmin):
-    list_display = ['created', 'author', 'text']
+    list_display = ['created', 'station', 'date', 'author', 'text']
     readonly_fields = ['created', 'updated']
 
 

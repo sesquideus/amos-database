@@ -1,6 +1,8 @@
 import functools
 import django
 
+from django.utils.safestring import mark_safe
+
 register = django.template.Library()
 
 

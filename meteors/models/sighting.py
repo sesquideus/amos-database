@@ -30,14 +30,14 @@ class SightingManager(models.Manager):
         Currently a mockup!!! Does not calculate anything, generates numbers randomly to populate the rows.
     """
 
-    def create_for_meteor(self, meteor, station, **kwargs):
+    def create_for_meteor(self, meteor_id, station_code, **kwargs):
         log.info(f"Creating a sighting for meteor {meteor}, station {station}")
 
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
             timestamp           = meteor.timestamp,
-            meteor              = meteor,
-            station             = Station.objects.get(code=station),
+            meteor              = meteor_id,
+            station             = Station.objects.get(code=station_code),
         )
 
         time = meteor.timestamp
@@ -67,8 +67,8 @@ class SightingManager(models.Manager):
         Create a new Sighting from data received at the POST endpoint.
     """
     def create_from_POST(self, station_code, **kwargs):
-        log.info(f"Creating a sighting from POST at station {station_code}")
-        #pp(kwargs)
+        frames = kwargs.get('frames')
+        log.info(f"Creating a sighting from POST at station {station_code} ({len(frames)})")
 
         Station = apps.get_model('stations', 'Station')
         sighting = self.create(
@@ -77,13 +77,13 @@ class SightingManager(models.Manager):
             station             = Station.objects.get(code = station_code),
         )
 
-        for order, frame in enumerate(kwargs.get('frames')):
+        for order, frame in enumerate(frames):
             Frame.objects.create(
                 timestamp       = datetime.datetime.strptime(frame.get('timestamp'), '%Y-%m-%d %H:%M:%S.%f%z'),
                 sighting        = sighting,
                 order           = order,
-                x               = 0,
-                y               = 0,
+                x               = frame.get('x'),
+                y               = frame.get('y'),
                 altitude        = frame.get('altitude'),
                 azimuth         = frame.get('azimuth'),
                 magnitude       = frame.get('magnitude'),

@@ -17,41 +17,45 @@ from django.views.decorators.csrf import csrf_exempt
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
 
-from stations.models import Station, Subnetwork, Heartbeat
+from stations.models import Station, Subnetwork, Heartbeat, LogEntry
 from meteors.models import Sighting
 from core.views import JSONDetailView, JSONListView, LoginDetailView
 
 log = logging.getLogger(__name__)
 
 
-class SingleView(LoginDetailView):
+class DetailView(LoginDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
     template_name   = 'stations/station/main.html'
 
+    #def get_queryset(self):
+        #return self.model.objects.with_log_entries()
+
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
         station.recent_heartbeats = Heartbeat.objects.order_by('-timestamp').for_station(station.code)[:10]
         station.recent_sightings = Sighting.objects.order_by('-timestamp').for_station(station.code).with_lightmax().with_station()[:10]
+        station.log_entriess = LogEntry.objects.for_station(station.code)[:10]
         return station
 
 
-@method_decorator(login_required, name = 'dispatch')
-class SingleViewJSON(JSONDetailView):
+@method_decorator(login_required, name='dispatch')
+class DetailViewJSON(JSONDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
 
 
-@method_decorator(login_required, name = 'dispatch')
+@method_decorator(login_required, name='dispatch')
 class ListViewJSON(JSONListView):
     model               = Station
     context_object_name = 'stations'
 
 
 #@method_decorator(login_required, name = 'dispatch')
-@method_decorator(csrf_exempt, name = 'dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class APIViewHeartbeat(View):
     def get(self, request):
         return django.http.JsonResponse({'ok': 'OK'})

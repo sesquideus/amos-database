@@ -12,7 +12,7 @@
     <tbody>
         {% for entry in station.log_entries.all|slice:":10" %}
             <tr>
-                <td class="data c timestamp">{{ entry.created|date:"Y-m-d H:i:s" }}</td>
+                <td class="data c timestamp">{{ entry.date|date:"Y-m-d" }}</td>
                 <td class="data name">{{ entry.author|default_if_none:"&mdash;" }}</td>
                 <td class="data text">{{ entry.text }}</td>
             </tr>
