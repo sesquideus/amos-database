@@ -1,0 +1,29 @@
+{% load static %}
+
+<div class="controls">
+    {% with previous=meteor.get_previous_by_timestamp next=meteor.get_next_by_timestamp %}
+        {% if previous %}
+            <a href="{% url 'meteor' name=previous.name %}">
+                <img src="{% static "pictures/previous.png" %}" alt="Previous" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first meteor" />
+        {% endif %}
+
+        <a href="{% url 'admin:meteors_meteor_change' meteor.id %}">
+            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
+        </a>
+
+        <a href="{% url 'meteor-KML' name=meteor.name %}" target="_blank">
+            <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
+        </a>
+
+        {% if next %}
+            <a href="{% url 'meteor' name=next.name %}">
+                <img src="{% static "pictures/next.png" %}" alt="Next" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last meteor" />
+        {% endif %}
+    {% endwith %}
+</div>

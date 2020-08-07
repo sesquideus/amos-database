@@ -8,7 +8,9 @@
 {% endblock headextra %}
 
 {% block pagetitle %}
-    {% include 'meteors/controls.html' %}
+    <h2>Meteor <span class="name">{{ meteor.name }}</span> (<span class="subnetwork">{{ meteor.subnetwork }}</span>)</h2>
+
+    {% include 'meteors/meteor/controls.html' %}
 {% endblock pagetitle %}
 
 {% block page %}

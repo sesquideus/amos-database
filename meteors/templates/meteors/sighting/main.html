@@ -2,34 +2,9 @@
 {% load tz static %}
 
 {% block pagetitle %}
-    <h2>Sighting {{ sighting.id }}</h2>
-    <div class="controls">
-        {% with previous=sighting.get_previous_by_timestamp next=sighting.get_next_by_timestamp %}
-            {% if previous %}
-                <a href="{% url 'sighting' id=previous.id %}">
-                    <img src="{% static "pictures/previous.png" %}" alt="Previous" />
-                </a>
-            {% else %}
-                <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first sighting" />
-            {% endif %}
+    <h2>Sighting <span class="name">{{ sighting.id }}</span></h2>
 
-            <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
-                <img src="{% static "pictures/edit.png" %}" alt="Edit" />
-            </a>
-
-            <a href="{% url 'sighting' id=sighting.id %}" target="_blank">
-                <img class="icon" src="{% static "pictures/icon-kml.png" %}" alt="View KML" />
-            </a>
-
-            {% if next %}
-                <a href="{% url 'sighting' id=next.id %}">
-                    <img src="{% static "pictures/next.png" %}" alt="Next" />
-                </a>
-            {% else %}
-                <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
-            {% endif %}
-        {% endwith %}
-    </div>
+    {% include 'meteors/sighting/controls.html' %}
 {% endblock pagetitle %}
 
 {% block page %}
@@ -48,13 +23,6 @@
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
             observed from <a class="object-link station" href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
-            by <span id="observer-name">
-                {% if sighting.observer is None %}
-                    <span class="unknown">unknown observer</span>
-                {% else %}
-                    {{ sighting.observer.name }}
-                {% endif %}
-            </span>
             at <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
         </p>
     </div>

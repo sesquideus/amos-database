@@ -35,8 +35,8 @@ def about(request):
 
 
 class LoginDetailView(LoginRequiredMixin, DetailView):
-    login_url = '/login/'
+    pass
 
 
 class LoginListView(LoginRequiredMixin, ListView):
-    login_url = '/login/'
+    pass

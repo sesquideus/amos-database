@@ -1,0 +1,26 @@
+{% load static %}
+
+<div class="controls">
+    {% with previous=sighting.get_previous_by_timestamp next=sighting.get_next_by_timestamp %}
+        {% if previous %}
+            <a href="{% url 'sighting' id=previous.id %}">
+                <img src="{% static "pictures/previous.png" %}" alt="Previous" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first sighting" />
+        {% endif %}
+
+        <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
+            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
+        </a>
+
+        {% if next %}
+            <a href="{% url 'sighting' id=next.id %}">
+                <img src="{% static "pictures/next.png" %}" alt="Next" />
+            </a>
+        {% else %}
+            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
+        {% endif %}
+    {% endwith %}
+</div>
+
