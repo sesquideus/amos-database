@@ -3,6 +3,7 @@ import pytz
 
 from django.utils.dateparse import parse_date
 
+
 class DateParser():
     def __init__(self, request):
         self.date       = parse_date(request.GET.get('date', datetime.date.today().isoformat()))
