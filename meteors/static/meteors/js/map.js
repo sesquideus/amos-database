@@ -2,7 +2,8 @@ createLayer = function(colour) {
     return new ol.layer.Vector({
         style: new ol.style.Style({
             image: new ol.style.Circle({
-                radius: 6,
+                radius: 4,
+                opacity: 0.6,
                 fill: new ol.style.Fill({color: colour}),
             }),
         }),
@@ -12,21 +13,25 @@ createLayer = function(colour) {
 createMeteorLayer = function(meteors) {
     var layer = createLayer('red');
     var source = new ol.source.Vector();
-    console.log("Adding meteor data");
+    console.log("Adding meteor data for all");
 
     for (var m in meteors) {
         meteor = meteors[m];
-        console.log(meteor);
-        source.addFeature(
-            new ol.Feature({
-                geometry: new ol.geom.Point(ol.proj.transform([meteor.longitude, meteor.latitude], 'EPSG:4326', 'EPSG:3857')),
-                style: new ol.style.Style({
-                    image: new ol.style.Circle({
-                        radius: 5 - (meteor.magnitude / 5),
+
+        for (var s in meteor.snapshots) {
+            snapshot = meteor.snapshots[s];
+            console.log(snapshot);
+            source.addFeature(
+                new ol.Feature({
+                    geometry: new ol.geom.Point(ol.proj.transform([snapshot.longitude, snapshot.latitude], 'EPSG:4326', 'EPSG:3857')),
+                    style: new ol.style.Style({
+                        image: new ol.style.Circle({
+                            radius: Math.exp(3 - (snapshot.magnitude / 5)),
+                        }),
                     }),
-                }),
-            })
-        );
+                })
+            );
+        }
     }
 
     layer.setSource(source);

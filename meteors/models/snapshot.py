@@ -111,3 +111,11 @@ class Snapshot(models.Model):
 
     def __str__(self):
         return f"Meteor {self.meteor}, snapshot {self.order}"
+
+    def as_dict(self):
+        return {
+            'latitude': self.latitude,
+            'longitude': self.longitude,
+            'altitude': self.altitude,
+            'magnitude': self.magnitude,
+        }

@@ -4,7 +4,7 @@ from celery import Celery
 from django.conf import settings
 
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'amos.settings')
-app = Celery('amos', broker = "amqp://localhost/")
+app = Celery('amos', broker="amqp://localhost/")
 
-app.config_from_object('django.conf:settings', namespace = 'CELERY')
+app.config_from_object('django.conf:settings', namespace='CELERY')
 app.autodiscover_tasks()

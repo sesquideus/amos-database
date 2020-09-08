@@ -38,5 +38,9 @@ class MeteorAdmin(admin.ModelAdmin):
         return obj.sightings.count()
     sighting_count.short_description = 'sighting count'
 
-    list_display = ['name', 'timestamp', 'subnetwork', 'sighting_count']
+    def snapshot_count(self, obj):
+        return obj.snapshots.count()
+    snapshot_count.short_description = 'snapshot count'
+
+    list_display = ['name', 'timestamp', 'subnetwork', 'sighting_count', 'snapshot_count']
     save_as = True

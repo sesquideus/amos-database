@@ -108,7 +108,6 @@ TEMPLATES = [
                 'core.templatetags.styles',
             ],
             'debug': DEBUG,
-#            'string_if_invalid': '<<%s>>',
         },
     },
 ]
@@ -153,6 +152,9 @@ AUTH_PASSWORD_VALIDATORS = [
 
 # Internationalization
 # https://docs.djangoproject.com/en/2.1/topics/i18n/
+
+SESSION_COOKIE_SECURE = True
+CSRF_COOKIE_SECURE = True
 
 LANGUAGE_CODE = 'en-us'
 

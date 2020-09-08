@@ -10,6 +10,7 @@ class StationInline(admin.TabularInline):
 
 class LogEntryInline(admin.TabularInline):
     model = LogEntry
+    extra = 1
     formfield_overrides = {
         models.TextField: {
             'widget': Textarea(attrs = {

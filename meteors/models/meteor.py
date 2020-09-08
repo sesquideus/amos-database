@@ -140,4 +140,7 @@ class Meteor(models.Model):
     def as_dict(self):
         return {
             'id': self.id,
+            'snapshots': [
+                snapshot.as_dict() for snapshot in self.snapshots.all()
+            ],
         }
