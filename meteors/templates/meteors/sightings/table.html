@@ -35,7 +35,7 @@
             <td class="r">
                 {% for frame in sighting.frames.all %}<a
                     href="{{ frame.get_absolute_url }}"
-                    style="color: hsl(0, 0%, {{ frame.magnitude|add:-10|multiply:-5 }}%); transform: scale({{frame.magnitude }});">&#9899;</a>{% endfor %}
+                    style="color: hsl(0, 0%, {{ frame.magnitude|add:-10|multiply:-5 }}%); transform: scale({{frame.magnitude }});">&#11044;</a>{% endfor %}
             </td>
             <td class="data magnitude">
                 {{ sighting.magnitude|magnitude }}

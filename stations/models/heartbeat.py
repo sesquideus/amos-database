@@ -2,6 +2,7 @@ import textwrap
 import datetime
 import pytz
 from django.db import models
+from django.db.models import F
 from django.apps import apps
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist

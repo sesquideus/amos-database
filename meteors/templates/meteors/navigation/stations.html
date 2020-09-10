@@ -3,7 +3,7 @@
         {% if subnetwork.stations.all and not forloop.first %}|{% endif %}
         {% for station in subnetwork.stations.all %}
             <div class="subnetwork">
-                <a href="{% url 'list-sightings-by-station' station.code %}">{{ station.code }}</a>
+                <a href="{% url 'list-sightings-by-station' station.code %}?date={{ date }}">{{ station.code }}</a>
             </div>
         {% endfor %}
     {% endfor %}

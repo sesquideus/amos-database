@@ -195,9 +195,9 @@ class Station(core.models.NamedModel):
 
     def get_current_status(self):
         try:
-            last_heartbeat = self.heartbeats.latest()
+            last_heartbeat = self.last_heartbeat[0]
             time_since = (datetime.datetime.now(pytz.utc) - last_heartbeat.timestamp).total_seconds()
-        except ObjectDoesNotExist:
+        except IndexError:
             return StatusEmpty()
 
         if not self.on:

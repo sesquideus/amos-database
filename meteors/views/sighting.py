@@ -104,6 +104,7 @@ class DetailView(django.views.generic.detail.DetailView):
     def get_object(self):
         sighting = super().get_object()
         frames = sighting.frames
+
         if frames.count() == 0:
             sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = None, None, None
         else:

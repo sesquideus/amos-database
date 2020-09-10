@@ -57,7 +57,8 @@ class ListDateView(GenericListView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
-            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors')}?date={form.cleaned_data['date'].strftime('%Y-%m-%d')}")
+            date = form.cleaned_data['date'].strftime('%Y-%m-%d')
+            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors')}?date={date}")
         else:
             return django.http.HttpResponseBadRequest()
 

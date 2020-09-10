@@ -6,7 +6,9 @@
 {% endblock pagetitle %}
 
 {% block page %}
-    It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %}, &#955;<sub>&#9737;</sub> = {{ now|solar_longitude|angle }})
+    <p>
+        It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %}, &#955;<sub>&#9737;</sub> = {{ now|solar_longitude|angle }})
+    </p>
 
     <table class="full-width alternating">
         <thead>
@@ -25,7 +27,7 @@
             {% for station in subnetwork.stations_full %}
                 <tr>
                     {% if forloop.first %}
-                        <th class="subgroup" rowspan="{{ subnetwork.stations.count }}">
+                        <th class="subgroup" rowspan="{{ subnetwork.station_count }}">
                             <a href="{{ subnetwork.get_absolute_url }}">{{ subnetwork.name }} ({{ subnetwork.code }})</a>
                         </th>
                     {% endif %}
@@ -44,7 +46,7 @@
                             </abbr>
                         </td>
                         <td class="status">
-                            {% if station.last_heartbeat.0 %}
+                            {% if heartbeat %}
                                 <a href="{{ heartbeat.get_absolute_url }}">
                                     {{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}
                                 </a>
@@ -71,14 +73,14 @@
                         </td>
 
                         <td class="time">
-                            {% if station.last_sighting.0 %}
+                            {% if last_sighting %}
                                 <a href="{{ last_sighting.get_absolute_url }}">{{ last_sighting.timestamp|date:"Y-m-d H:i:s" }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
                         <td class="time">
-                            {% if station.last_sighting.0 %}
+                            {% if last_sighting %}
                                 {{ last_sighting.timestamp|since_date_time }}
                             {% else %}
                                 <span class="empty">never</span>

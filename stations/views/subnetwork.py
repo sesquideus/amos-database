@@ -1,17 +1,12 @@
 import datetime
 import pytz
 
-from django.utils.decorators import method_decorator
-from django.contrib.auth.decorators import login_required
-
-from django.views.generic.detail import DetailView
-from django.views.generic.list import ListView
+from core.views import LoginDetailView, LoginListView
 
 from stations.models import Subnetwork
 
 
-@method_decorator(login_required, name='dispatch')
-class StatusView(ListView):
+class StatusView(LoginListView):
     model               = Subnetwork
     context_object_name = 'subnetworks'
     template_name       = 'stations/status.html'
@@ -25,8 +20,7 @@ class StatusView(ListView):
         return context
 
 
-@method_decorator(login_required, name='dispatch')
-class SingleView(DetailView):
+class SingleView(LoginDetailView):
     model           = Subnetwork
     slug_field      = 'code'
     slug_url_kwarg  = 'code'

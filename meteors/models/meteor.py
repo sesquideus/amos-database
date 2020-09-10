@@ -4,7 +4,7 @@ import pytz
 import numpy as np
 
 from django.db import models
-from django.db.models import Prefetch, Window, F, Q, Subquery, OuterRef, Min, Max
+from django.db.models import Prefetch, Window, F, Q, Subquery, OuterRef, Min, Max, Count
 from django.db.models.functions import Lead, Sqrt
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -25,6 +25,8 @@ class MeteorQuerySet(models.QuerySet):
                 'sightings',
                 queryset=Sighting.objects.with_frames().with_station().with_lightmax().order_by('timestamp'),
             )
+        ).annotate(
+            sighting_count=Count('sightings')
         )
 
     def with_snapshots(self):
@@ -33,6 +35,8 @@ class MeteorQuerySet(models.QuerySet):
                 'snapshots',
                 queryset=Snapshot.objects.all(),
             )
+        ).annotate(
+            snapshot_count=Count('snapshots')
         )
 
     def with_subnetwork(self):

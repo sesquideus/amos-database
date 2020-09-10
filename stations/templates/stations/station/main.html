@@ -20,8 +20,8 @@
     <div class="inner">
         <div class="info">
             <h3>Station info</h3>
-                <p>{{ station.address }}</p>
-                <p id="location">{{ station.location }}</p>
+                <p>Address: {{ station.address|default:"&mdash;" }}</p>
+                <p id="location">Location: {{ station.location|default:"&mdash;" }}</p>
                 <p id="localtime">Local time: <span class="b">{% timezone station.timezone %}{% now "Y-m-d H:i:s" %}{% endtimezone %}</span></p>
                 {% with status=station.current_status %}
                     <p id="status">{{ status.short }}</p>
