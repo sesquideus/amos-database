@@ -10,12 +10,13 @@
         It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %}, &#955;<sub>&#9737;</sub> = {{ now|solar_longitude|angle }})
     </p>
 
-    <table class="full-width alternating">
+    <table class="full-width">
         <thead>
             <tr>
                 <th>subnetwork</th>
                 <th>code</th>
                 <th>name</th>
+                <th>enabled</th>
                 <th colspan="2">status</th>
                 <th>local time</th>
                 <th colspan="2">&#x2600;</th>
@@ -40,6 +41,9 @@
                             <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
                         </td>
 
+                        <td class="status data">
+                            {% if station.on %}&#10003;{% else %}{% endif %}
+                        </td>
                         <td class="status data">
                             <abbr class="{{ status.code }}" title="{{ status.get_description }}">
                                 {{ status.short }}
@@ -100,6 +104,9 @@
                     <td colspan="10" class="data c empty">No stations are defined in this subnetwork.</td>
                 </tr>
             {% endfor %}
+            {% if not forloop.last %}
+                <tr><td colspan="12">&nbsp;</td></tr>
+            {% endif %}
         {% endfor %}
     </table>
 {% endblock page %}

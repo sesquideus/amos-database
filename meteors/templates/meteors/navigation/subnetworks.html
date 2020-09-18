@@ -1,5 +1,6 @@
 <div class="navigation">
     {% for subnetwork in subnetworks %}
-        <a href="{% url 'list-meteors-by-subnetwork' subnetwork.code %}">{{ subnetwork.name }}</a>
+        {% if not forloop.first %}|{% endif %}
+        <a href="{% url 'list-meteors-by-subnetwork' subnetwork.code %}?date={{ date }}">{{ subnetwork.name }}</a>
     {% endfor %}
 </div>

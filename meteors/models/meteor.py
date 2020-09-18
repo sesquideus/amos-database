@@ -26,7 +26,7 @@ class MeteorQuerySet(models.QuerySet):
                 queryset=Sighting.objects.with_frames().with_station().with_lightmax().order_by('timestamp'),
             )
         ).annotate(
-            sighting_count=Count('sightings')
+            sighting_count=Count('sightings', distinct=True)
         )
 
     def with_snapshots(self):
@@ -36,7 +36,7 @@ class MeteorQuerySet(models.QuerySet):
                 queryset=Snapshot.objects.all(),
             )
         ).annotate(
-            snapshot_count=Count('snapshots')
+            snapshot_count=Count('snapshots', distinct=True)
         )
 
     def with_subnetwork(self):
@@ -93,7 +93,7 @@ class MeteorQuerySet(models.QuerySet):
         return self.filter(subnetwork__code=subnetwork_code)
 
     def with_everything(self):
-        return self.with_sightings().with_subnetwork().with_snapshots().with_lightmax()
+        return self.with_subnetwork().with_sightings().with_snapshots().with_lightmax()
 
 
 class Meteor(models.Model):
@@ -117,7 +117,7 @@ class Meteor(models.Model):
                                     )
     timestamp                       = models.DateTimeField(
                                         verbose_name        = "timestamp",
-                                        auto_now_add        = True,
+                                        default             = datetime.datetime.utcnow,
                                     )
 
     source                          = models.ForeignKey(

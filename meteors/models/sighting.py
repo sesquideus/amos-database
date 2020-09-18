@@ -130,6 +130,9 @@ class SightingQuerySet(models.QuerySet):
     def with_everything(self):
         return self.with_station().with_meteor().with_frames().with_lightmax()
 
+    def for_meteor(self, meteor_name):
+        return self.filter(meteor__name=meteor_name)
+
     def for_station(self, station_code):
         return self.filter(station__code=station_code)
 

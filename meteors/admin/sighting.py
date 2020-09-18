@@ -45,6 +45,9 @@ class SightingInline(admin.TabularInline):
 
 @admin.register(Sighting)
 class SightingAdmin(admin.ModelAdmin):
+    def get_queryset(self, request):
+        return super().get_queryset(request).prefetch_related('meteor', 'station')
+
     def meteor_link(self, sighting):
         if sighting.meteor is None:
             return mark_safe("&mdash;")
@@ -87,7 +90,6 @@ class SightingAdmin(admin.ModelAdmin):
             }
         ),
     )
-#    readonly_fields = ['lightmaxMagnitude']
 
     list_display = ['timestamp', 'meteor_link', 'station_link']
     list_filter = ['station']

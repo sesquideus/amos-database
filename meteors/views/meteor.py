@@ -57,8 +57,9 @@ class ListDateView(GenericListView):
     def post(self, request):
         form = DateForm(request.POST)
         if form.is_valid():
+            url = django.urls.reverse('list-meteors')
             date = form.cleaned_data['date'].strftime('%Y-%m-%d')
-            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors')}?date={date}")
+            return django.http.HttpResponseRedirect(f"{url}?date={date}")
         else:
             return django.http.HttpResponseBadRequest()
 
@@ -73,17 +74,28 @@ class ListBySubnetworkView(ListDateView):
     template_name = 'meteors/list-meteors-subnetwork.html'
 
     def get_queryset(self):
-        return super().get_queryset().for_subnetwork(self.kwargs['subnetwork_code'])
+        if self.request.GET.get('date'):
+            self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
+        else:
+            self.date = datetime.date.today()
+        return self.queryset.for_night(self.date)
 
     def get_context_data(self):
         context = super().get_context_data()
-        context['subnetwork'] = Subnetwork.objects.get(code=self.kwargs['subnetwork_code'])
+        context.update({
+            'date': self.date,
+            'form': DateForm(initial={'date': self.date}),
+            'subnetwork': Subnetwork.objects.get(code=self.kwargs['subnetwork_code']),
+            'navigation': django.urls.reverse('list-meteors'),
+        })
         return context
 
-    def post(self, request):
+    def post(self, request, subnetwork_code):
         form = DateForm(request.POST)
         if form.is_valid():
-            return django.http.HttpResponseRedirect(f"{django.urls.reverse('list-meteors-by-subnetwork')}?date={form.cleaned_data['datetime'].strftime('%Y-%m-%d')}")
+            url = django.urls.reverse('list-meteors-by-subnetwork', kwargs={'subnetwork_code': subnetwork_code})
+            date = form.cleaned_data['date'].strftime('%Y-%m-%d')
+            return django.http.HttpResponseRedirect(f"{url}?date={date}")
         else:
             return django.http.HttpResponseBadRequest()
 

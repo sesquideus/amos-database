@@ -27,6 +27,7 @@ class MeteorAdmin(admin.ModelAdmin):
                 'fields': (
                     ('name',),
                     ('subnetwork',),
+                    ('timestamp',),
                 ),
             },
         ),
@@ -34,12 +35,15 @@ class MeteorAdmin(admin.ModelAdmin):
     inlines = [SightingInline, SnapshotInline]
     date_hierarchy = 'timestamp'
 
+    def get_queryset(self, request):
+        return super().get_queryset(request).with_sightings().with_snapshots().with_subnetwork()
+
     def sighting_count(self, obj):
-        return obj.sightings.count()
+        return obj.sighting_count
     sighting_count.short_description = 'sighting count'
 
     def snapshot_count(self, obj):
-        return obj.snapshots.count()
+        return obj.snapshot_count
     snapshot_count.short_description = 'snapshot count'
 
     list_display = ['name', 'timestamp', 'subnetwork', 'sighting_count', 'snapshot_count']

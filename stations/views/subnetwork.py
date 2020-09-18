@@ -2,10 +2,13 @@ import datetime
 import pytz
 
 from core.views import LoginDetailView, LoginListView
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 
 from stations.models import Subnetwork
 
 
+@method_decorator(cache_page(5), name='dispatch')
 class StatusView(LoginListView):
     model               = Subnetwork
     context_object_name = 'subnetworks'
