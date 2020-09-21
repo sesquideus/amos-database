@@ -30,14 +30,14 @@ class DetailView(LoginDetailView):
     slug_url_kwarg  = 'code'
     template_name   = 'stations/station/main.html'
 
-    #def get_queryset(self):
-        #return self.model.objects.with_log_entries()
+    def get_queryset(self, **kwargs):
+        return self.model.objects.with_last_heartbeat().with_last_sighting().with_log_entries()
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
         station.recent_heartbeats = Heartbeat.objects.order_by('-timestamp').for_station(station.code)[:10]
         station.recent_sightings = Sighting.objects.order_by('-timestamp').for_station(station.code).with_lightmax().with_station()[:10]
-        station.log_entriess = LogEntry.objects.for_station(station.code)[:10]
+#        station.log_entries = LogEntry.objects.for_station(station.code)
         return station
 
 
@@ -62,8 +62,8 @@ class APIViewHeartbeat(View):
 
     def post(self, request, code):
         log.info(f"Incoming heartbeat for station {code}")
-        #pp(request.headers)
-        #pp(request.body)
+        pp(request.headers)
+        pp(request.body)
 
         try:
             data = json.loads(request.body)
@@ -71,8 +71,8 @@ class APIViewHeartbeat(View):
             report = Heartbeat.objects.create_from_POST(code, **data)
             report.save()
 
-            response = HttpResponse('Heartbeat received', status = 201)
-        #response['location'] = reverse('station-receive-heartbeat', args = [report.id])
+            response = HttpResponse('Heartbeat received', status=201)
+        #response['location'] = reverse('station-receive-heartbeat', args=[report.id])
             return response
 
         except json.JSONDecodeError:
@@ -83,7 +83,7 @@ class APIViewHeartbeat(View):
             return HttpResponseBadRequest()
 
 
-@method_decorator(csrf_exempt, name = 'dispatch')
+@method_decorator(csrf_exempt, name='dispatch')
 class APIViewSighting(View):
     def post(self, request, code):
         log.info(f"Incoming new sighting from station {code}")
@@ -95,8 +95,8 @@ class APIViewSighting(View):
 
             sighting = Sighting.objects.create_from_POST(code, **data)
 
-            response = HttpResponse('New sighting received', status = 201)
-            response['location'] = reverse('sighting', args = [sighting.id])
+            response = HttpResponse('New sighting received', status=201)
+            response['location'] = reverse('sighting', args=[sighting.id])
             return response
 
         except json.JSONDecodeError:

@@ -37,8 +37,8 @@ class StationQuerySet(models.QuerySet):
             )
         )
 
-    def with_log_entries(self, count=12):
-        return self.prefetch_related('log_entries')[:count]
+    def with_log_entries(self):
+        return self.prefetch_related('log_entries')
 
 
 class Station(core.models.NamedModel):
@@ -197,7 +197,7 @@ class Station(core.models.NamedModel):
         try:
             last_heartbeat = self.last_heartbeat[0]
             time_since = (datetime.datetime.now(pytz.utc) - last_heartbeat.timestamp).total_seconds()
-        except IndexError:
+        except (IndexError, AttributeError):
             return StatusEmpty()
 
         if not self.on:
