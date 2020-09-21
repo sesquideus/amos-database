@@ -43,7 +43,7 @@ class ListDateView(GenericListView):
             self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
         else:
             self.date = datetime.date.today()
-        return self.queryset.for_night(self.date)
+        return self.queryset.for_date(self.date)
 
     def get_context_data(self):
         context = super().get_context_data()
@@ -78,7 +78,7 @@ class ListBySubnetworkView(ListDateView):
             self.date = datetime.datetime.strptime(self.request.GET['date'], '%Y-%m-%d').date()
         else:
             self.date = datetime.date.today()
-        return self.queryset.for_night(self.date)
+        return self.queryset.for_date(self.date)
 
     def get_context_data(self):
         context = super().get_context_data()

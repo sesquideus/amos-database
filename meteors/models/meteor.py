@@ -81,13 +81,13 @@ class MeteorQuerySet(models.QuerySet):
             ),
         )
 
+    def for_date(self, date):
+        return self.filter(timestamp__date=date)
+
     def for_night(self, date):
         midnight = datetime.datetime.combine(date, datetime.datetime.min.time()).replace(tzinfo=pytz.UTC)
         half_day = datetime.timedelta(hours=12)
-        return self.filter(
-            timestamp__gte=(midnight - half_day),
-            timestamp__lte=(midnight + half_day),
-        )
+        return self.filter(timestamp__range=(midnight - half_day, midnight + half_day))
 
     def for_subnetwork(self, subnetwork_code):
         return self.filter(subnetwork__code=subnetwork_code)
