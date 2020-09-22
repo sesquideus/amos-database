@@ -58,3 +58,6 @@ class LogEntryAdmin(admin.ModelAdmin):
 class HeartbeatAdmin(admin.ModelAdmin):
     list_filter = ['station', 'timestamp']
     readonly_fields = ['timestamp', 'received']
+
+    def get_queryset(self, request):
+        return super().get_queryset(request).with_station()

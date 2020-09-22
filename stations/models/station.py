@@ -40,6 +40,9 @@ class StationQuerySet(models.QuerySet):
     def with_log_entries(self):
         return self.prefetch_related('log_entries')
 
+    def with_subnetwork(self):
+        return self.select_related('subnetwork')
+
 
 class Station(core.models.NamedModel):
     class Meta:
@@ -128,10 +131,7 @@ class Station(core.models.NamedModel):
                                     )
 
     def __str__(self):
-        return "{name} ({subnetwork})".format(
-            name        = self.name,
-            subnetwork  = self.subnetwork,
-        )
+        return f"{self.name} ({self.subnetwork.name})"
 
     def get_absolute_url(self):
         return reverse('station', kwargs = {'code': self.code})
