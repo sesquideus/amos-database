@@ -71,7 +71,7 @@ class APIViewHeartbeat(View):
             report = Heartbeat.objects.create_from_POST(code, **data)
             report.save()
 
-            response = HttpResponse('Heartbeat received', status=201)
+            response = HttpResponse(f"Heartbeat received at {datetime.datetime.utcnow()}", status=201)
         #response['location'] = reverse('station-receive-heartbeat', args=[report.id])
             return response
 
