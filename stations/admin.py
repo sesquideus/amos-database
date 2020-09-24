@@ -36,7 +36,7 @@ class SubnetworkAdmin(admin.ModelAdmin):
 class StationAdmin(admin.ModelAdmin):
     fieldsets = (
         ('Properties', {
-            'fields': ('name', 'code', 'subnetwork', 'address', 'country', 'on'),
+            'fields': ('name', 'code', 'subnetwork', 'address', 'country', 'founded', 'on'),
         }),
         ('Geographics coordinates', {
             'fields': ('latitude', 'longitude', 'altitude', 'timezone'),
