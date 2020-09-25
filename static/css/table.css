@@ -138,3 +138,10 @@ td abbr.none {
     color: hsl(0, 0%, 60%);
 }
 
+span.enabled {
+    color: hsl(120, 100%, 40%);
+}
+
+span.disabled {
+    color: hsl(0, 100%, 50%);
+}

@@ -142,7 +142,7 @@ class Heartbeat(models.Model):
                                     )
 
     def __str__(self):
-        return f"[{self.timestamp}] {self.station.code} {self.get_status_display()}"
+        return f"[{self.timestamp}] {self.station.code} {self.get_status_display()} {self.get_lid_display()} {self.get_heating_display()}"
 
     def get_absolute_url(self):
         return reverse('heartbeat', kwargs={'code': self.station.code, 'id': self.id})
