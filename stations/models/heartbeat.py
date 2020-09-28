@@ -78,11 +78,13 @@ class Heartbeat(models.Model):
     LID_CLOSED = 'C'
     LID_PROBLEM = 'P'
     LID_UNKNOWN = 'U'
+    LID_SAFETY = 'S'
     LID_STATES                      = [
                                         (LID_OPEN, 'open'),
                                         (LID_CLOSED, 'closed'),
                                         (LID_PROBLEM, 'problem'),
                                         (LID_UNKNOWN, 'unknown'),
+                                        (LID_SAFETY, 'safety'),
                                     ]
 
     HEATING_OFF = '0'
@@ -93,6 +95,10 @@ class Heartbeat(models.Model):
                                         (HEATING_ON, 'on'),
                                         (HEATING_PROBLEM, 'problem'),
                                     ]
+
+    II_OFF = '0'
+    II_ON = '1'
+
 
     objects                         = HeartbeatManager.from_queryset(HeartbeatQuerySet)()
 
@@ -128,6 +134,8 @@ class Heartbeat(models.Model):
                                         null                = True,
                                         blank               = True,
                                     )
+
+    # Environmental data
     temperature                     = models.FloatField(
                                         null                = True,
                                         blank               = True,
@@ -141,8 +149,15 @@ class Heartbeat(models.Model):
                                         blank               = True,
                                     )
 
+    # Management
+    automatic                       = models.BooleanField(
+                                        null                = False,
+                                        blank               = False,
+                                        default             = False,
+                                    )
+
     def __str__(self):
-        return f"[{self.timestamp}] {self.station.code} {self.get_status_display()} {self.get_lid_display()} {self.get_heating_display()}"
+        return f"[{self.timestamp}] {self.station.code} (status {self.get_status_display()}, lid {self.get_lid_display()}, heating {self.get_heating_display()})"
 
     def get_absolute_url(self):
         return reverse('heartbeat', kwargs={'code': self.station.code, 'id': self.id})

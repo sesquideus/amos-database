@@ -17,7 +17,7 @@ class ProfileAdmin(UserAdmin):
 
     @short_description('Location')
     def getLocation(self, instance):
-        return instance.profile.formatLocation()
+        return instance.profile.format_location()
         
     def get_inline_instances(self, request, obj = None):
         if not obj:
