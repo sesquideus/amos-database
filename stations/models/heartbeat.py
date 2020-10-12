@@ -22,14 +22,19 @@ class HeartbeatManager(models.Manager):
     def create_from_POST(self, code, **kwargs):
         Station = apps.get_model('stations', 'Station')
         heartbeat = self.create(
-            timestamp       = kwargs.get('timestamp'),
+            automatic       = kwargs.get('auto', None),
+            timestamp       = kwargs.get('time'),
             station         = Station.objects.get(code=code),
-            status          = kwargs.get('status', None),
-            lid             = kwargs.get('lid', None),
+            cover           = kwargs.get('cs', None),
+            cover_position  = kwargs.get('cp', None),
             heating         = kwargs.get('heating', None),
             temperature     = kwargs.get('temperature', None),
             pressure        = kwargs.get('pressure', None),
             humidity        = kwargs.get('humidity', None),
+            storage_primary_available   = kwargs['disk']['prim']['a'],
+            storage_primary_total       = kwargs['disk']['prim']['t'],
+            storage_permanent_available = kwargs['disk']['perm']['a'],
+            storage_permanent_total     = kwargs['disk']['perm']['t'],
         )
         return heartbeat
 
@@ -74,30 +79,31 @@ class Heartbeat(models.Model):
                                         (STATE_UNKNOWN, 'unknown'),
                                     ]
 
-    LID_OPEN = 'O'
-    LID_CLOSED = 'C'
-    LID_PROBLEM = 'P'
-    LID_UNKNOWN = 'U'
-    LID_SAFETY = 'S'
-    LID_STATES                      = [
-                                        (LID_OPEN, 'open'),
-                                        (LID_CLOSED, 'closed'),
-                                        (LID_PROBLEM, 'problem'),
-                                        (LID_UNKNOWN, 'unknown'),
-                                        (LID_SAFETY, 'safety'),
+    COVER_OPEN = 'O'
+    COVER_CLOSED = 'C'
+    COVER_PROBLEM = 'P'
+    COVER_UNKNOWN = 'U'
+    COVER_SAFETY = 'S'
+    COVER_STATES                    = [
+                                        (COVER_OPEN, 'open'),
+                                        (COVER_CLOSED, 'closed'),
+                                        (COVER_PROBLEM, 'problem'),
+                                        (COVER_UNKNOWN, 'unknown'),
+                                        (COVER_SAFETY, 'safety'),
                                     ]
 
     HEATING_OFF = '0'
     HEATING_ON = '1'
-    HEATING_PROBLEM = 'P'
+    HEATING_UNKNOWN = '?'
     HEATING_STATES                  = [
                                         (HEATING_OFF, 'off'),
                                         (HEATING_ON, 'on'),
-                                        (HEATING_PROBLEM, 'problem'),
+                                        (HEATING_UNKNOWN, 'unknown'),
                                     ]
 
     II_OFF = '0'
     II_ON = '1'
+    II_UNKNOWN = '?'
 
 
     objects                         = HeartbeatManager.from_queryset(HeartbeatQuerySet)()
@@ -122,9 +128,13 @@ class Heartbeat(models.Model):
                                         blank               = True,
                                         default             = STATE_UNKNOWN,
                                     )
-    lid                             = models.CharField(
+    cover_state                     = models.CharField(
                                         max_length          = 1,
-                                        choices             = LID_STATES,
+                                        choices             = COVER_STATES,
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    cover_position                  = models.PositiveSmallIntegerField(
                                         null                = True,
                                         blank               = True,
                                     )
@@ -135,19 +145,16 @@ class Heartbeat(models.Model):
                                         blank               = True,
                                     )
 
+    # Storage
+    storage_primary_available       = models.FloatField(null=True, blank=True)
+    storage_primary_total           = models.FloatField(null=True, blank=True)
+    storage_permanent_available     = models.FloatField(null=True, blank=True)
+    storage_permanent_total         = models.FloatField(null=True, blank=True)
+
     # Environmental data
-    temperature                     = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                    )
-    pressure                        = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                    )
-    humidity                        = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                    )
+    temperature                     = models.FloatField(null=True, blank=True)
+    pressure                        = models.FloatField(null=True, blank=True)
+    humidity                        = models.FloatField(null=True, blank=True)
 
     # Management
     automatic                       = models.BooleanField(
@@ -157,7 +164,7 @@ class Heartbeat(models.Model):
                                     )
 
     def __str__(self):
-        return f"[{self.timestamp}] {self.station.code} (status {self.get_status_display()}, lid {self.get_lid_display()}, heating {self.get_heating_display()})"
+        return f"[{self.station.code}] at {self.timestamp}: {self.automatic}"
 
     def get_absolute_url(self):
         return reverse('heartbeat', kwargs={'code': self.station.code, 'id': self.id})
