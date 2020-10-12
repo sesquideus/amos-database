@@ -25,7 +25,7 @@ class HeartbeatManager(models.Manager):
             automatic       = kwargs.get('auto', None),
             timestamp       = kwargs.get('time'),
             station         = Station.objects.get(code=code),
-            cover           = kwargs.get('cs', None),
+            cover_state     = kwargs.get('cs', None),
             cover_position  = kwargs.get('cp', None),
             heating         = kwargs.get('heating', None),
             temperature     = kwargs.get('temperature', None),
