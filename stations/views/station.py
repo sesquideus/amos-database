@@ -87,8 +87,6 @@ class APIViewHeartbeat(View):
 class APIViewSighting(View):
     def post(self, request, code):
         log.info(f"Incoming new sighting from station {code}")
-        #pp(request.headers)
-        #pp(request.body)
 
         try:
             data = json.loads(request.body)

@@ -1,6 +1,7 @@
 import textwrap
 import datetime
 import pytz
+import dotmap
 from django.db import models
 from django.db.models import F, Prefetch
 from django.apps import apps
@@ -21,16 +22,18 @@ class HeartbeatManager(models.Manager):
 
     def create_from_POST(self, code, **kwargs):
         Station = apps.get_model('stations', 'Station')
+
+        data = dotmap.DotMap(kwargs, _dynamic=False)
+
         heartbeat = self.create(
-            automatic       = kwargs.get('auto', None),
-            timestamp       = kwargs.get('time'),
+            automatic       = data.auto,
+            timestamp       = data.time,
             station         = Station.objects.get(code=code),
-            cover_state     = kwargs.get('cs', None),
-            cover_position  = kwargs.get('cp', None),
-            heating         = kwargs.get('heating', None),
-            temperature     = kwargs.get('temperature', None),
-            pressure        = kwargs.get('pressure', None),
-            humidity        = kwargs.get('humidity', None),
+            cover_position  = kwargs['dome']['z']['sp'],
+            temperature     = kwargs['dome']['t']['t_sht'],
+            t_lens          = kwargs['dome']['t']['t_lens'],
+            t_cpu           = kwargs['dome']['t']['t_cpu'],
+            humidity        = kwargs['dome']['t']['h_sht'],
             storage_primary_available   = kwargs['disk']['prim']['a'],
             storage_primary_total       = kwargs['disk']['prim']['t'],
             storage_permanent_available = kwargs['disk']['perm']['a'],
@@ -145,6 +148,10 @@ class Heartbeat(models.Model):
                                         blank               = True,
                                     )
 
+    servo_moving                    = models.BooleanField(null=True, blank=True)
+    servo_direction_opening         = models.BooleanField(null=True, blank=True)
+    lens_heating                    = models.BooleanField(null=True, blank=True)
+
     # Storage
     storage_primary_available       = models.FloatField(null=True, blank=True)
     storage_primary_total           = models.FloatField(null=True, blank=True)
@@ -153,7 +160,8 @@ class Heartbeat(models.Model):
 
     # Environmental data
     temperature                     = models.FloatField(null=True, blank=True)
-    pressure                        = models.FloatField(null=True, blank=True)
+    t_lens                          = models.FloatField(null=True, blank=True)
+    t_cpu                           = models.FloatField(null=True, blank=True)
     humidity                        = models.FloatField(null=True, blank=True)
 
     # Management
