@@ -77,7 +77,7 @@ class TemperatureGraphView(LoginDetailView):
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
         fig.set_size_inches(5.38, 1.5)
-        ax.plot(self.minutes, self.temperatures, marker='*')
+        ax.scatter(self.minutes, self.temperatures, marker='*')
         ax.invert_yaxis()
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
 

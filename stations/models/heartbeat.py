@@ -113,6 +113,8 @@ class HeartbeatQuerySet(models.QuerySet):
                 humidity=Avg('humidity'),
                 t_lens=Avg('t_lens'),
                 t_cpu=Avg('t_cpu'),
+            ).order_by(
+                'timestamp'
             )
 
 
