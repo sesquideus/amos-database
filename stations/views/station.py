@@ -78,9 +78,9 @@ class APIViewHeartbeat(View):
         except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
-        except Exception as e:
-            print(e)
-            return HttpResponseBadRequest()
+#        except Exception as e:
+#            print(e)
+#            return HttpResponseBadRequest()
 
 
 @method_decorator(csrf_exempt, name='dispatch')

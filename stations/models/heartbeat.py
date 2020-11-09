@@ -12,6 +12,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import core.models
 
 
+def explode_stateS(string):
+    return list(map(lambda x: x != '-', string))
+
+
 class HeartbeatManager(models.Manager):
     def get_queryset(self):
         return HeartbeatQuerySet(
@@ -20,24 +24,43 @@ class HeartbeatManager(models.Manager):
             hints=self._hints,
         )
 
-    def create_from_POST(self, code, **kwargs):
+    def create_from_POST(self, code, **data):
         Station = apps.get_model('stations', 'Station')
 
-        data = dotmap.DotMap(kwargs, _dynamic=False)
+        automatic = data['auto']
+        timestamp = data['time']
+        station = Station.objects.get(code=code)
+
+        # If state S is there, parse it, otherwise set everything to None
+        stateS = data['dome']['s']
+        servo_moving, servo_opening, dome_open, dome_closed, lens_heating, camera_heating, intensifier_active, fan_active, _, \
+        rain_sensor_active, light_sensor_active, computer_power, _, _, cover_safety_position, _, servo_blocked, _, \
+        error_t_lens, error_SHT31, emergency_closing_light, error_watchdog_reset, \
+        error_brownout_reset, error_computer_power, error_t_CPU, emergency_closing_rain = \
+            explode_stateS(stateS) if stateS else [None] * 26
+
+        # If state T is there, store values, otherwise set them to None
+        stateT = data['dome']['t']
+        temperature = stateT['t_sht']   if stateT else None
+        t_lens      = stateT['t_lents'] if stateT else None
+        t_cpu       = stateT['t_cpu']   if stateT else None
+        humidity    = stateT['h_sht']   if stateT else None
+
+        shaft_position = data['dome']['z']['sp'] if data['dome']['z'] else None
 
         heartbeat = self.create(
-            automatic       = data.auto,
-            timestamp       = data.time,
-            station         = Station.objects.get(code=code),
-            cover_position  = kwargs['dome']['z']['sp'],
-            temperature     = kwargs['dome']['t']['t_sht'],
-            t_lens          = kwargs['dome']['t']['t_lens'],
-            t_cpu           = kwargs['dome']['t']['t_cpu'],
-            humidity        = kwargs['dome']['t']['h_sht'],
-            storage_primary_available   = kwargs['disk']['prim']['a'],
-            storage_primary_total       = kwargs['disk']['prim']['t'],
-            storage_permanent_available = kwargs['disk']['perm']['a'],
-            storage_permanent_total     = kwargs['disk']['perm']['t'],
+            automatic       = automatic,
+            timestamp       = timestamp,
+            station         = station,
+            cover_position  = shaft_position,
+            temperature     = temperature,
+            t_lens          = t_lens,
+            t_cpu           = t_cpu,
+            humidity        = humidity,
+            storage_primary_available   = data['disk']['prim']['a'],
+            storage_primary_total       = data['disk']['prim']['t'],
+            storage_permanent_available = data['disk']['perm']['a'],
+            storage_permanent_total     = data['disk']['perm']['t'],
         )
         return heartbeat
 
