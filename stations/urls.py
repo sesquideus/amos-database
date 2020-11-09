@@ -8,6 +8,7 @@ urlpatterns = [
     path('stations/',                                   subnetwork.StatusView.as_view(),    name='status'),
 
     path('station/<slug:code>/',                        station.DetailView.as_view(),       name='station'),
+    path('station/<slug:code>/temperature',             station.TemperatureGraphView.as_view(),   name='station-temperature'),
     path('station/<slug:code>/json/',                   station.DetailViewJSON.as_view(),   name='station-JSON'),
     path('station/<slug:code>/heartbeat/',              station.APIViewHeartbeat.as_view(), name='station-receive-heartbeat'),
     path('station/<slug:code>/sighting/',               station.APIViewSighting.as_view(),  name='station-receive-sighting'),

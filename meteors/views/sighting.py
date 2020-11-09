@@ -93,8 +93,7 @@ class ListByStationView(ListDateView):
             return django.http.HttpResponseBadRequest()
 
 
-@method_decorator(login_required, name='dispatch')
-class DetailView(django.views.generic.detail.DetailView):
+class DetailView(core.views.LoginDetailView):
     model           = Sighting
     queryset        = Sighting.objects.with_neighbours().with_everything()
     slug_field      = 'id'

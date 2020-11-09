@@ -3,7 +3,8 @@ import datetime
 import pytz
 import dotmap
 from django.db import models
-from django.db.models import F, Prefetch
+from django.db.models import F, Prefetch, Avg
+from django.db.models.functions import TruncMinute
 from django.apps import apps
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -94,6 +95,25 @@ class HeartbeatQuerySet(models.QuerySet):
                 queryset=Station.objects.with_subnetwork(),
             )
         )
+
+    def for_graph(self, start=None, end=None):
+        if end == None:
+            end = datetime.datetime.now(tz=pytz.utc)
+        if start == None:
+            start = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+
+        return self.filter(
+                timestamp__range=(start, end)
+            ).annotate(
+                minute=TruncMinute('timestamp')
+            ).values(
+                'minute'
+            ).annotate(
+                temperature=Avg('temperature'),
+                humidity=Avg('humidity'),
+                t_lens=Avg('t_lens'),
+                t_cpu=Avg('t_cpu'),
+            )
 
 
 class Heartbeat(models.Model):

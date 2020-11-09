@@ -3,6 +3,7 @@ import pytz
 import json
 import logging
 import django
+import io
 
 from pprint import pprint as pp
 
@@ -16,6 +17,14 @@ from django.views.decorators.csrf import csrf_exempt
 
 from django.views.generic.detail import DetailView, BaseDetailView
 from django.views.generic.list import ListView
+
+
+import matplotlib
+matplotlib.use('Agg')
+from matplotlib import pyplot
+from matplotlib import ticker
+from matplotlib.backends.backend_agg import FigureCanvasAgg
+
 
 from stations.models import Station, Subnetwork, Heartbeat, LogEntry
 from meteors.models import Sighting
@@ -52,6 +61,36 @@ class DetailViewJSON(JSONDetailView):
 class ListViewJSON(JSONListView):
     model               = Station
     context_object_name = 'stations'
+
+
+class TemperatureGraphView(LoginDetailView):
+    model           = Station
+    slug_field      = 'code'
+    slug_url_kwarg  = 'code'
+    context_object_name = 'station'
+
+    def get_object(self, **kwargs):
+        self.minutes = [x['minute'] for x in Heartbeat.objects.for_graph()]
+        self.temperatures = [x['temperature'] for x in Heartbeat.objects.for_graph()]
+
+    def render_to_response(self, context, **response_kwargs):
+        fig, ax = pyplot.subplots()
+        fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
+        fig.set_size_inches(5.38, 1.5)
+        ax.plot(self.minutes, self.temperatures, marker='*')
+        ax.invert_yaxis()
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
+
+        canvas = FigureCanvasAgg(fig)
+        buf = io.BytesIO()
+        canvas.print_png(buf)
+        pyplot.close(fig)
+
+        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
+        response['Content-Length'] = str(len(response.content))
+        return response
+
+
 
 
 #@method_decorator(login_required, name = 'dispatch')
