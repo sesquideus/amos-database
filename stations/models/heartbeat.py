@@ -26,13 +26,31 @@ class HeartbeatManager(models.Manager):
         stateS = data['dome']['s']
         stateT = data['dome']['t']
 
+        if stateS is None:
+            cover_state = None
+        else:
+            if stateS[0] != '-':
+                if stateS[1] != '-':
+                    cover_state = Heartbeat.COVER_OPENING
+                else:
+                    cover_state = Heartbeat.COVER_CLOSING
+            else:
+                if stateS[14] != '-':
+                    cover_state = Heartbeat.COVER_SAFETY
+                else:
+                    if stateS[2] != '-':
+                        cover_state = Heartbeat.COVER_OPEN
+                    elif stateS[3] != '-':
+                        cover_state = Heartbeat.COVER_CLOSING
+                    else:
+                        cover_state = Heartbeat.COVER_PROBLEM
+
         heartbeat = self.create(
             automatic               = data['auto'],
             timestamp               = data['time'],
             station                 = Station.objects.get(code=code),
 
-            dome_open_sensor        = None if stateS is None else (stateS[2] != '-'),
-            dome_closed_sensor      = None if stateS is None else (stateS[3] != '-'),
+            status_string           = stateS,
             lens_heating            = None if stateS is None else (stateS[4] != '-'),
             camera_heating          = None if stateS is None else (stateS[5] != '-'),
             intensifier_active      = None if stateS is None else (stateS[6] != '-'),
@@ -47,7 +65,9 @@ class HeartbeatManager(models.Manager):
             t_cpu                   = None if stateT is None else stateT['t_cpu'],
             humidity                = None if stateT is None else stateT['h_sht'],
 
-            cover_position          = data['dome']['z']['sp'] if data['dome']['z'] else None,
+            cover_state             = None if stateS is None else
+                                        Heartbeat.COVER_OPEN if stateS[2] != '-' else Heartbeat.COVER_CLOSED,
+            cover_position          = None if data['dome']['z'] is None else data['dome']['z']['sp'],
 
             storage_primary_available   = data['disk']['prim']['a'],
             storage_primary_total       = data['disk']['prim']['t'],
@@ -87,8 +107,8 @@ class Heartbeat(models.Model):
                                     ]
 
     STATE_OBSERVING = 'O'
-    STATE_MALFUNCTION = 'M'
     STATE_NOT_OBSERVING = 'N'
+    STATE_MALFUNCTION = 'M'
     STATE_UNKNOWN = 'U'
     STATES                          = [
                                         (STATE_OBSERVING, 'observing'),
@@ -102,7 +122,6 @@ class Heartbeat(models.Model):
     COVER_CLOSED = 'C'
     COVER_CLOSING = 'c'
     COVER_PROBLEM = 'P'
-    COVER_UNKNOWN = 'U'
     COVER_SAFETY = 'S'
     COVER_STATES                    = [
                                         (COVER_OPEN, 'open'),
@@ -110,7 +129,6 @@ class Heartbeat(models.Model):
                                         (COVER_CLOSED, 'closed'),
                                         (COVER_CLOSING, 'closing'),
                                         (COVER_PROBLEM, 'problem'),
-                                        (COVER_UNKNOWN, 'unknown'),
                                         (COVER_SAFETY, 'safety'),
                                     ]
 

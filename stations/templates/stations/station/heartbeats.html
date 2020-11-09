@@ -5,23 +5,29 @@
     <thead>
         <tr>
             <th>timestamp</th>
+            <th>ago</th>
             <th>status</th>
-            <th>lid</th>
-            <th>heating</th>
-            <th><abbr title="temperature">T</abbr></th>
-            <th><abbr title="atmospheric pressure">p</abbr></th>
+            <th>status string</th>
+            <th>cover</th>
+            <th><abbr title="ambient temperature">T<sub>env</sub></abbr></th>
+            <th><abbr title="temperature of the lens">T<sub>lens</sub></abbr></th>
+            <th><abbr title="temperature of the CPU">T<sub>CPU</sub></abbr></th>
             <th><abbr title="relative humidity">RH</abbr></th>
         </tr>
     </thead>
     {% for heartbeat in station.recent_heartbeats %}
         <tr>
             <td class="data timestamp">{{ heartbeat.timestamp|date:"Y-m-d H:i:s" }}</td>
+            <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
             <td class="data status">{{ heartbeat.get_status_display }}</td>
-            <td class="data status">{{ heartbeat.get_lid_display }}</td>
-            <td class="data status">{{ heartbeat.get_heating_display }}</td>
+            <td class="data">{{ heartbeat.status_string }}</td>
+            <td class="data status">{{ heartbeat.get_cover_state_display }}</td>
+
             <td class="data">{{ heartbeat.temperature|temperature }}</td>
-            <td class="data">{{ heartbeat.pressure|pressure }}</td>
+            <td class="data">{{ heartbeat.t_lens|temperature }}</td>
+            <td class="data">{{ heartbeat.t_cpu|temperature }}</td>
             <td class="data">{{ heartbeat.humidity|humidity }}</td>
+
         </tr>
     {% empty %}
         <tr>

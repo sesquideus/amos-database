@@ -26,8 +26,4 @@ class SingleView(LoginDetailView):
     slug_field      = 'id'
     slug_url_kwarg  = 'id'
     template_name   = 'stations/heartbeat.html'
-    context_object_name = 'report'
-
-    def get_object(self, **kwargs):
-        report = super().get_object(**kwargs)
-        return report
+    context_object_name = 'heartbeat'

@@ -4,7 +4,7 @@
 {% block pagetitle %}
     <h2>Heartbeat</h2>
     <div class="controls">
-        <a href="{% url 'admin:stations_heartbeat_change' report.id %}">
+        <a href="{% url 'admin:stations_heartbeat_change' heartbeat.id %}">
             <img class="" src="{% static 'pictures/edit.png' %}" />
         </a>
     </div>
@@ -12,8 +12,8 @@
 
 {% block page %}
     <p>
-        From station <a href="{{ report.station.get_absolute_url }}">{{ report.station.name }}</a> (<span class="bold">{{ report.station.code }}</span>),
-        received at {{ report.timestamp }}
+        From station <a href="{{ heartbeat.station.get_absolute_url }}">{{ heartbeat.station.name }}</a> (<span class="bold">{{ heartbeat.station.code }}</span>),
+        received at {{ heartbeat.timestamp }}
     </p>
 
     <h3>Stations</h3>
@@ -21,21 +21,27 @@
             <thead>
                 <tr>
                     <th>timestamp</th>
+                    <th>status</th>
+                    <th>status string</th>
                     <th>ago</th>
-                    <th>lid</th>
+                    <th>cover</th>
                     <th>temperature</th>
-                    <th>pressure</th>
+                    <th>lens temperature</th>
+                    <th>CPU temperature</th>
                     <th>humidity</th>
                 </tr>
             </thead>
             <tbody>
                 <tr>
-                    <td class="data status">{{ report.timestamp }}</td>
-                    <td class="data time">{{ report.timestamp|since_date_time }}</td>
-                    <td class="data status">{{ report.get_lid_display }}</td>
-                    <td class="data">{{ report.temperature|temperature }}</td>
-                    <td class="data">{{ report.pressure|pressure }}</td>
-                    <td class="data">{{ report.humidity|humidity }}</td>
+                    <td class="data status">{{ heartbeat.timestamp }}</td>
+                    <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
+                    <td class="data">{{ heartbeat.status }}</td>
+                    <td class="data">{{ heartbeat.status_string }}</td>
+                    <td class="data status">{{ heartbeat.get_lid_display }}</td>
+                    <td class="data">{{ heartbeat.temperature|temperature }}</td>
+                    <td class="data">{{ heartbeat.t_lens|temperature }}</td>
+                    <td class="data">{{ heartbeat.t_cpu|temperature }}</td>
+                    <td class="data">{{ heartbeat.humidity|humidity }}</td>
                 </tr>
             </tbody>
         </table>
