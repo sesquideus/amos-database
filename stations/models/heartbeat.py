@@ -12,10 +12,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import core.models
 
 
-def explode_stateS(string):
-    return list(map(lambda x: x != '-', string))
-
-
 class HeartbeatManager(models.Manager):
     def get_queryset(self):
         return HeartbeatQuerySet(
@@ -27,36 +23,32 @@ class HeartbeatManager(models.Manager):
     def create_from_POST(self, code, **data):
         Station = apps.get_model('stations', 'Station')
 
-        automatic = data['auto']
-        timestamp = data['time']
-        station = Station.objects.get(code=code)
-
-        # If state S is there, parse it, otherwise set everything to None
         stateS = data['dome']['s']
-        servo_moving, servo_opening, dome_open, dome_closed, lens_heating, camera_heating, intensifier_active, fan_active, _, \
-        rain_sensor_active, light_sensor_active, computer_power, _, _, cover_safety_position, _, servo_blocked, _, \
-        error_t_lens, error_SHT31, emergency_closing_light, error_watchdog_reset, \
-        error_brownout_reset, error_computer_power, error_t_CPU, emergency_closing_rain = \
-            explode_stateS(stateS) if stateS else [None] * 26
-
-        # If state T is there, store values, otherwise set them to None
         stateT = data['dome']['t']
-        temperature = stateT['t_sht']   if stateT else None
-        t_lens      = stateT['t_lens']  if stateT else None
-        t_cpu       = stateT['t_cpu']   if stateT else None
-        humidity    = stateT['h_sht']   if stateT else None
-
-        shaft_position = data['dome']['z']['sp'] if data['dome']['z'] else None
 
         heartbeat = self.create(
-            automatic       = automatic,
-            timestamp       = timestamp,
-            station         = station,
-            cover_position  = shaft_position,
-            temperature     = temperature,
-            t_lens          = t_lens,
-            t_cpu           = t_cpu,
-            humidity        = humidity,
+            automatic               = data['auto'],
+            timestamp               = data['time'],
+            station                 = Station.objects.get(code=code),
+
+            dome_open_sensor        = None if stateS is None else (stateS[2] != '-'),
+            dome_closed_sensor      = None if stateS is None else (stateS[3] != '-'),
+            lens_heating            = None if stateS is None else (stateS[4] != '-'),
+            camera_heating          = None if stateS is None else (stateS[5] != '-'),
+            intensifier_active      = None if stateS is None else (stateS[6] != '-'),
+            fan_active              = None if stateS is None else (stateS[7] != '-'),
+
+            rain_sensor_active      = None if stateS is None else (stateS[9] != '-'),
+            light_sensor_active     = None if stateS is None else (stateS[10] != '-'),
+            computer_power          = None if stateS is None else (stateS[11] != '-'),
+
+            temperature             = None if stateT is None else stateT['t_sht'],
+            t_lens                  = None if stateT is None else stateT['t_lens'],
+            t_cpu                   = None if stateT is None else stateT['t_cpu'],
+            humidity                = None if stateT is None else stateT['h_sht'],
+
+            cover_position          = data['dome']['z']['sp'] if data['dome']['z'] else None,
+
             storage_primary_available   = data['disk']['prim']['a'],
             storage_primary_total       = data['disk']['prim']['t'],
             storage_permanent_available = data['disk']['perm']['a'],
@@ -100,37 +92,27 @@ class Heartbeat(models.Model):
     STATE_UNKNOWN = 'U'
     STATES                          = [
                                         (STATE_OBSERVING, 'observing'),
-                                        (STATE_MALFUNCTION, 'malfunction'),
                                         (STATE_NOT_OBSERVING, 'not observing'),
+                                        (STATE_MALFUNCTION, 'malfunction'),
                                         (STATE_UNKNOWN, 'unknown'),
                                     ]
 
     COVER_OPEN = 'O'
+    COVER_OPENING = 'o'
     COVER_CLOSED = 'C'
+    COVER_CLOSING = 'c'
     COVER_PROBLEM = 'P'
     COVER_UNKNOWN = 'U'
     COVER_SAFETY = 'S'
     COVER_STATES                    = [
                                         (COVER_OPEN, 'open'),
+                                        (COVER_OPENING, 'opening'),
                                         (COVER_CLOSED, 'closed'),
+                                        (COVER_CLOSING, 'closing'),
                                         (COVER_PROBLEM, 'problem'),
                                         (COVER_UNKNOWN, 'unknown'),
                                         (COVER_SAFETY, 'safety'),
                                     ]
-
-    HEATING_OFF = '0'
-    HEATING_ON = '1'
-    HEATING_UNKNOWN = '?'
-    HEATING_STATES                  = [
-                                        (HEATING_OFF, 'off'),
-                                        (HEATING_ON, 'on'),
-                                        (HEATING_UNKNOWN, 'unknown'),
-                                    ]
-
-    II_OFF = '0'
-    II_ON = '1'
-    II_UNKNOWN = '?'
-
 
     objects                         = HeartbeatManager.from_queryset(HeartbeatQuerySet)()
 
@@ -160,32 +142,29 @@ class Heartbeat(models.Model):
                                         null                = True,
                                         blank               = True,
                                     )
-    cover_position                  = models.PositiveSmallIntegerField(
-                                        null                = True,
-                                        blank               = True,
-                                    )
-    heating                         = models.CharField(
-                                        max_length          = 1,
-                                        choices             = HEATING_STATES,
-                                        null                = True,
-                                        blank               = True,
-                                    )
 
-    servo_moving                    = models.BooleanField(null=True, blank=True)
-    servo_direction_opening         = models.BooleanField(null=True, blank=True)
+    # Device sensors
+    status_string                   = models.CharField(null=True, blank=True, max_length=32)
     lens_heating                    = models.BooleanField(null=True, blank=True)
-
-    # Storage
-    storage_primary_available       = models.FloatField(null=True, blank=True)
-    storage_primary_total           = models.FloatField(null=True, blank=True)
-    storage_permanent_available     = models.FloatField(null=True, blank=True)
-    storage_permanent_total         = models.FloatField(null=True, blank=True)
+    camera_heating                  = models.BooleanField(null=True, blank=True)
+    intensifier_active              = models.BooleanField(null=True, blank=True)
+    fan_active                      = models.BooleanField(null=True, blank=True)
+    rain_sensor_active              = models.BooleanField(null=True, blank=True)
+    light_sensor_active             = models.BooleanField(null=True, blank=True)
+    computer_power                  = models.BooleanField(null=True, blank=True)
+    cover_position                  = models.PositiveSmallIntegerField(null=True, blank=True)
 
     # Environmental data
     temperature                     = models.FloatField(null=True, blank=True)
     t_lens                          = models.FloatField(null=True, blank=True)
     t_cpu                           = models.FloatField(null=True, blank=True)
     humidity                        = models.FloatField(null=True, blank=True)
+
+    # Storage
+    storage_primary_available       = models.FloatField(null=True, blank=True)
+    storage_primary_total           = models.FloatField(null=True, blank=True)
+    storage_permanent_available     = models.FloatField(null=True, blank=True)
+    storage_permanent_total         = models.FloatField(null=True, blank=True)
 
     # Management
     automatic                       = models.BooleanField(
