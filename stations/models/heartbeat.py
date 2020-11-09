@@ -42,7 +42,7 @@ class HeartbeatManager(models.Manager):
         # If state T is there, store values, otherwise set them to None
         stateT = data['dome']['t']
         temperature = stateT['t_sht']   if stateT else None
-        t_lens      = stateT['t_lents'] if stateT else None
+        t_lens      = stateT['t_lens']  if stateT else None
         t_cpu       = stateT['t_cpu']   if stateT else None
         humidity    = stateT['h_sht']   if stateT else None
 
