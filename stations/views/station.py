@@ -69,13 +69,10 @@ class GraphView(LoginDetailView):
     slug_url_kwarg  = 'code'
     context_object_name = 'station'
 
-    def format_axes(self, ax):
-        return ax
-
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.heartbeats_graph = Heartbeat.objects.for_station(station.code).for_graph()
-        station.minutes = [hb['minute'] for hb in station.heartbeats_graph]
+        station.graph = Heartbeat.objects.for_station(station.code).as_graph()
+        station.minutes = [hb.minute for hb in station.graph]
         return station
 
     def render_to_response(self, context, **response_kwargs):
@@ -97,19 +94,35 @@ class GraphView(LoginDetailView):
 
 
 class TemperatureGraphView(GraphView):
+    def format_axes(self, ax):
+        ax.scatter(self.object.minutes, [hb.t_env for hb in self.object.graph], s=0.5, color=(0, 0.8, 0.3), marker='.')
+        ax.scatter(self.object.minutes, [hb.t_lens for hb in self.object.graph], s=0.5, color=(0, 0.2, 0.7), marker='.')
+        ax.scatter(self.object.minutes, [hb.t_cpu for hb in self.object.graph], s=0.5, color=(1, 0, 0.2), marker='.')
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
+        return ax
+
+
+
+
+class GraphViewJSON(LoginDetailView):
+    model = Station
+    context_object_name = 'stations'
+    slug_field  = 'code'
+    slug_url_kwarg = 'code'
+
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
-        station.t_env = [hb['temperature'] for hb in station.heartbeats_graph]
-        station.t_lens = [hb['t_lens'] for hb in station.heartbeats_graph]
-        station.t_cpu = [hb['t_cpu'] for hb in station.heartbeats_graph]
+        station.graph = Heartbeat.objects.for_station(station.code).as_graph()
         return station
 
-    def format_axes(self, ax):
-        ax.scatter(self.object.minutes, self.object.t_env, s=0.5, c=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.minutes, self.object.t_lens, s=0.5, c=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.minutes, self.object.t_cpu, s=0.5, c=(1, 0, 0.2), marker='.')
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} °C"))
-        return ax
+    def get_context_data(self, **kwargs):
+        return {
+                hb.minute.strftime("%Y-%m-%d %H:%M:%S"): (hb.t_lens, hb.t_cpu, hb.t_env)
+            for hb in self.get_object().graph
+        }
+
+    def render_to_response(self, context, **response_kwargs):
+        return django.http.JsonResponse(context, **response_kwargs)
 
 
 #@method_decorator(login_required, name = 'dispatch')

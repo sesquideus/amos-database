@@ -116,6 +116,10 @@ td.station {
     text-align: center;
 }
 
+td.verbatim {
+    font-family: "Consolas", monospace;
+}
+
 td.c {
     text-align: center;
 }

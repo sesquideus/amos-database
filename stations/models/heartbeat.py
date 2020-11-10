@@ -96,7 +96,7 @@ class HeartbeatQuerySet(models.QuerySet):
             )
         )
 
-    def for_graph(self, start=None, end=None):
+    def as_graph(self, start=None, end=None):
         if end == None:
             end = datetime.datetime.now(tz=pytz.utc)
         if start == None:
@@ -105,14 +105,11 @@ class HeartbeatQuerySet(models.QuerySet):
         return self.filter(
                 timestamp__range=(start, end)
             ).annotate(
-                minute=TruncMinute('timestamp')
-            ).values(
-                'minute'
-            ).annotate(
-                temperature=Avg('temperature'),
-                humidity=Avg('humidity'),
-                t_lens=Avg('t_lens'),
-                t_cpu=Avg('t_cpu'),
+                minute=TruncMinute('timestamp'),
+                t_env=Avg('temperature'),
+                h_env=Avg('humidity'),
+                t_len=Avg('t_lens'),
+                t_CPU=Avg('t_cpu'),
             ).order_by(
                 'timestamp'
             )
@@ -158,6 +155,8 @@ class Heartbeat(models.Model):
 
     timestamp                       = models.DateTimeField(
                                         verbose_name        = 'timestamp',
+                                        blank               = True,
+                                        auto_now_add        = True,
                                     )
     received                        = models.DateTimeField(
                                         verbose_name        = 'received at',
@@ -214,7 +213,7 @@ class Heartbeat(models.Model):
                                     )
 
     def __str__(self):
-        return f"[{self.station.code}] at {self.timestamp}: {self.automatic}"
+        return f"[{self.station.code}] at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')}: {self.status_string}"
 
     def get_absolute_url(self):
         return reverse('heartbeat', kwargs={'code': self.station.code, 'id': self.id})

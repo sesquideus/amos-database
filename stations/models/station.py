@@ -43,6 +43,15 @@ class StationQuerySet(models.QuerySet):
     def with_subnetwork(self):
         return self.select_related('subnetwork')
 
+    def with_graph(self):
+        return self.prefetch_related(
+            Prefetch(
+                'heartbeats',
+                queryset=Heartbeat.objects.for_graph(),
+                to_attr='heartbeats_graph',
+            )
+        )
+
 
 class Station(core.models.NamedModel):
     class Meta:
