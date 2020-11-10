@@ -22,7 +22,7 @@ from django.views.generic.list import ListView
 import matplotlib
 matplotlib.use('Agg')
 from matplotlib import pyplot
-from matplotlib import ticker
+from matplotlib import ticker, dates
 from matplotlib.backends.backend_agg import FigureCanvasAgg
 
 
@@ -63,23 +63,28 @@ class ListViewJSON(JSONListView):
     context_object_name = 'stations'
 
 
-class TemperatureGraphView(LoginDetailView):
+class GraphView(LoginDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
     context_object_name = 'station'
 
+    def format_axes(self, ax):
+        return ax
+
     def get_object(self, **kwargs):
-        self.minutes = [x['minute'] for x in Heartbeat.objects.for_graph()]
-        self.temperatures = [x['temperature'] for x in Heartbeat.objects.for_graph()]
+        station = super().get_object(**kwargs)
+        station.heartbeats_graph = Heartbeat.objects.for_station(station.code).for_graph()
+        station.minutes = [hb['minute'] for hb in station.heartbeats_graph]
+        return station
 
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
-        fig.set_size_inches(5.38, 1.5)
-        ax.scatter(self.minutes, self.temperatures, marker='*')
-        ax.invert_yaxis()
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
+        fig.set_size_inches(8, 3)
+        ax.set_xlim(datetime.datetime.now() - datetime.timedelta(days=1), datetime.datetime.now())
+        ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
+        ax = self.format_axes(ax)
 
         canvas = FigureCanvasAgg(fig)
         buf = io.BytesIO()
@@ -91,6 +96,20 @@ class TemperatureGraphView(LoginDetailView):
         return response
 
 
+class TemperatureGraphView(GraphView):
+    def get_object(self, **kwargs):
+        station = super().get_object(**kwargs)
+        station.t_env = [hb['temperature'] for hb in station.heartbeats_graph]
+        station.t_lens = [hb['t_lens'] for hb in station.heartbeats_graph]
+        station.t_cpu = [hb['t_cpu'] for hb in station.heartbeats_graph]
+        return station
+
+    def format_axes(self, ax):
+        ax.scatter(self.object.minutes, self.object.t_env, marker='.')
+        ax.scatter(self.object.minutes, self.object.t_lens, marker='.')
+        ax.scatter(self.object.minutes, self.object.t_cpu, marker='.')
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} °C"))
+        return ax
 
 
 #@method_decorator(login_required, name = 'dispatch')
