@@ -105,9 +105,9 @@ class TemperatureGraphView(GraphView):
         return station
 
     def format_axes(self, ax):
-        ax.scatter(self.object.minutes, self.object.t_env, marker='.')
-        ax.scatter(self.object.minutes, self.object.t_lens, marker='.')
-        ax.scatter(self.object.minutes, self.object.t_cpu, marker='.')
+        ax.scatter(self.object.minutes, self.object.t_env, s=0.5, c=(0, 0.8, 0.3), marker='.')
+        ax.scatter(self.object.minutes, self.object.t_lens, s=0.5, c=(0, 0.2, 0.7), marker='.')
+        ax.scatter(self.object.minutes, self.object.t_cpu, s=0.5, c=(1, 0, 0.2), marker='.')
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} °C"))
         return ax
 
