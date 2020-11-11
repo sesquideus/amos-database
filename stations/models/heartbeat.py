@@ -3,8 +3,8 @@ import datetime
 import pytz
 import dotmap
 from django.db import models
-from django.db.models import F, Prefetch, Avg
-from django.db.models.functions import TruncMinute
+from django.db.models import F, Func, Prefetch, Avg
+from django.db.models.functions import TruncMinute, Extract, Floor
 from django.apps import apps
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
@@ -66,8 +66,7 @@ class HeartbeatManager(models.Manager):
             t_cpu                   = None if stateT is None else stateT['t_cpu'],
             humidity                = None if stateT is None else stateT['h_sht'],
 
-            cover_state             = None if stateS is None else
-                                        Heartbeat.COVER_OPEN if stateS[2] != '-' else Heartbeat.COVER_CLOSED,
+            cover_state             = cover_state,
             cover_position          = None if data['dome']['z'] is None else data['dome']['z']['sp'],
 
             storage_primary_available   = data['disk']['prim']['a'],
@@ -104,15 +103,19 @@ class HeartbeatQuerySet(models.QuerySet):
 
         return self.filter(
                 timestamp__range=(start, end)
+            ).order_by(
+                'timestamp'
             ).annotate(
-                minute=TruncMinute('timestamp'),
+                unix=Floor(Extract('timestamp', 'epoch') / 60) * 60,
+            ).values(
+                'unix'
+            ).annotate(
                 t_env=Avg('temperature'),
                 h_env=Avg('humidity'),
                 t_len=Avg('t_lens'),
                 t_CPU=Avg('t_cpu'),
-            ).order_by(
-                'timestamp'
-            )
+            ).order_by()
+
 
 
 class Heartbeat(models.Model):

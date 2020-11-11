@@ -72,7 +72,7 @@ class GraphView(LoginDetailView):
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
         station.graph = Heartbeat.objects.for_station(station.code).as_graph()
-        station.minutes = [hb.minute for hb in station.graph]
+        station.minutes = [datetime.datetime.utcfromtimestamp(hb['unix']) for hb in station.graph]
         return station
 
     def render_to_response(self, context, **response_kwargs):
@@ -95,13 +95,11 @@ class GraphView(LoginDetailView):
 
 class TemperatureGraphView(GraphView):
     def format_axes(self, ax):
-        ax.scatter(self.object.minutes, [hb.t_env for hb in self.object.graph], s=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.minutes, [hb.t_lens for hb in self.object.graph], s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.minutes, [hb.t_cpu for hb in self.object.graph], s=0.5, color=(1, 0, 0.2), marker='.')
+        ax.scatter(self.object.minutes, [hb['t_env'] for hb in self.object.graph], s=0.5, color=(0, 0.8, 0.3), marker='.')
+        ax.scatter(self.object.minutes, [hb['t_len'] for hb in self.object.graph], s=0.5, color=(0, 0.2, 0.7), marker='.')
+        ax.scatter(self.object.minutes, [hb['t_CPU'] for hb in self.object.graph], s=0.5, color=(1, 0, 0.2), marker='.')
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         return ax
-
-
 
 
 class GraphViewJSON(LoginDetailView):
@@ -117,7 +115,7 @@ class GraphViewJSON(LoginDetailView):
 
     def get_context_data(self, **kwargs):
         return {
-                hb.minute.strftime("%Y-%m-%d %H:%M:%S"): (hb.t_lens, hb.t_cpu, hb.t_env)
+            hb['unix']: hb
             for hb in self.get_object().graph
         }
 
