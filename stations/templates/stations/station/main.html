@@ -32,8 +32,11 @@
             {% include "stations/station/heartbeats.html" %}
             {% include "stations/station/log.html" %}
 
-            <h3>Light curve</h3>
-            <img class="chart" src="{% url 'station-temperature-graph' code=station.code %}" alt="Light curve" />
+            <h3>Temperature</h3>
+            <img class="chart" src="{% url 'station-temperature-graph' code=station.code %}" alt="Temperature graph" />
+
+            <h3>Humidity</h3>
+            <img class="chart" src="{% url 'station-humidity-graph' code=station.code %}" alt="Humidity graph" />
         </div>
 
         {% comment %}

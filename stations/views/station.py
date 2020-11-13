@@ -101,6 +101,13 @@ class TemperatureGraphView(GraphView):
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         return ax
 
+class HumidityGraphView(GraphView):
+    def format_axes(self, ax):
+        ax.scatter(self.object.minutes, [hb['h_env'] for hb in self.object.graph], s=0.5, color=(0, 0.6, 1), marker='.')
+        ax.set_ylim(0, 100)
+        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} %"))
+        return ax
+
 
 class GraphViewJSON(LoginDetailView):
     model = Station

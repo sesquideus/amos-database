@@ -26,6 +26,11 @@ urlpatterns = [
         name='station-temperature-graph'
     ),
     path(
+        'station/<slug:code>/humidity',
+        station.HumidityGraphView.as_view(),
+        name='station-humidity-graph'
+    ),
+    path(
         'station/<slug:code>/temperature/json',
         station.GraphViewJSON.as_view(),
         name='station-temperature-json'
