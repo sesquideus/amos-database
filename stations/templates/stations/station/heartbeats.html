@@ -20,7 +20,7 @@
             <td class="data timestamp">{{ heartbeat.timestamp|date:"Y-m-d H:i:s" }}</td>
             <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
             <td class="data status">{{ heartbeat.get_status_display }}</td>
-            <td class="data status verbatim">{{ heartbeat.status_string|default:'?' }}</td>
+            <td class="data status verbatim">{{ heartbeat.status_string|default:'????????|????????|????????' }}</td>
             <td class="data status">{{ heartbeat.get_cover_state_display }}</td>
 
             <td class="data">{{ heartbeat.temperature|temperature }}</td>

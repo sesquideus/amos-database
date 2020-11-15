@@ -2,8 +2,9 @@ import textwrap
 import datetime
 import pytz
 import dotmap
+
 from django.db import models
-from django.db.models import F, Func, Prefetch, Avg
+from django.db.models import F, Func, Prefetch, Avg, Min, Max
 from django.db.models.functions import TruncMinute, Extract, Floor
 from django.apps import apps
 from django.urls import reverse
@@ -42,7 +43,7 @@ class HeartbeatManager(models.Manager):
                     if stateS[2] != '-':
                         cover_state = Heartbeat.COVER_OPEN
                     elif stateS[3] != '-':
-                        cover_state = Heartbeat.COVER_CLOSING
+                        cover_state = Heartbeat.COVER_CLOSED
                     else:
                         cover_state = Heartbeat.COVER_PROBLEM
 
@@ -95,7 +96,7 @@ class HeartbeatQuerySet(models.QuerySet):
             )
         )
 
-    def as_graph(self, start=None, end=None):
+    def as_graph(self, start=None, end=None, interval=60):
         if end == None:
             end = datetime.datetime.now(tz=pytz.utc)
         if start == None:
@@ -106,14 +107,16 @@ class HeartbeatQuerySet(models.QuerySet):
             ).order_by(
                 'timestamp'
             ).annotate(
-                unix=Floor(Extract('timestamp', 'epoch') / 60) * 60,
+                unix=Floor(Extract('timestamp', 'epoch') / interval) * interval,
+                time=Func(F('unix'), function="TO_TIMESTAMP", output_field=models.DateTimeField()),
             ).values(
-                'unix'
+                'time',
             ).annotate(
                 t_env=Avg('temperature'),
                 h_env=Avg('humidity'),
                 t_len=Avg('t_lens'),
                 t_CPU=Avg('t_cpu'),
+                cover=Max('cover_state'),
             ).order_by()
 
 

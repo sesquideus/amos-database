@@ -32,6 +32,7 @@ pycycle = "*"
 sqlparse = "*"
 pysocks = "*"
 python-memcached = "*"
+pandas = "*"
 
 [requires]
 python_version = "3.8"

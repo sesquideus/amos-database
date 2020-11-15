@@ -8,6 +8,13 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.urls import reverse
 
 
+class JsonResponseMixin():
+    def render_to_response(self, context, **response_kwargs):
+        return django.http.JsonResponse(
+            context,
+            **response_kwargs,
+        )
+
 class JSONDetailView(BaseDetailView):
     def get_context_data(self, **kwargs):
         try:
