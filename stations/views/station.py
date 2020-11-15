@@ -89,7 +89,7 @@ class DataFrameView(LoginDetailView):
 class GraphView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
-        fig.tight_layout(rect=(0.02, 0.05, 1.03, 1))
+        fig.tight_layout(rect=(0.05, 0.05, 1.03, 1))
         fig.set_size_inches(8, 3)
         ax.set_xlim(self.start, self.end)
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
@@ -125,12 +125,13 @@ class SensorsScatterView(GraphView):
     def format_axes(self, fig, ax):
         ones = np.ones(len(self.object.df))
         xs = self.object.df.timestamp.to_numpy()
-        ax.scatter(xs, ones * 1, s=2, c=self.object.df.lens_heating.to_numpy(), marker='*')
-        ax.scatter(xs, ones * 2, s=2, c=self.object.df.fan_active.to_numpy(), marker='*')
-        ax.scatter(xs, ones * 3, s=2, c=self.object.df.intensifier_active.to_numpy(), marker='*')
-        ax.scatter(xs, ones * 4, s=2, c=self.object.df.rain_sensor_active.to_numpy(), marker='*')
-        ax.scatter(xs, ones * 5, s=2, c=self.object.df.light_sensor_active.to_numpy(), marker='*')
-#        ax.set_yticks(['lens', 'fan', 'ii', 'rain', 'light'])
+        ax.scatter(xs, ones * 1, s=200, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 2, s=200, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 3, s=200, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 4, s=200, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 5, s=200, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.set_yticks([1, 2, 3, 4, 5])
+        ax.set_yticklabels(['lens', 'fan', 'intensifier', 'rain', 'light'])
         ax.set_ylim(0.5, 5.5)
         fig.set_size_inches(8, 2)
         return fig, ax
