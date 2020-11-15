@@ -22,13 +22,18 @@ urlpatterns = [
     ),
     path(
         'station/<slug:code>/temperature',
-        station.TemperatureGraphView.as_view(),
+        station.TemperatureScatterView.as_view(),
         name='station-temperature-graph'
     ),
     path(
         'station/<slug:code>/humidity',
-        station.HumidityGraphView.as_view(),
+        station.HumidityScatterView.as_view(),
         name='station-humidity-graph'
+    ),
+    path(
+        'station/<slug:code>/sensors',
+        station.SensorsScatterView.as_view(),
+        name='station-sensors-graph'
     ),
     path(
         'station/<slug:code>/temperature/json',

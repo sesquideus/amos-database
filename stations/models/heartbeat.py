@@ -4,7 +4,7 @@ import pytz
 import dotmap
 
 from django.db import models
-from django.db.models import F, Func, Prefetch, Avg, Min, Max
+from django.db.models import F, Func, Aggregate, Prefetch, Avg, Min, Max
 from django.db.models.functions import TruncMinute, Extract, Floor
 from django.apps import apps
 from django.urls import reverse
@@ -12,6 +12,13 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 
 import core.models
+
+
+class BoolOr(Aggregate):
+    function = 'BOOL_OR'
+
+class BoolAnd(Aggregate):
+    function = 'BOOL_AND'
 
 
 class HeartbeatManager(models.Manager):
@@ -96,7 +103,7 @@ class HeartbeatQuerySet(models.QuerySet):
             )
         )
 
-    def as_graph(self, start=None, end=None, interval=60):
+    def for_floored_interval(self, start=None, end=None, interval=60):
         if end == None:
             end = datetime.datetime.now(tz=pytz.utc)
         if start == None:
@@ -109,6 +116,11 @@ class HeartbeatQuerySet(models.QuerySet):
             ).annotate(
                 unix=Floor(Extract('timestamp', 'epoch') / interval) * interval,
                 time=Func(F('unix'), function="TO_TIMESTAMP", output_field=models.DateTimeField()),
+            )
+
+    def as_graph(self, start=None, end=None, interval=60):
+        return self.for_floored_interval(
+                start, end, interval
             ).values(
                 'time',
             ).annotate(
@@ -119,6 +131,33 @@ class HeartbeatQuerySet(models.QuerySet):
                 cover=Max('cover_state'),
             ).order_by()
 
+    def as_sensors_graph(self, start=None, end=None, interval=60):
+        return self.for_floored_interval(
+                start, end, interval
+            ).values(
+                'time',
+            ).annotate(
+                t_env=Avg('temperature'),
+                lh=BoolOr('lens_heating'),
+                ch=BoolOr('camera_heating'),
+                ii=BoolOr('intensifier_active'),
+                fa=BoolOr('fan_active'),
+                rs=BoolOr('rain_sensor_active'),
+                ls=BoolOr('light_sensor_active'),
+                cp=BoolOr('computer_power')
+            ).order_by()
+
+    def as_scatter(self, start=None, end=None):
+        if end == None:
+            end = datetime.datetime.now(tz=pytz.utc)
+        if start == None:
+            start = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+
+        return self.filter(
+            timestamp__range=(start, end)
+        ).order_by(
+            'timestamp'
+        )
 
 
 class Heartbeat(models.Model):
