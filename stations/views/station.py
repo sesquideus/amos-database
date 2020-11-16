@@ -79,7 +79,7 @@ class DataFrameView(LoginDetailView):
         station = super().get_object(**kwargs)
 
         self.start = kwargs.get('start', datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1))
-        self.end = kwargs.get('end', datetime.datetime.now())
+        self.end = kwargs.get('end', datetime.datetime.now(tz=pytz.utc))
 
         data = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
         station.df = pd.DataFrame(list(data.values()))
@@ -125,14 +125,20 @@ class SensorsScatterView(GraphView):
     def format_axes(self, fig, ax):
         ones = np.ones(len(self.object.df))
         xs = self.object.df.timestamp.to_numpy()
-        ax.scatter(xs, ones * 1, s=200, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 2, s=200, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 3, s=200, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 4, s=200, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 5, s=200, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.set_yticks([1, 2, 3, 4, 5])
-        ax.set_yticklabels(['lens', 'fan', 'intensifier', 'rain', 'light'])
-        ax.set_ylim(0.5, 5.5)
+
+        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('o', 3).replace('O', 4)
+
+        ax.scatter(xs, ones * 1, s=100, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 2, s=100, c=self.object.df.camera_heating.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 3, s=100, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 4, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 6, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 7, s=100, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 8, s=100, c=self.object.df.computer_power.to_numpy(), cmap='bwr_r', marker='|')
+        ax.scatter(xs, ones * 10, s=100, c=cover.to_numpy(), cmap='viridis', marker='|')
+        ax.set_yticks([1, 2, 3, 4, 6, 7, 8, 10])
+        ax.set_yticklabels(['lens', 'camera', 'fan', 'intensifier', 'rain', 'light', 'computer', 'cover'])
+        ax.set_ylim(0.5, 10.5)
         fig.set_size_inches(8, 2)
         return fig, ax
 
@@ -182,7 +188,7 @@ class DataFrameAggView(LoginDetailView):
 
         self.interval = kwargs.get('interval', 600)
         self.start = kwargs.get('start', datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1))
-        self.end = kwargs.get('end', datetime.datetime.now() + datetime.timedelta(seconds=self.interval))
+        self.end = kwargs.get('end', datetime.datetime.now(tz=pytz.utc) + datetime.timedelta(seconds=self.interval))
 
         self.start = floor_to(self.start, self.interval)
         self.end = floor_to(self.end, self.interval)
