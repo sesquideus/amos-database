@@ -126,7 +126,7 @@ class SensorsScatterView(GraphView):
         ones = np.ones(len(self.object.df))
         xs = self.object.df.timestamp.to_numpy()
 
-        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('o', 3).replace('O', 4)
+        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
 
         ax.scatter(xs, ones * 1, s=100, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|')
         ax.scatter(xs, ones * 2, s=100, c=self.object.df.camera_heating.to_numpy(), cmap='bwr_r', marker='|')
