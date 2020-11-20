@@ -226,6 +226,8 @@ class Station(core.models.NamedModel):
             'longitude': self.longitude,
             'altitude': self.altitude,
             'status': self.get_current_status().short,
+            'sun-alt': self.sun_position()['alt'],
+            'sun-az': self.sun_position()['az'],
         }
 
 

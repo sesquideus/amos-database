@@ -90,7 +90,7 @@ class GraphView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.05, 0.05, 1.03, 1))
-        fig.set_size_inches(8, 3)
+        fig.set_size_inches(12, 3)
         ax.set_xlim(self.start, self.end)
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
         ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
@@ -128,18 +128,18 @@ class SensorsScatterView(GraphView):
 
         cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
 
-        ax.scatter(xs, ones * 1, s=100, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 2, s=100, c=self.object.df.camera_heating.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 3, s=100, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 4, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 6, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 7, s=100, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 8, s=100, c=self.object.df.computer_power.to_numpy(), cmap='bwr_r', marker='|')
-        ax.scatter(xs, ones * 10, s=100, c=cover.to_numpy(), cmap='viridis', marker='|')
-        ax.set_yticks([1, 2, 3, 4, 6, 7, 8, 10])
-        ax.set_yticklabels(['lens', 'camera', 'fan', 'intensifier', 'rain', 'light', 'computer', 'cover'])
-        ax.set_ylim(0.5, 10.5)
-        fig.set_size_inches(8, 2)
+        ax.scatter(xs, ones * 1, s=100, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 2, s=100, c=self.object.df.camera_heating.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 8, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 9, s=100, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
+        ax.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
+        ax.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
+        ax.set_ylim(0.5, 11.5)
+        fig.set_size_inches(12, 2)
         return fig, ax
 
 

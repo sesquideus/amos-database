@@ -33,6 +33,7 @@ sqlparse = "*"
 pysocks = "*"
 python-memcached = "*"
 pandas = "*"
+uwsgi = "*"
 
 [requires]
 python_version = "3.8"
