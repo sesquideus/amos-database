@@ -33,27 +33,27 @@
                         </th>
                     {% endif %}
                     {% with sun=station.sun_position heartbeat=station.last_heartbeat.0 status=station.get_current_status last_sighting=station.last_sighting.0 %}
-                        <td class="station-code">
+                        <td class="data c">
                             {{ station.code }}
                         </td>
 
-                        <td class="station-name">
+                        <td class="data c">
                             <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
                         </td>
 
-                        <td class="status data">
+                        <td class="status c">
                             {% if station.on %}
                                 <span class="enabled">&#10004;</span>
                             {% else %}
                                 <span class="disabled">&#10006;</span>
                             {% endif %}
                         </td>
-                        <td class="status data">
+                        <td class="status c">
                             <abbr class="{{ status.code }}" title="{{ status.get_description }}">
                                 {{ status.short }}
                             </abbr>
                         </td>
-                        <td class="status">
+                        <td class="status c">
                             {% if heartbeat %}
                                 <a href="{{ heartbeat.get_absolute_url }}">
                                     {{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}
@@ -80,14 +80,14 @@
                             <span class="sun arrow" style="transform: rotate({{ sun.az|add:-90 }}deg);">&#8594;</span>
                         </td>
 
-                        <td class="time">
+                        <td class="time c">
                             {% if last_sighting %}
                                 <a href="{{ last_sighting.get_absolute_url }}">{{ last_sighting.timestamp|date:"Y-m-d H:i:s" }}</a>
                             {% else %}
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
-                        <td class="time">
+                        <td class="time c">
                             {% if last_sighting %}
                                 {{ last_sighting.timestamp|since_date_time }}
                             {% else %}

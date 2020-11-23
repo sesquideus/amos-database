@@ -213,3 +213,6 @@ CELERY_RESULT_SERIALIZER = 'json'
 CELERY_TIMEZONE = 'UTC'
 
 DJANGO_CELERY_BEAT_TZ_AWARE = False
+
+if os.environ.get('DJANGO_DEVELOPMENT'):
+    from amos.development import *  # or specific overrides

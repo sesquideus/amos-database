@@ -16,35 +16,17 @@
         received at {{ heartbeat.timestamp }}
     </p>
 
-    <h3>Stations</h3>
+    <h3>Properties</h3>
         <table>
-            <thead>
-                <tr>
-                    <th>timestamp</th>
-                    <th>status</th>
-                    <th>status string</th>
-                    <th>ago</th>
-                    <th>cover</th>
-                    <th>temperature</th>
-                    <th>lens temperature</th>
-                    <th>CPU temperature</th>
-                    <th>humidity</th>
-                </tr>
-            </thead>
+            {% include "stations/heartbeat/thead.html" %}
             <tbody>
                 <tr>
-                    <td class="data status">{{ heartbeat.timestamp }}</td>
-                    <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
-                    <td class="data">{{ heartbeat.status }}</td>
-                    <td class="data verbatim">{{ heartbeat.status_string }}</td>
-                    <td class="data status">{{ heartbeat.get_lid_display }}</td>
-                    <td class="data">{{ heartbeat.temperature|temperature }}</td>
-                    <td class="data">{{ heartbeat.t_lens|temperature }}</td>
-                    <td class="data">{{ heartbeat.t_cpu|temperature }}</td>
-                    <td class="data">{{ heartbeat.humidity|humidity }}</td>
+                    <td class="data c timestamp">
+                        {{ heartbeat.timestamp|date:"Y-m-d H:i:s" }}
+                    </td>
+                    {% include "stations/heartbeat/tr.html" %}
                 </tr>
             </tbody>
         </table>
 
 {% endblock page %}
-

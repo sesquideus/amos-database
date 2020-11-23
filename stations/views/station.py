@@ -14,7 +14,6 @@ from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import render
 from django.urls import reverse
 from django.utils.decorators import method_decorator
-from django.views import View
 from django.views.decorators.csrf import csrf_exempt
 
 from django.views.generic.detail import DetailView, BaseDetailView
@@ -88,13 +87,18 @@ class DataFrameView(LoginDetailView):
 
 class GraphView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
+
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.05, 0.05, 1.03, 1))
         fig.set_size_inches(12, 3)
         ax.set_xlim(self.start, self.end)
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
         ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
-        fig, ax = self.format_axes(fig, ax)
+
+        if len(self.object.df) == 0:
+            pass
+        else:
+            fig, ax = self.format_axes(fig, ax)
 
         canvas = FigureCanvasAgg(fig)
         buf = io.BytesIO()
@@ -212,7 +216,7 @@ class DataFrameAggView(LoginDetailView):
 
 #@method_decorator(login_required, name = 'dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
-class APIViewHeartbeat(View):
+class APIViewHeartbeat(django.views.View):
     def get(self, request):
         return django.http.JsonResponse({'ok': 'OK'})
 
@@ -240,7 +244,7 @@ class APIViewHeartbeat(View):
 
 
 @method_decorator(csrf_exempt, name='dispatch')
-class APIViewSighting(View):
+class APIViewSighting(django.views.View):
     def post(self, request, code):
         log.info(f"Incoming new sighting from station {code}")
 
@@ -259,3 +263,6 @@ class APIViewSighting(View):
         except Exception as e:
             log.warning(e)
             return HttpResponseBadRequest()
+
+    def get(self, request, code):
+        return HttpResponse('OK', status=201)

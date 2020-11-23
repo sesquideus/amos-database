@@ -1,0 +1,27 @@
+
+    <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
+
+    <td class="data boolean">{{ heartbeat.automatic|boolean }}</td>
+    <td class="data status">{{ heartbeat.get_status_display }}</td>
+    <td class="data status verbatim">{{ heartbeat.status_string|default:'????????|????????|????????' }}</td>
+
+    <td class="data c">{{ heartbeat.get_cover_state_display|default:"?" }}</td>
+    <td class="data c">{{ heartbeat.cover_position|default:"&mdash;" }}</td>
+
+    <td class="data boolean">{{ heartbeat.lens_heating|boolean }}</td>
+    <td class="data boolean">{{ heartbeat.camera_heating|boolean }}</td>
+    <td class="data boolean">{{ heartbeat.intensifier_active|boolean }}</td>
+    <td class="data boolean">{{ heartbeat.fan_active|boolean }}</td>
+
+    <td class="data boolean">{{ heartbeat.rain_sensor_active|boolean }}</td>
+    <td class="data boolean">{{ heartbeat.light_sensor_active|boolean }}</td>
+    <td class="data boolean">{{ heartbeat.computer_power|boolean }}</td>
+
+    <td class="data">{{ heartbeat.temperature|temperature }}</td>
+    <td class="data">{{ heartbeat.t_lens|temperature }}</td>
+    <td class="data">{{ heartbeat.t_cpu|temperature }}</td>
+    <td class="data">{{ heartbeat.humidity|humidity }}</td>
+
+    <td class="data disk">{{ heartbeat.storage_primary_available|gigabytes }} / {{ heartbeat.storage_primary_total|gigabytes }}</td>
+    <td class="data disk">{{ heartbeat.storage_permanent_available|gigabytes }} / {{ heartbeat.storage_permanent_total|gigabytes }}</td>
+</tr>

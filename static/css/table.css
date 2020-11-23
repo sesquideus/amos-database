@@ -7,10 +7,15 @@ table {
 
 table.full-width {
     width: 100%;
+    table-layout: stretch;
 }
 
 table.alternating tr:nth-child(even) {
     background-color: hsla(0, 0%, 80%, 0.4);
+}
+
+table.heartbeats {
+    table-layout: fixed;
 }
 
 tr {
@@ -35,7 +40,7 @@ th {
     padding-right: 10px;
 }
 
-th.subgroup {
+tr.subgroup th, th.subgroup {
     background-color: hsla(220, 20%, 30%, 1);
 }
 
@@ -84,44 +89,26 @@ td.text {
     overflow: ellipsis;
 }
 
-td.time {
-    text-align: center;
-}
-
-td.seen {
-    text-align: center;
-}
-
-td.station-code {
-    text-align: center;
-}
-
-td.station-name {
-    text-align: left;
-}
-
-td.subnetwork {
-    text-align: center;
-}
-
-td.meteor {
-    text-align: center;
-}
-
-td.status {
-    text-align: center;
-}
-
-td.station {
-    text-align: center;
-}
-
 td.verbatim {
     font-family: "Consolas", monospace;
+    width: 150px;
+}
+
+td.l {
+    text-align: left;
 }
 
 td.c {
     text-align: center;
+}
+
+td.r {
+    text-align: center;
+}
+
+td.boolean {
+    text-align: center;
+    width: 60px;
 }
 
 /* station status colours */

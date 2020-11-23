@@ -6,7 +6,7 @@ import pytz
 from astropy.time import Time
 from django.utils.safestring import mark_safe
 
-from .utilities import mdash, empty_on_error, graceful
+from .utilities import default_string, empty_on_error, graceful
 
 register = django.template.Library()
 
@@ -69,8 +69,20 @@ def magnitude(value: float):
 
 @register.filter
 @graceful
+def gigabytes(value: float):
+    return f"{value:.1f} GB"
+
+
+@register.filter
+@graceful
 def angle(value: float):
     return mark_safe(f"{value:.2f}°")
+
+
+@register.filter
+@graceful
+def boolean(value: bool):
+    return "yes" if value else "no"
 
 
 @register.filter
@@ -102,7 +114,7 @@ def multiply(value: float, factor: float):
 
 
 @register.filter
-@mdash
+@graceful
 @empty_on_error(AttributeError)
 def safetime(time):
     return time.strftime("%H:%M:%S.%f")

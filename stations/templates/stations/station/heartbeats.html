@@ -1,37 +1,18 @@
 {% load quantities %}
 
-<h3>Status ({{ station.heartbeats.count }} heartbeats total)</h3>
-<table>
-    <thead>
-        <tr>
-            <th>timestamp</th>
-            <th>ago</th>
-            <th>status</th>
-            <th>status string</th>
-            <th>cover</th>
-            <th><abbr title="ambient temperature">T<sub>env</sub></abbr></th>
-            <th><abbr title="temperature of the lens">T<sub>lens</sub></abbr></th>
-            <th><abbr title="temperature of the CPU">T<sub>CPU</sub></abbr></th>
-            <th><abbr title="relative humidity">RH</abbr></th>
-        </tr>
-    </thead>
+<h3>Heartbeats ({{ station.heartbeats.count }} total)</h3>
+<table class="heartbeats">
+    {% include "stations/heartbeat/thead.html" %}
     {% for heartbeat in station.recent_heartbeats %}
         <tr>
-            <td class="data timestamp">{{ heartbeat.timestamp|date:"Y-m-d H:i:s" }}</td>
-            <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
-            <td class="data status">{{ heartbeat.get_status_display }}</td>
-            <td class="data status verbatim">{{ heartbeat.status_string|default:'????????|????????|????????' }}</td>
-            <td class="data status">{{ heartbeat.get_cover_state_display }}</td>
-
-            <td class="data">{{ heartbeat.temperature|temperature }}</td>
-            <td class="data">{{ heartbeat.t_lens|temperature }}</td>
-            <td class="data">{{ heartbeat.t_cpu|temperature }}</td>
-            <td class="data">{{ heartbeat.humidity|humidity }}</td>
-
+            <td class="data c timestamp">
+                <a href="{% url 'heartbeat' code=station.code id=heartbeat.id %}">{{ heartbeat.timestamp|date:"Y-m-d H:i:s" }}</a>
+            </td>
+            {% include "stations/heartbeat/tr.html" %}
         </tr>
     {% empty %}
         <tr>
-            <td class="data c empty" colspan="7">There are no heartbeats for this station.</td>
+            <td class="data c empty" colspan="50">There are no heartbeats for this station.</td>
         </tr>
     {% endfor %}
 </table>

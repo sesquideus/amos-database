@@ -6,13 +6,10 @@ from django.utils.safestring import mark_safe
 register = django.template.Library()
 
 
-def mdash(function):
+def default_string(function, replacement="&mdash;"):
     @functools.wraps(function)
     def wrapper(arg):
-        if arg == None:
-            return mark_safe("&mdash;")
-        else:
-            return function(arg)
+        return mark_safe(replacement) if arg is None else function(arg)
 
     return wrapper
 
@@ -24,12 +21,12 @@ def empty_on_error(*exceptions):
             try:
                 return function(*args, **kwargs)
             except exceptions as e:
-                print(f"Caught exception {e.__class__.__name__} ({e}) and returning '' for {function.__name__}")
+                print(f"Caught exception {e.__class__.__name__} ({e}), returning None for {function.__name__}")
                 return None
         return wrapper
 
     return protected
 
 
-def graceful(function):
-    return mdash(empty_on_error(TypeError, ValueError)(function))
+def graceful(function, replacement="&mdash;"):
+    return default_string(empty_on_error(TypeError, ValueError)(function), replacement)

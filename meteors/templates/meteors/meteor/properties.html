@@ -19,7 +19,7 @@
         <td>local time</td>
         <td class="data">
             {% if meteor.subnetwork is None %}
-                ?
+                <span class="empty">unknown subnetwork</span>
             {% else %}
                 {% timezone meteor.subnetwork.timezone %}{{ meteor.timestamp|date:"Y-m-d H:i:s" }}{% endtimezone %}
             {% endif %}
