@@ -130,16 +130,22 @@ class SensorsScatterView(GraphView):
         ones = np.ones(len(self.object.df))
         xs = self.object.df.timestamp.to_numpy()
 
-        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
+        def normalize(what, min, max):
+            return what.astype(float).to_numpy() * (max - min) + min
 
-        ax.scatter(xs, ones * 1, s=100, c=self.object.df.lens_heating.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 2, s=100, c=self.object.df.camera_heating.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 8, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 9, s=100, c=self.object.df.light_sensor_active.to_numpy(), cmap='bwr_r', marker='|', vmin=0, vmax=1)
+        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
         ax.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
+
+        ax.scatter(xs, ones * 9, s=100, c=normalize(self.object.df.light_sensor_active, 0.2, 0.5), cmap='plasma', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 8, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='winter_r', marker='|', vmin=0, vmax=1)
+
+        ax.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+
+        ax.scatter(xs, ones * 2, s=100, c=normalize(self.object.df.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 1, s=100, c=normalize(self.object.df.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+
         ax.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
         ax.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
         ax.set_ylim(0.5, 11.5)
