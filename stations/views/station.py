@@ -179,8 +179,8 @@ class ScatterView(DataFrameView):
 
         ax_storage.legend(
             handles=[
-                Line2D([0], [0], color=(1, 0.5, 0), lw=1, label='primary'),
-                Line2D([0], [0], color=(0, 0.8, 0.5), lw=1, label='permanent'),
+                Line2D([0], [0], color=C_primary, lw=1, label='primary'),
+                Line2D([0], [0], color=C_permanent, lw=1, label='permanent'),
             ],
             loc=(1.01, 0.5),
         )
@@ -228,23 +228,27 @@ class ScatterView(DataFrameView):
 
         ones = np.ones(len(self.object.df))
 
-        def normalize(what, min, max):
-            return what.astype(float).to_numpy() * (max - min) + min
+        cov = self.object.df.cover_state.to_numpy()
+        cover = np.where(
+            cov == 'C', C_cover_closed, np.where(
+            cov == 'c', C_cover_closing, np.where(
+            cov == 'S', C_cover_safety, np.where(
+            cov == 'o', C_cover_opening, np.where(
+            cov == 'O', C_cover_open, C_cover_problem
+        )))))
+        ax_sensors.scatter(xs, ones * 11, s=100, c=cover, marker='|', vmin=0, vmax=5)
 
-        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
-        ax_sensors.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
+        ax_sensors.scatter(xs, ones * 9, s=100, c=np.where(self.object.df.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 8, s=100, c=np.where(self.object.df.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 9, s=100, c=normalize(self.object.df.light_sensor_active, 0, 1), cmap='plasma', marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 8, s=100, c=normalize(self.object.df.rain_sensor_active, 0.5, 1), cmap='YlGnBu_r', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 6, s=100, c=np.where(self.object.df.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 5, s=100, c=np.where(self.object.df.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 4, s=100, c=np.where(self.object.df.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 2, s=100, c=np.where(self.object.df.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 2, s=100, c=normalize(self.object.df.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 1, s=100, c=normalize(self.object.df.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
-
-
+        ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
 
         return FigurePNGResponse(fig)
 
