@@ -134,7 +134,7 @@ class ScatterView(DataFrameView):
         C_light_active = '#D0D0E0'
         C_light_not_active = '#000000'
         C_raining = '#0020FF'
-        C_not_raining = '#40C040'
+        C_not_raining = '#80D080'
 
         C_device_off = '#202020'
         C_device_on = '#FF8040'
@@ -197,16 +197,16 @@ class ScatterView(DataFrameView):
                 #Line2D([0], [0], color=C_cover_closing, lw=4, label='closing'),
                 Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
                 Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
-                Line2D([0], [0], color=C_raining, lw=4, label='raining'),
-                Line2D([0], [0], color=C_device_on, lw=4, label='device on'),
-                Line2D([0], [0], color=C_heating_on, lw=4, label='heating on'),
+                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
+                Line2D([0], [0], color=C_device_off, lw=4, label='device off'),
+                Line2D([0], [0], color=C_heating_off, lw=4, label='heating off'),
                 Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
                 #Line2D([0], [0], color=C_cover_opening, lw=4, label='opening'),
                 Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
                 Line2D([0], [0], color=C_light_active, lw=4, label='light'),
-                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
-                Line2D([0], [0], color=C_device_off, lw=4, label='device off'),
-                Line2D([0], [0], color=C_heating_off, lw=4, label='heating off'),
+                Line2D([0], [0], color=C_raining, lw=4, label='raining'),
+                Line2D([0], [0], color=C_device_on, lw=4, label='device on'),
+                Line2D([0], [0], color=C_heating_on, lw=4, label='heating on'),
             ],
             ncol=2,
             loc=(1.01, 0.0),
@@ -236,17 +236,17 @@ class ScatterView(DataFrameView):
             cov == 'o', C_cover_opening, np.where(
             cov == 'O', C_cover_open, C_cover_problem,
         )))))
-        ax_sensors.scatter(xs, ones * 11, s=100, c=cover, marker='|', vmin=0, vmax=5)
+        ax_sensors.scatter(xs, ones * 11, s=150, c=cover, marker='|', vmin=0, vmax=5)
 
-        ax_sensors.scatter(xs, ones * 9, s=100, c=np.where(self.object.df.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 8, s=100, c=np.where(self.object.df.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 9, s=150, c=np.where(self.object.df.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 8, s=150, c=np.where(self.object.df.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 6, s=100, c=np.where(self.object.df.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 5, s=100, c=np.where(self.object.df.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 4, s=100, c=np.where(self.object.df.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 6, s=150, c=np.where(self.object.df.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 5, s=150, c=np.where(self.object.df.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 4, s=150, c=np.where(self.object.df.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 2, s=100, c=np.where(self.object.df.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 2, s=150, c=np.where(self.object.df.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 1, s=150, c=np.where(self.object.df.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
 
         ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
 
