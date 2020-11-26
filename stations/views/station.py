@@ -117,9 +117,34 @@ class GraphView(DataFrameView):
 
 class ScatterView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
+        C_T_env = (0, 0.8, 0.3)
+        C_T_lens = (0, 0.2, 0.7)
+        C_T_CPU = (1, 0, 0.2)
+        C_H = (0, 0.6, 1)
+        C_primary = (1, 0.5, 0)
+        C_permanent = (0, 0.8, 0.5)
+
+        C_cover_closed = (0.2, 0, 0.3)
+        C_cover_open = (1, 0.8, 0)
+        C_cover_opening = (0.6, 0.5, 0.4)
+        C_cover_closing = (0.6, 0.5, 0.4)
+        C_cover_safety = (0, 0.5, 0.5)
+        C_cover_problem = (1, 0, 0)
+
+        C_light_active = (0.8, 0.8, 0.9)
+        C_light_not_active = (0, 0, 0)
+        C_raining = (0, 0, 1)
+        C_not_raining = (0.2, 0.8, 0.2)
+
+        C_device_off = (0, 0, 0)
+        C_device_on = (1, 0.6, 0.3)
+
+        C_heating_on = (1, 0.2, 0)
+        C_heating_off = (0.7, 0.8, 1)
+
         fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
         fig.set_size_inches(12, 8)
-        fig.tight_layout(rect=(0.07, 0, 0.8, 1))
+        fig.tight_layout(rect=(0.07, 0, 0.77, 1))
 
         for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
@@ -128,11 +153,11 @@ class ScatterView(DataFrameView):
         ax_temp.set_ylabel('temperature')
         ax_temp.legend(
             handles=[
-                Line2D([0], [0], marker='|', color=(0, 0.8, 0.3), lw=1, label='environment'),
-                Line2D([0], [0], marker='|', color=(0, 0.2, 0.7), lw=1, label='lens'),
-                Line2D([0], [0], marker='|', color=(1, 0, 0.2), lw=1, label='CPU'),
+                Line2D([0], [0], color=C_T_env, lw=1, label='environment'),
+                Line2D([0], [0], color=C_T_lens, lw=1, label='lens'),
+                Line2D([0], [0], color=C_T_CPU, lw=1, label='CPU'),
             ],
-            bbox_to_anchor=(1.01, 1),
+            loc=(1.01, 0.5),
         )
 
         ax_humi.set_ylim(0, 100)
@@ -140,10 +165,25 @@ class ScatterView(DataFrameView):
         ax_humi.set_ylabel('Humidity')
         ax_humi.legend(['relative humidity'])
 
-        ax_storage.set_ylim(0, 4000)
+        ax_humi.legend(
+            handles=[
+                Line2D([0], [0], color=C_H, lw=1, label='relative humidity'),
+            ],
+            loc=(1.01, 0.5),
+        )
+
+        ax_storage.set_ylim(0, 256)
         ax_storage.set_ylabel('Storage')
         ax_storage.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} GB"))
         ax_storage.legend(['primary', 'permanent'])
+
+        ax_storage.legend(
+            handles=[
+                Line2D([0], [0], color=(1, 0.5, 0), lw=1, label='primary'),
+                Line2D([0], [0], color=(0, 0.8, 0.5), lw=1, label='permanent'),
+            ],
+            loc=(1.01, 0.5),
+        )
 
         ax_sensors.set_xlim(self.start, self.end)
         ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
@@ -153,17 +193,23 @@ class ScatterView(DataFrameView):
 
         ax_sensors.legend(
             handles=[
-                Line2D([0], [0], marker='|', color=pyplot.cm.viridis(0), lw=0, label='closed'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.viridis(0.99), lw=0, label='open'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.plasma(0), lw=4, label='dark'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.plasma(0.99), lw=4, label='light'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.copper(0.99), lw=4, label='on'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.copper(0), lw=4, label='off'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.YlGnBu(0.5), lw=4, label='not raining'),
-                Line2D([0], [0], marker='|', color=pyplot.cm.YlGnBu(1.0), lw=4, label='raining'),
+                Line2D([0], [0], color=C_cover_closed, lw=4, label='cover closed'),
+                #Line2D([0], [0], color=C_cover_closing, lw=4, label='closing'),
+                Line2D([0], [0], color=C_cover_safety, lw=4, label='safety'),
+                Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
+                Line2D([0], [0], color=C_raining, lw=4, label='raining'),
+                Line2D([0], [0], color=C_device_on, lw=4, label='device on'),
+                Line2D([0], [0], color=C_heating_on, lw=4, label='heating on'),
+                Line2D([0], [0], color=C_cover_open, lw=4, label='cover open'),
+                #Line2D([0], [0], color=C_cover_opening, lw=4, label='opening'),
+                Line2D([0], [0], color=C_cover_problem, lw=4, label='problem'),
+                Line2D([0], [0], color=C_light_active, lw=4, label='light'),
+                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
+                Line2D([0], [0], color=C_device_off, lw=4, label='device off'),
+                Line2D([0], [0], color=C_heating_off, lw=4, label='heating off'),
             ],
             ncol=2,
-            bbox_to_anchor=(1.01, 1),
+            loc=(1.01, 0.0),
         )
 
         if (len(self.object.df) == 0):
@@ -171,14 +217,14 @@ class ScatterView(DataFrameView):
 
         xs = self.object.df.timestamp.to_numpy()
 
-        ax_temp.scatter(xs, self.object.df.temperature, s=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax_temp.scatter(xs, self.object.df.t_lens, s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax_temp.scatter(xs, self.object.df.t_cpu, s=0.5, color=(1, 0, 0.2), marker='.')
+        ax_temp.scatter(xs, self.object.df.temperature, s=0.5, color=C_T_env, marker='.')
+        ax_temp.scatter(xs, self.object.df.t_lens, s=0.5, color=C_T_lens, marker='.')
+        ax_temp.scatter(xs, self.object.df.t_cpu, s=0.5, color=C_T_CPU, marker='.')
 
-        ax_humi.scatter(xs, self.object.df.humidity, s=0.5, color=(0, 0.6, 1), marker='.')
+        ax_humi.scatter(xs, self.object.df.humidity, s=0.5, color=C_H, marker='.')
 
-        ax_storage.scatter(xs, self.object.df.storage_primary_available)
-        ax_storage.scatter(xs, self.object.df.storage_permanent_available)
+        ax_storage.scatter(xs, self.object.df.storage_primary_available, color=C_primary, marker='*')
+        ax_storage.scatter(xs, self.object.df.storage_permanent_available, color=C_permanent, marker='*')
 
         ones = np.ones(len(self.object.df))
 
