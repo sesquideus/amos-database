@@ -35,6 +35,13 @@ urlpatterns = [
         station.SensorsScatterView.as_view(),
         name='station-sensors-graph'
     ),
+
+    path(
+        'station/<slug:code>/graph',
+        station.ScatterView.as_view(),
+        name='station-graph',
+    ),
+
     path(
         'station/<slug:code>/temperature/json',
         station.GraphViewJSON.as_view(),

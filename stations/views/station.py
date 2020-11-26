@@ -25,7 +25,8 @@ matplotlib.use('Agg')
 from matplotlib import pyplot
 from matplotlib import ticker, dates
 from matplotlib.backends.backend_agg import FigureCanvasAgg
-
+from matplotlib.patches import Patch
+from matplotlib.lines import Line2D
 
 from stations.models import Station, Subnetwork, Heartbeat, LogEntry
 from meteors.models import Sighting
@@ -36,6 +37,17 @@ log = logging.getLogger(__name__)
 
 def floor_to(time, interval):
     return datetime.datetime.fromtimestamp(time.timestamp() // interval * interval).replace(tzinfo=pytz.utc)
+
+
+class FigurePNGResponse(django.http.HttpResponse):
+    def __init__(self, figure):
+        canvas = FigureCanvasAgg(figure)
+        buf = io.BytesIO()
+        canvas.print_png(buf)
+        pyplot.close(figure)
+
+        super().__init__(buf.getvalue(), content_type='image/png')
+        self['Content-Length'] = str(len(self.content))
 
 
 class DetailView(LoginDetailView):
@@ -100,14 +112,95 @@ class GraphView(DataFrameView):
         else:
             fig, ax = self.format_axes(fig, ax)
 
-        canvas = FigureCanvasAgg(fig)
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        pyplot.close(fig)
+        return FigurePNGResponse(fig)
 
-        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
-        response['Content-Length'] = str(len(response.content))
-        return response
+
+class ScatterView(DataFrameView):
+    def render_to_response(self, context, **response_kwargs):
+        fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
+        fig.set_size_inches(12, 8)
+        fig.tight_layout(rect=(0.07, 0, 0.8, 1))
+
+        for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
+            ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
+
+        ax_temp.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
+        ax_temp.set_ylabel('temperature')
+        ax_temp.legend(
+            handles=[
+                Line2D([0], [0], marker='|', color=(0, 0.8, 0.3), lw=1, label='environment'),
+                Line2D([0], [0], marker='|', color=(0, 0.2, 0.7), lw=1, label='lens'),
+                Line2D([0], [0], marker='|', color=(1, 0, 0.2), lw=1, label='CPU'),
+            ],
+            bbox_to_anchor=(1.01, 1),
+        )
+
+        ax_humi.set_ylim(0, 100)
+        ax_humi.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
+        ax_humi.set_ylabel('Humidity')
+        ax_humi.legend(['relative humidity'])
+
+        ax_storage.set_ylim(0, 4000)
+        ax_storage.set_ylabel('Storage')
+        ax_storage.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} GB"))
+        ax_storage.legend(['primary', 'permanent'])
+
+        ax_sensors.set_xlim(self.start, self.end)
+        ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
+        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
+        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
+        ax_sensors.set_ylim(0.5, 11.5)
+
+        ax_sensors.legend(
+            handles=[
+                Line2D([0], [0], marker='|', color=pyplot.cm.viridis(0), lw=0, label='closed'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.viridis(0.99), lw=0, label='open'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.plasma(0), lw=4, label='dark'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.plasma(0.99), lw=4, label='light'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.copper(0.99), lw=4, label='on'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.copper(0), lw=4, label='off'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.YlGnBu(0.5), lw=4, label='not raining'),
+                Line2D([0], [0], marker='|', color=pyplot.cm.YlGnBu(1.0), lw=4, label='raining'),
+            ],
+            ncol=2,
+            bbox_to_anchor=(1.01, 1),
+        )
+
+        if (len(self.object.df) == 0):
+            return FigurePNGResponse(fig)
+
+        xs = self.object.df.timestamp.to_numpy()
+
+        ax_temp.scatter(xs, self.object.df.temperature, s=0.5, color=(0, 0.8, 0.3), marker='.')
+        ax_temp.scatter(xs, self.object.df.t_lens, s=0.5, color=(0, 0.2, 0.7), marker='.')
+        ax_temp.scatter(xs, self.object.df.t_cpu, s=0.5, color=(1, 0, 0.2), marker='.')
+
+        ax_humi.scatter(xs, self.object.df.humidity, s=0.5, color=(0, 0.6, 1), marker='.')
+
+        ax_storage.scatter(xs, self.object.df.storage_primary_available)
+        ax_storage.scatter(xs, self.object.df.storage_permanent_available)
+
+        ones = np.ones(len(self.object.df))
+
+        def normalize(what, min, max):
+            return what.astype(float).to_numpy() * (max - min) + min
+
+        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
+        ax_sensors.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
+
+        ax_sensors.scatter(xs, ones * 9, s=100, c=normalize(self.object.df.light_sensor_active, 0, 1), cmap='plasma', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 8, s=100, c=normalize(self.object.df.rain_sensor_active, 0.5, 1), cmap='YlGnBu_r', marker='|', vmin=0, vmax=1)
+
+        ax_sensors.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+
+        ax_sensors.scatter(xs, ones * 2, s=100, c=normalize(self.object.df.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 1, s=100, c=normalize(self.object.df.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+
+
+
+        return FigurePNGResponse(fig)
 
 
 class TemperatureScatterView(GraphView):

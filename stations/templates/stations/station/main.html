@@ -33,9 +33,7 @@
             {% include "stations/station/log.html" %}
 
             <h3>Charts</h3>
-            <img class="chart" src="{% url 'station-temperature-graph' code=station.code %}" alt="Temperature graph" />
-            <img class="chart" src="{% url 'station-humidity-graph' code=station.code %}" alt="Humidity graph" />
-            <img class="chart" src="{% url 'station-sensors-graph' code=station.code %}" alt="Sensors graph" />
+            <img class="chart" src="{% url 'station-graph' code=station.code %}" alt="Graph" />
         </div>
 
         {% comment %}
