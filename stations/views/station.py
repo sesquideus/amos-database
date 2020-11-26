@@ -117,34 +117,34 @@ class GraphView(DataFrameView):
 
 class ScatterView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
-        C_T_env = (0, 0.8, 0.3)
-        C_T_lens = (0, 0.2, 0.7)
-        C_T_CPU = (1, 0, 0.2)
-        C_H = (0, 0.6, 1)
-        C_primary = (1, 0.5, 0)
-        C_permanent = (0, 0.8, 0.5)
+        C_T_env = '#00D040'
+        C_T_lens = '#0030B0'
+        C_T_CPU = '#E01040'
+        C_H = '#0080C0'
+        C_primary = '#FF8000'
+        C_permanent = '#00A040'
 
-        C_cover_closed = (0.2, 0, 0.3)
-        C_cover_open = (1, 0.8, 0)
-        C_cover_opening = (0.6, 0.5, 0.4)
-        C_cover_closing = (0.6, 0.5, 0.4)
-        C_cover_safety = (0, 0.5, 0.5)
-        C_cover_problem = (1, 0, 0)
+        C_cover_closed = '#400060'
+        C_cover_open = '#FFC000'
+        C_cover_opening = '#A08060'
+        C_cover_closing = '#A08060'
+        C_cover_safety = '#008080'
+        C_cover_problem = '#FF0000'
 
-        C_light_active = (0.8, 0.8, 0.9)
-        C_light_not_active = (0, 0, 0)
-        C_raining = (0, 0, 1)
-        C_not_raining = (0.2, 0.8, 0.2)
+        C_light_active = '#D0D0E0'
+        C_light_not_active = '#000000'
+        C_raining = '#0020FF'
+        C_not_raining = '#40C040'
 
-        C_device_off = (0, 0, 0)
-        C_device_on = (1, 0.6, 0.3)
+        C_device_off = '#202020'
+        C_device_on = '#FF8040'
 
-        C_heating_on = (1, 0.2, 0)
-        C_heating_off = (0.7, 0.8, 1)
+        C_heating_on = '#FF3000'
+        C_heating_off = '#A0C0FF'
 
         fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
-        fig.set_size_inches(12, 8)
-        fig.tight_layout(rect=(0.07, 0, 0.77, 1))
+        fig.set_size_inches(15, 8)
+        fig.tight_layout(rect=(0.07, 0, 0.79, 1))
 
         for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
@@ -193,16 +193,16 @@ class ScatterView(DataFrameView):
 
         ax_sensors.legend(
             handles=[
-                Line2D([0], [0], color=C_cover_closed, lw=4, label='cover closed'),
+                Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
                 #Line2D([0], [0], color=C_cover_closing, lw=4, label='closing'),
-                Line2D([0], [0], color=C_cover_safety, lw=4, label='safety'),
+                Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
                 Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
                 Line2D([0], [0], color=C_raining, lw=4, label='raining'),
                 Line2D([0], [0], color=C_device_on, lw=4, label='device on'),
                 Line2D([0], [0], color=C_heating_on, lw=4, label='heating on'),
-                Line2D([0], [0], color=C_cover_open, lw=4, label='cover open'),
+                Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
                 #Line2D([0], [0], color=C_cover_opening, lw=4, label='opening'),
-                Line2D([0], [0], color=C_cover_problem, lw=4, label='problem'),
+                Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
                 Line2D([0], [0], color=C_light_active, lw=4, label='light'),
                 Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
                 Line2D([0], [0], color=C_device_off, lw=4, label='device off'),
@@ -234,7 +234,7 @@ class ScatterView(DataFrameView):
             cov == 'c', C_cover_closing, np.where(
             cov == 'S', C_cover_safety, np.where(
             cov == 'o', C_cover_opening, np.where(
-            cov == 'O', C_cover_open, C_cover_problem
+            cov == 'O', C_cover_open, C_cover_problem,
         )))))
         ax_sensors.scatter(xs, ones * 11, s=100, c=cover, marker='|', vmin=0, vmax=5)
 
