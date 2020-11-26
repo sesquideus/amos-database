@@ -55,27 +55,27 @@ class HeartbeatManager(models.Manager):
                         cover_state = Heartbeat.COVER_PROBLEM
 
         heartbeat = self.create(
-            automatic               = data['auto'],
-            timestamp               = data['time'],
-            station                 = Station.objects.get(code=code),
+            automatic                   = data['auto'],
+            timestamp                   = data['time'],
+            station                     = Station.objects.get(code=code),
 
-            status_string           = stateS,
-            lens_heating            = None if stateS is None else (stateS[4] != '-'),
-            camera_heating          = None if stateS is None else (stateS[5] != '-'),
-            intensifier_active      = None if stateS is None else (stateS[6] != '-'),
-            fan_active              = None if stateS is None else (stateS[7] != '-'),
+            status_string               = stateS,
+            lens_heating                = None if stateS is None else (stateS[4] != '-'),
+            camera_heating              = None if stateS is None else (stateS[5] != '-'),
+            intensifier_active          = None if stateS is None else (stateS[6] != '-'),
+            fan_active                  = None if stateS is None else (stateS[7] != '-'),
 
-            rain_sensor_active      = None if stateS is None else (stateS[9] != '-'),
-            light_sensor_active     = None if stateS is None else (stateS[10] != '-'),
-            computer_power          = None if stateS is None else (stateS[11] != '-'),
+            rain_sensor_active          = None if stateS is None else (stateS[9] != '-'),
+            light_sensor_active         = None if stateS is None else (stateS[10] != '-'),
+            computer_power              = None if stateS is None else (stateS[11] != '-'),
 
-            temperature             = None if stateT is None else stateT['t_sht'],
-            t_lens                  = None if stateT is None else stateT['t_lens'],
-            t_cpu                   = None if stateT is None else stateT['t_cpu'],
-            humidity                = None if stateT is None else stateT['h_sht'],
+            temperature                 = None if stateT is None else stateT['t_sht'],
+            t_lens                      = None if stateT is None else stateT['t_lens'],
+            t_cpu                       = None if stateT is None else stateT['t_cpu'],
+            humidity                    = None if stateT is None else stateT['h_sht'],
 
-            cover_state             = cover_state,
-            cover_position          = None if data['dome']['z'] is None else data['dome']['z']['sp'],
+            cover_state                 = cover_state,
+            cover_position              = None if data['dome']['z'] is None else data['dome']['z']['sp'],
 
             storage_primary_available   = data['disk']['prim']['a'],
             storage_primary_total       = data['disk']['prim']['t'],

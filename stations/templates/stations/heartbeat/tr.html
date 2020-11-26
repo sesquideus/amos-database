@@ -6,7 +6,7 @@
     <td class="data status verbatim">{{ heartbeat.status_string|default:'????????|????????|????????' }}</td>
 
     <td class="data c">{{ heartbeat.get_cover_state_display|default:"?" }}</td>
-    <td class="data c">{{ heartbeat.cover_position|default:"&mdash;" }}</td>
+    <td class="data c">{{ heartbeat.cover_position|default_if_none:"&mdash;" }}</td>
 
     <td class="data boolean">{{ heartbeat.lens_heating|boolean }}</td>
     <td class="data boolean">{{ heartbeat.camera_heating|boolean }}</td>
