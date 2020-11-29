@@ -143,8 +143,8 @@ class ScatterView(DataFrameView):
         C_heating_off = '#A0C0FF'
 
         fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
-        fig.set_size_inches(15, 8)
-        fig.tight_layout(rect=(0.07, 0, 0.79, 1))
+        fig.set_size_inches(12.8, 8)
+        fig.tight_layout(rect=(0.07, 0, 0.76, 1))
 
         for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
