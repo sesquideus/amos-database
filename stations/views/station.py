@@ -398,19 +398,18 @@ class APIViewSighting(django.views.View):
         log.info(f"Incoming new sighting from station {code}")
 
         try:
-            data = json.loads(request.body)
+            pp(request.content_type)
+            pp(request.POST)
+            pp(request.FILES)
 
-            sighting = Sighting.objects.create_from_POST(code, **data)
+            #sighting = Sighting.objects.create_from_POST(code, **data)
 
             response = HttpResponse('New sighting received', status=201)
-            response['location'] = reverse('sighting', args=[sighting.id])
+            #response['location'] = reverse('sighting', args=[sighting.id])
             return response
 
         except json.JSONDecodeError:
             log.warning("JSON decoding error in the sighting")
-            return HttpResponseBadRequest()
-        except Exception as e:
-            log.warning(e)
             return HttpResponseBadRequest()
 
     def get(self, request, code):

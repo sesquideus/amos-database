@@ -161,8 +161,13 @@ class Sighting(models.Model):
                                         verbose_name        = "timestamp",
                                     )
 
-    composite                       = models.ImageField(
-                                        upload_to           = 'sightings/',
+    jpg                             = models.ImageField(
+                                        upload_to           = 'sightings/%Y/%m/%d/',
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    xml                             = models.FileField(
+                                        upload_to           = 'sightings/%Y/%m/%d/',
                                         null                = True,
                                         blank               = True,
                                     )

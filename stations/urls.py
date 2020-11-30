@@ -54,11 +54,11 @@ urlpatterns = [
     ),
     path('station/<slug:code>/heartbeat/',
         station.APIViewHeartbeat.as_view(),
-        name='station-receive-heartbeat'
+        name='station-receive-heartbeat',
     ),
     path('station/<slug:code>/sighting/',
         station.APIViewSighting.as_view(),
-        name='station-receive-sighting'
+        name='station-receive-sighting',
     ),
     path('stations/json/',
         station.ListViewJSON.as_view(),
