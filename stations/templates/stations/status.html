@@ -7,7 +7,7 @@
 
 {% block page %}
     <p>
-        It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %}, &#955;<sub>&#9737;</sub> = {{ now|solar_longitude|angle }})
+        It is {{ now }} ({% timezone "Europe/Bratislava" %} {{ now }} {% endtimezone %})
     </p>
 
     <table class="full-width">
@@ -109,8 +109,24 @@
                 </tr>
             {% endfor %}
             {% if not forloop.last %}
-                <tr><td colspan="12">&nbsp;</td></tr>
+                <tr class="spacer"><td colspan="12"></td></tr>
             {% endif %}
         {% endfor %}
+    </table>
+
+    <h3>Sun info</h3>
+    <table>
+        <tr>
+            <th>Property</th>
+            <th>Value</th>
+        </tr>
+        <tr>
+            <td>Solar longitude &#955;<sub>&#9737;</sub></td>
+            <td>{{ now|solar_longitude|angle }}</td>
+        </tr>
+        <tr>
+            <td>Solar declination &#948;<sub>&#9737;</sub></td>
+            <td></td>
+        </tr>
     </table>
 {% endblock page %}

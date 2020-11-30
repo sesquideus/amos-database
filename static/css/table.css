@@ -23,6 +23,12 @@ tr {
     border-collapse: collapse;
 }
 
+tr.spacer {
+    padding: 0px;
+    height: 3px;
+    background-color: hsla(200, 40%, 10%, 1);
+}
+
 tr.max-light {
     font-weight: bold;
 }
