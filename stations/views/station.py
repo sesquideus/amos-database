@@ -398,11 +398,16 @@ class APIViewSighting(django.views.View):
         log.info(f"Incoming new sighting from station {code}")
 
         try:
-            pp(request.content_type)
-            pp(request.POST)
-            pp(request.FILES)
+#            pp(request.content_type)
+#            pp(request.POST)
+#            pp(request.FILES)
 
-            #sighting = Sighting.objects.create_from_POST(code, **data)
+            data = {
+                'post': json.loads(request.POST['text']),
+                'files': request.FILES,
+            }
+
+            sighting = Sighting.objects.create_from_POST(code, **data)
 
             response = HttpResponse('New sighting received', status=201)
             #response['location'] = reverse('sighting', args=[sighting.id])

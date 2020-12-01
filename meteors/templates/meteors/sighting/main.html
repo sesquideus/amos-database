@@ -40,9 +40,9 @@
             <img class="chart" src="{% url 'sighting-sky' id=sighting.id %}" alt="Sky visualisation" />
         </div>
         <div class="preview">
-            {% if sighting.composite %}
-            <a href="{{ sighting.composite.url }}">
-                <img class="sighting" src="{{ sighting.composite.url }}" alt="Image for sighting {{ sighting.id }} is missing" />
+            {% if sighting.jpg %}
+            <a href="{{ sighting.jpg.url }}">
+                <img class="sighting" src="{{ sighting.jpg.url }}" alt="Image for sighting {{ sighting.id }} is missing" />
             </a>
             {% else %}
                 <img class="sighting empty" src="{% static "no-image.svg" %} "/>

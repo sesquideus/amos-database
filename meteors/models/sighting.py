@@ -64,9 +64,9 @@ class SightingManager(models.Manager):
             )
 
     """
-        Create a new Sighting from data received at the POST endpoint.
+        Create a new Sighting from data received at the POST endpoint (old mockup)
     """
-    def create_from_POST(self, station_code, **kwargs):
+    def create_from_POST_old(self, station_code, **kwargs):
         frames = kwargs.get('frames')
         log.info(f"Creating a sighting from POST at station {station_code} ({len(frames)})")
 
@@ -90,6 +90,22 @@ class SightingManager(models.Manager):
             )
         return sighting
 
+
+    def create_from_POST(self, station_code, **kwargs):
+        log.info(f"Creating a sighting from POST at station {station_code}")
+
+        Station = apps.get_model('stations', 'Station')
+        try:
+            sighting = self.create(
+                timestamp           = datetime.datetime.strptime(kwargs['post']['timestamp'], '%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=pytz.utc),
+                meteor              = None,
+                station             = Station.objects.get(code=station_code),
+                jpg                 = kwargs['files'].get('jpg', None),
+                xml                 = kwargs['files'].get('xml', None),
+            )
+        except KeyError as e:
+            log.error("Invalid sighting")
+            raise e
 
 class SightingQuerySet(models.QuerySet):
     def with_neighbours(self):
