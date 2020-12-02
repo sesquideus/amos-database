@@ -97,7 +97,7 @@ class SightingManager(models.Manager):
         Station = apps.get_model('stations', 'Station')
         try:
             sighting = self.create(
-                timestamp           = datetime.datetime.strptime(kwargs['post']['timestamp'], '%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=pytz.utc),
+                timestamp           = datetime.datetime.strptime(kwargs['meta']['timestamp'], '%Y-%m-%d %H:%M:%S.%f').replace(tzinfo=pytz.utc),
                 meteor              = None,
                 station             = Station.objects.get(code=station_code),
                 jpg                 = kwargs['files'].get('jpg', None),

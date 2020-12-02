@@ -144,7 +144,7 @@ class ScatterView(DataFrameView):
 
         fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
         fig.set_size_inches(12.8, 8)
-        fig.tight_layout(rect=(0.07, 0, 0.76, 1))
+        fig.tight_layout(rect=(0.07, 0, 0.87, 1))
 
         for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
@@ -182,7 +182,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_primary, lw=1, label='primary'),
                 Line2D([0], [0], color=C_permanent, lw=1, label='permanent'),
             ],
-            loc=(1.01, 0.5),
+            loc=(1.01, 0.7),
         )
 
         ax_sensors.set_xlim(self.start, self.end)
@@ -194,22 +194,20 @@ class ScatterView(DataFrameView):
         ax_sensors.legend(
             handles=[
                 Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
-                #Line2D([0], [0], color=C_cover_closing, lw=4, label='closing'),
                 Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
-                Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
-                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
-                Line2D([0], [0], color=C_device_off, lw=4, label='device off'),
-                Line2D([0], [0], color=C_heating_off, lw=4, label='heating off'),
                 Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
-                #Line2D([0], [0], color=C_cover_opening, lw=4, label='opening'),
                 Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
+                Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
                 Line2D([0], [0], color=C_light_active, lw=4, label='light'),
+                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
                 Line2D([0], [0], color=C_raining, lw=4, label='raining'),
-                Line2D([0], [0], color=C_device_on, lw=4, label='device on'),
-                Line2D([0], [0], color=C_heating_on, lw=4, label='heating on'),
+                Line2D([0], [0], color=C_device_off, lw=4, label='device: off'),
+                Line2D([0], [0], color=C_device_on, lw=4, label='device: on'),
+                Line2D([0], [0], color=C_heating_off, lw=4, label='heating: off'),
+                Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
             ],
-            ncol=2,
-            loc=(1.01, 0.0),
+            ncol=1,
+            loc=(1.01, -0.1),
         )
 
         if (len(self.object.df) == 0):
@@ -403,7 +401,7 @@ class APIViewSighting(django.views.View):
 #            pp(request.FILES)
 
             data = {
-                'post': json.loads(request.POST['text']),
+                'meta': json.loads(request.POST['meta']),
                 'files': request.FILES,
             }
 
