@@ -86,7 +86,7 @@ class SightingAdmin(admin.ModelAdmin):
         ),
         ('Images',
             {
-                'fields': ['composite'],
+                'fields': ['jpg'],
             }
         ),
     )
