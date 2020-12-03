@@ -75,8 +75,8 @@ class DataFrameView(core.views.LoginDetailView):
         heartbeats = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
         station.df_heartbeat = pd.DataFrame(list(heartbeats.values()))
 
-        sightings = Sighting.objects.for_station(station.code).with_everything().as_scatter(self.start, self.end)
-        station.df_sightings = pd.DataFrame(list(sightings.values()))
+        sightings = Sighting.objects.for_station(station.code).with_everything().as_scatter(self.start, self.end).values('timestamp', 'magnitude')
+        station.df_sightings = pd.DataFrame(list(sightings.values())).fillna(value=np.nan)
         return station
 
 
@@ -126,12 +126,15 @@ class ScatterView(DataFrameView):
         C_heating_on = '#FF3000'
         C_heating_off = '#A0C0FF'
 
-        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1, sharex=True)
-        fig.set_size_inches(12.8, 8)
+        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1)
+        fig.set_size_inches(12.8, 10)
         fig.tight_layout(rect=(0.07, 0, 0.87, 1))
 
         for ax in [ax_sightings, ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
+            ax.tick_params(axis='both', which='both', labelsize=10)
+            ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
+            ax.set_xlim(self.start, self.end)
 
         ax_sightings.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.1f}"))
         ax_sightings.set_ylabel('apparent magnitude')
@@ -179,8 +182,6 @@ class ScatterView(DataFrameView):
             loc=(1.01, 0.3),
         )
 
-        ax_sensors.set_xlim(self.start, self.end)
-        ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
         ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
         ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
         ax_sensors.set_ylim(0.5, 11.5)
@@ -206,7 +207,8 @@ class ScatterView(DataFrameView):
 
         if (len(self.object.df_sightings) > 0):
             xs = self.object.df_sightings.timestamp.to_numpy()
-            ax_sightings.scatter(xs, self.object.df_sightings.magnitude, s=np.exp(-self.object.df_sightings.magnitude / 2) * 3, color=C_sighting, marker='*')
+            ys = self.object.df_sightings.magnitude.to_numpy()
+            ax_sightings.scatter(xs, ys, s=np.exp(-ys / 2) * 3, color=C_sighting, marker='*')
 
         if (len(self.object.df_heartbeat) > 0):
             xs = self.object.df_heartbeat.timestamp.to_numpy()
@@ -241,8 +243,6 @@ class ScatterView(DataFrameView):
 
             ax_sensors.scatter(xs, ones * 2, s=150, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
             ax_sensors.scatter(xs, ones * 1, s=150, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
-
-            ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
 
         return core.http.FigurePNGResponse(fig)
 
