@@ -37,12 +37,12 @@ class DetailView(core.views.LoginDetailView):
     template_name   = 'stations/station/main.html'
 
     def get_queryset(self, **kwargs):
-        return self.model.objects.with_last_heartbeat().with_last_sighting().with_log_entries()
+        return self.model.objects.with_last_heartbeat().with_last_sighting().with_counts().with_log_entries()
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
         station.recent_heartbeats = Heartbeat.objects.order_by('-timestamp').for_station(station.code)[:10]
-        station.recent_sightings = Sighting.objects.order_by('-timestamp').for_station(station.code).with_lightmax().with_station()[:10]
+        station.recent_sightings = Sighting.objects.order_by('-timestamp').for_station(station.code).with_everything()[:10]
 #        station.log_entries = LogEntry.objects.for_station(station.code)
         return station
 

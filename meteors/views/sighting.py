@@ -105,9 +105,13 @@ class DetailView(core.views.LoginDetailView):
         frames = sighting.frames
 
         if frames.count() == 0:
-            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = None, None, None
+            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = \
+                None, None, None
         else:
-            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = sighting.frames.order_by('timestamp')[0], sighting.frames.order_by('-timestamp')[0], sighting.frames.order_by('magnitude')[0]
+            sighting.frame_first, sighting.frame_lightmax, sighting.frame_last = \
+                sighting.frames.order_by('timestamp')[0], \
+                sighting.frames.order_by('-timestamp')[0], \
+                sighting.frames.order_by('magnitude')[0]
         return sighting
 
     def get_context_data(self, **kwargs):

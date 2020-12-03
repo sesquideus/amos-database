@@ -22,8 +22,13 @@
             {% else %}
                 <span class="unknown">Unidentified meteor</span>
             {% endif %}
-            observed from <a class="object-link station" href="{% url 'station' code=sighting.station.code %}" id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}</a>
-            at <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
+            observed from
+            <a class="object-link station"
+                href="{% url 'station' code=sighting.station.code %}"
+                id="location-name">{{ sighting.station.name|default_if_none:"(unknown)" }}
+            </a>
+            at
+            <span id="time">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</span>
         </p>
     </div>
 

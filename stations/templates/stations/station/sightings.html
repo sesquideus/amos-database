@@ -1,12 +1,16 @@
 {% load quantities %}
 
-<h3>Sightings ({{ station.sightings.count }} total)</h3>
+<h3>Latest sightings (out of {{ station.sighting_count }} total)</h3>
 <table>
     <thead>
         <tr>
             <th>timestamp</th>
             <th>ago</th>
             <th>magnitude</th>
+            <th>altitude</th>
+            <th>azimuth</th>
+            <th>duration</th>
+            <th>frames</th>
         </tr>
     </thead>
     {% for sighting in station.recent_sightings %}
@@ -19,6 +23,18 @@
             </td>
             <td class="data magnitude">
                 {{ sighting.magnitude|magnitude }}
+            </td>
+            <td class="data angle">
+                {{ sighting.altitude|angle }}
+            </td>
+            <td class="data azimuth">
+                {{ sighting.azimuth|angle }}
+            </td>
+            <td class="data time">
+                {{ sighting.frames.last.flight_time.total_seconds|floatformat:3 }} s
+            </td>
+            <td class="data r">
+                {{ sighting.frame_count }}
             </td>
         </tr>
     {% empty %}

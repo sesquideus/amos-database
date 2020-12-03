@@ -15,7 +15,7 @@ table.alternating tr:nth-child(even) {
 }
 
 table.heartbeats {
-    table-layout: fixed;
+    width: 100%;
 }
 
 tr {

@@ -2,7 +2,7 @@ import datetime
 import pytz
 
 from django.db import models
-from django.db.models import Prefetch, F, Q, OuterRef, Max
+from django.db.models import Prefetch, F, Q, OuterRef, Max, Count
 from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 
@@ -17,6 +17,12 @@ from core.templatetags.quantities import since_date_time
 
 
 class StationQuerySet(models.QuerySet):
+    def with_counts(self):
+        return self.prefetch_related('sightings').prefetch_related('heartbeats').annotate(
+            sighting_count=Count('sightings'),
+            heartbeat_count=Count('heartbeats'),
+        )
+
     def with_last_sighting(self):
         latest = Sighting.objects.order_by('station__id', '-timestamp').distinct('station__id')
         return self.prefetch_related(
@@ -64,7 +70,7 @@ class Station(core.models.NamedModel):
                                                 latitude__gte=-90,
                                                 latitude__lte=90,
                                                 longitude__gte=-180,
-                                                longitude__lte=180
+                                                longitude__lte=180,
                                             ),
                                             name='coordinates',
                                         )
