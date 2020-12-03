@@ -3,34 +3,25 @@ import pytz
 import json
 import logging
 import django
-import io
 import numpy as np
 import pandas as pd
 
-from pprint import pprint as pp
+import core.views
+import core.http
 
 from django.contrib.auth.decorators import login_required
-from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render
+from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 from django.views.decorators.csrf import csrf_exempt
 
-from django.views.generic.detail import DetailView, BaseDetailView
-from django.views.generic.list import ListView
-
-
-import matplotlib
-matplotlib.use('Agg')
 from matplotlib import pyplot
 from matplotlib import ticker, dates
-from matplotlib.backends.backend_agg import FigureCanvasAgg
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
 
 from stations.models import Station, Subnetwork, Heartbeat, LogEntry
 from meteors.models import Sighting
-from core.views import JSONDetailView, JSONListView, LoginDetailView, JsonResponseMixin
 
 log = logging.getLogger(__name__)
 
@@ -39,18 +30,7 @@ def floor_to(time, interval):
     return datetime.datetime.fromtimestamp(time.timestamp() // interval * interval).replace(tzinfo=pytz.utc)
 
 
-class FigurePNGResponse(django.http.HttpResponse):
-    def __init__(self, figure):
-        canvas = FigureCanvasAgg(figure)
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        pyplot.close(figure)
-
-        super().__init__(buf.getvalue(), content_type='image/png')
-        self['Content-Length'] = str(len(self.content))
-
-
-class DetailView(LoginDetailView):
+class DetailView(core.views.LoginDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
@@ -68,19 +48,19 @@ class DetailView(LoginDetailView):
 
 
 @method_decorator(login_required, name='dispatch')
-class DetailViewJSON(JSONDetailView):
+class DetailViewJSON(core.views.JSONDetailView):
     model           = Station
     slug_field      = 'code'
     slug_url_kwarg  = 'code'
 
 
 @method_decorator(login_required, name='dispatch')
-class ListViewJSON(JSONListView):
+class ListViewJSON(core.views.JSONListView):
     model               = Station
     context_object_name = 'stations'
 
 
-class DataFrameView(LoginDetailView):
+class DataFrameView(core.views.LoginDetailView):
     model = Station
     slug_field = 'code'
     slug_url_kwarg = 'code'
@@ -92,14 +72,16 @@ class DataFrameView(LoginDetailView):
         self.start = kwargs.get('start', datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1))
         self.end = kwargs.get('end', datetime.datetime.now(tz=pytz.utc))
 
-        data = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
-        station.df = pd.DataFrame(list(data.values()))
+        heartbeats = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
+        station.df_heartbeat = pd.DataFrame(list(heartbeats.values()))
+
+        sightings = Sighting.objects.for_station(station.code).as_scatter(self.start, self.end)
+        station.df_sightings = pd.DataFrame(list(sightings.values()))
         return station
 
 
 class GraphView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
-
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.05, 0.05, 1.03, 1))
         fig.set_size_inches(12, 3)
@@ -107,16 +89,18 @@ class GraphView(DataFrameView):
         ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
         ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
 
-        if len(self.object.df) == 0:
+        if len(self.object.df_heartbeat) == 0:
             pass
         else:
             fig, ax = self.format_axes(fig, ax)
 
-        return FigurePNGResponse(fig)
+        return core.http.FigurePNGResponse(fig)
 
 
 class ScatterView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
+        C_sighting = 'green'
+
         C_T_env = '#00D040'
         C_T_lens = '#0030B0'
         C_T_CPU = '#E01040'
@@ -142,12 +126,22 @@ class ScatterView(DataFrameView):
         C_heating_on = '#FF3000'
         C_heating_off = '#A0C0FF'
 
-        fig, (ax_temp, ax_humi, ax_storage, ax_sensors) = pyplot.subplots(4, 1, sharex=True)
+        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1, sharex=True)
         fig.set_size_inches(12.8, 8)
         fig.tight_layout(rect=(0.07, 0, 0.87, 1))
 
-        for ax in [ax_temp, ax_humi, ax_storage, ax_sensors]:
+        for ax in [ax_sightings, ax_temp, ax_humi, ax_storage, ax_sensors]:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
+
+        ax_sightings.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.1f}"))
+        ax_sightings.set_ylabel('apparent magnitude')
+        ax_sightings.invert_yaxis()
+        ax_sightings.legend(
+            handles=[
+                Line2D([0], [0], color=C_sighting, lw=0, marker='*', label='sighting'),
+            ],
+            loc=(1.01, 0.8),
+        )
 
         ax_temp.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         ax_temp.set_ylabel('temperature')
@@ -157,7 +151,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_T_lens, lw=1, label='lens'),
                 Line2D([0], [0], color=C_T_CPU, lw=1, label='CPU'),
             ],
-            loc=(1.01, 0.5),
+            loc=(1.01, 0.0),
         )
 
         ax_humi.set_ylim(0, 100)
@@ -169,7 +163,7 @@ class ScatterView(DataFrameView):
             handles=[
                 Line2D([0], [0], color=C_H, lw=1, label='relative humidity'),
             ],
-            loc=(1.01, 0.5),
+            loc=(1.01, 0.4),
         )
 
         ax_storage.set_ylim(0, 256)
@@ -182,7 +176,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_primary, lw=1, label='primary'),
                 Line2D([0], [0], color=C_permanent, lw=1, label='permanent'),
             ],
-            loc=(1.01, 0.7),
+            loc=(1.01, 0.3),
         )
 
         ax_sensors.set_xlim(self.start, self.end)
@@ -207,26 +201,29 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
             ],
             ncol=1,
-            loc=(1.01, -0.1),
+            loc=(1.01, -0.5),
         )
 
-        if (len(self.object.df) == 0):
-            return FigurePNGResponse(fig)
+        if (len(self.object.df_heartbeat) == 0):
+            return core.http.FigurePNGResponse(fig)
 
-        xs = self.object.df.timestamp.to_numpy()
+        xs = self.object.df_sightings.timestamp.to_numpy()
+        ax_sightings.scatter(xs, self.object.df_sightings.magnitude, s=np.exp(-self.object.df_sightings.magnitude / 2) * 3, color=C_sighting, marker='*')
 
-        ax_temp.scatter(xs, self.object.df.temperature, s=0.5, color=C_T_env, marker='.')
-        ax_temp.scatter(xs, self.object.df.t_lens, s=0.5, color=C_T_lens, marker='.')
-        ax_temp.scatter(xs, self.object.df.t_cpu, s=0.5, color=C_T_CPU, marker='.')
+        xs = self.object.df_heartbeat.timestamp.to_numpy()
 
-        ax_humi.scatter(xs, self.object.df.humidity, s=0.5, color=C_H, marker='.')
+        ax_temp.scatter(xs, self.object.df_heartbeat.temperature, s=0.5, color=C_T_env, marker='.')
+        ax_temp.scatter(xs, self.object.df_heartbeat.t_lens, s=0.5, color=C_T_lens, marker='.')
+        ax_temp.scatter(xs, self.object.df_heartbeat.t_cpu, s=0.5, color=C_T_CPU, marker='.')
 
-        ax_storage.scatter(xs, self.object.df.storage_primary_available, color=C_primary, marker='*')
-        ax_storage.scatter(xs, self.object.df.storage_permanent_available, color=C_permanent, marker='*')
+        ax_humi.scatter(xs, self.object.df_heartbeat.humidity, s=0.5, color=C_H, marker='.')
 
-        ones = np.ones(len(self.object.df))
+        ax_storage.scatter(xs, self.object.df_heartbeat.storage_primary_available, color=C_primary, marker='*')
+        ax_storage.scatter(xs, self.object.df_heartbeat.storage_permanent_available, color=C_permanent, marker='*')
 
-        cov = self.object.df.cover_state.to_numpy()
+        ones = np.ones(len(self.object.df_heartbeat))
+
+        cov = self.object.df_heartbeat.cover_state.to_numpy()
         cover = np.where(
             cov == 'C', C_cover_closed, np.where(
             cov == 'c', C_cover_closing, np.where(
@@ -236,56 +233,58 @@ class ScatterView(DataFrameView):
         )))))
         ax_sensors.scatter(xs, ones * 11, s=150, c=cover, marker='|', vmin=0, vmax=5)
 
-        ax_sensors.scatter(xs, ones * 9, s=150, c=np.where(self.object.df.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 8, s=150, c=np.where(self.object.df.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 9, s=150, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 8, s=150, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 6, s=150, c=np.where(self.object.df.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 5, s=150, c=np.where(self.object.df.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 4, s=150, c=np.where(self.object.df.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 6, s=150, c=np.where(self.object.df_heartbeat.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 5, s=150, c=np.where(self.object.df_heartbeat.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 4, s=150, c=np.where(self.object.df_heartbeat.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
 
-        ax_sensors.scatter(xs, ones * 2, s=150, c=np.where(self.object.df.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
-        ax_sensors.scatter(xs, ones * 1, s=150, c=np.where(self.object.df.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 2, s=150, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        ax_sensors.scatter(xs, ones * 1, s=150, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
 
         ax_sensors.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
 
-        return FigurePNGResponse(fig)
+        return core.http.FigurePNGResponse(fig)
 
 
 class TemperatureScatterView(GraphView):
     def format_axes(self, fig, ax):
-        ax.scatter(self.object.df.timestamp, self.object.df.temperature, s=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.df.timestamp, self.object.df.t_lens, s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.df.timestamp, self.object.df.t_cpu, s=0.5, color=(1, 0, 0.2), marker='.')
+        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.temperature, s=0.5, color=(0, 0.8, 0.3), marker='.')
+        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.t_lens, s=0.5, color=(0, 0.2, 0.7), marker='.')
+        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.t_cpu, s=0.5, color=(1, 0, 0.2), marker='.')
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         return fig, ax
 
+
 class HumidityScatterView(GraphView):
     def format_axes(self, fig, ax):
-        ax.scatter(self.object.df.timestamp, self.object.df.humidity, s=0.5, color=(0, 0.6, 1), marker='.')
+        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.humidity, s=0.5, color=(0, 0.6, 1), marker='.')
         ax.set_ylim(0, 100)
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
         return fig, ax
 
+
 class SensorsScatterView(GraphView):
     def format_axes(self, fig, ax):
-        ones = np.ones(len(self.object.df))
-        xs = self.object.df.timestamp.to_numpy()
+        ones = np.ones(len(self.object.df_heartbeat))
+        xs = self.object.df_heartbeat.timestamp.to_numpy()
 
         def normalize(what, min, max):
             return what.astype(float).to_numpy() * (max - min) + min
 
-        cover = self.object.df.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
+        cover = self.object.df_heartbeat.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
         ax.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
 
-        ax.scatter(xs, ones * 9, s=100, c=normalize(self.object.df.light_sensor_active, 0.2, 0.5), cmap='plasma', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 8, s=100, c=self.object.df.rain_sensor_active.to_numpy(), cmap='winter_r', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 9, s=100, c=normalize(self.object.df_heartbeat.light_sensor_active, 0.2, 0.5), cmap='plasma', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 8, s=100, c=self.object.df_heartbeat.rain_sensor_active.to_numpy(), cmap='winter_r', marker='|', vmin=0, vmax=1)
 
-        ax.scatter(xs, ones * 6, s=100, c=self.object.df.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 5, s=100, c=self.object.df.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 4, s=100, c=self.object.df.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 6, s=100, c=self.object.df_heartbeat.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 5, s=100, c=self.object.df_heartbeat.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 4, s=100, c=self.object.df_heartbeat.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
 
-        ax.scatter(xs, ones * 2, s=100, c=normalize(self.object.df.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 1, s=100, c=normalize(self.object.df.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 2, s=100, c=normalize(self.object.df_heartbeat.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
+        ax.scatter(xs, ones * 1, s=100, c=normalize(self.object.df_heartbeat.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
 
         ax.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
         ax.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
@@ -296,16 +295,16 @@ class SensorsScatterView(GraphView):
 
 class TemperaturePandasGraphView(GraphView):
     def format_axes(self, ax):
-        print(self.object.df)
-        ax.plot(self.object.df.index, self.object.df.t_env, linewidth=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.df.index, self.object.df.t_len, s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.df.index, self.object.df.t_CPU, s=0.5, color=(1, 0, 0.2), marker='.')
+        print(self.object.df_heartbeat)
+        ax.plot(self.object.df_heartbeat.index, self.object.df_heartbeat.t_env, linewidth=0.5, color=(0, 0.8, 0.3), marker='.')
+        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.t_len, s=0.5, color=(0, 0.2, 0.7), marker='.')
+        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.t_CPU, s=0.5, color=(1, 0, 0.2), marker='.')
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         return ax
 
 class HumidityGraphView(GraphView):
     def format_axes(self, ax):
-        ax.scatter(self.object.df.index, self.object.df.h_env, s=0.5, color=(0, 0.6, 1), marker='.')
+        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.h_env, s=0.5, color=(0, 0.6, 1), marker='.')
         ax.set_ylim(0, 100)
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
         return ax
@@ -315,17 +314,17 @@ class SensorsGraphView(GraphView):
         return Heartbeat.objects.for_station(self.station.code).as_sensors_graph(self.start, self.end, self.interval)
 
     def format_axes(self, ax):
-        print(self.object.df.to_numpy().transpose())
-        ax.imshow(self.object.df.values)
+        print(self.object.df_heartbeat.to_numpy().transpose())
+        ax.imshow(self.object.df_heartbeat.values)
         return ax
 
 
-class GraphViewJSON(JsonResponseMixin, DataFrameView):
+class GraphViewJSON(core.views.JsonResponseMixin, DataFrameView):
     def get_context_data(self, **kwargs):
-        return self.object.df.to_dict(orient='index')
+        return self.object.df_heartbeat.to_dict(orient='index')
 
 
-class DataFrameAggView(LoginDetailView):
+class DataFrameAggView(core.views.LoginDetailView):
     model = Station
     slug_field = 'code'
     slug_url_kwarg = 'code'
@@ -354,14 +353,11 @@ class DataFrameAggView(LoginDetailView):
             data = pd.DataFrame(columns=['time', 't_env', 't_CPU', 't_len', 'h_env'])
             data.set_index('time', inplace=True)
 
-        self.station.df = timestamps.merge(data, how="left", on="time")
-        self.station.df.set_index('time', inplace=True)
+        self.station.df_heartbeat = timestamps.merge(data, how="left", on="time")
+        self.station.df_heartbeat.set_index('time', inplace=True)
         return self.station
 
 
-
-
-#@method_decorator(login_required, name = 'dispatch')
 @method_decorator(csrf_exempt, name='dispatch')
 class APIViewHeartbeat(django.views.View):
     def get(self, request):
@@ -379,7 +375,7 @@ class APIViewHeartbeat(django.views.View):
             report.save()
 
             response = HttpResponse(f"Heartbeat received at {datetime.datetime.utcnow()}", status=201)
-        #response['location'] = reverse('station-receive-heartbeat', args=[report.id])
+            response['location'] = reverse('station-receive-heartbeat', args=[report.id])
             return response
 
         except json.JSONDecodeError:
@@ -407,8 +403,8 @@ class APIViewSighting(django.views.View):
 
             sighting = Sighting.objects.create_from_POST(code, **data)
 
-            response = HttpResponse('New sighting received', status=201)
-            #response['location'] = reverse('sighting', args=[sighting.id])
+            response = HttpResponse(f"New sighting received (id {sighting.id})", status=201)
+            response['location'] = reverse('sighting', args=[sighting.id])
             return response
 
         except json.JSONDecodeError:
@@ -416,4 +412,4 @@ class APIViewSighting(django.views.View):
             return HttpResponseBadRequest()
 
     def get(self, request, code):
-        return HttpResponse('OK', status=201)
+        return HttpResponse('Nothing to see here', status=201)

@@ -47,3 +47,5 @@ class LoginDetailView(LoginRequiredMixin, DetailView):
 
 class LoginListView(LoginRequiredMixin, ListView):
     pass
+
+

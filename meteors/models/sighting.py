@@ -160,6 +160,14 @@ class SightingQuerySet(models.QuerySet):
         half_day = datetime.timedelta(hours=12)
         return self.filter(timestamp__range=(midnight - half_day, midnight + half_day))
 
+    def as_scatter(self, start=None, end=None):
+        if end == None:
+            end = datetime.datetime.now(tz=pytz.utc)
+        if start == None:
+            start = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+
+        return self.filter(timestamp__range=(start, end)).order_by('timestamp')
+
 
 class Sighting(models.Model):
     class Meta:

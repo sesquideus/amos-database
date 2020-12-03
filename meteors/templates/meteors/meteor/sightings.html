@@ -16,7 +16,7 @@
                 <td class="data seen">
                     <a href="{{ sighting.station.get_absolute_url }}">{{ sighting.station.code }}</a>
                 </td>
-                <td class="data time">
+                <td class="data timestamp">
                     <a href="{{ sighting.get_absolute_url }}">{{ sighting.timestamp|date:"H:i:s.u" }}</a>
                 </td>
                 <td class="data magnitude">{{ sighting.magnitude|magnitude }}</td>

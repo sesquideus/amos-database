@@ -11,7 +11,7 @@
     </thead>
     {% for sighting in station.recent_sightings %}
         <tr>
-            <td class="data time">
+            <td class="data timestamp">
                 <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp }}</a>
             </td>
             <td class="data">

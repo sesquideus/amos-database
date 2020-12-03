@@ -87,6 +87,7 @@ td.name {
 
 td.timestamp {
     width: 100mm;
+    text-align: center;
 }
 
 td.text {

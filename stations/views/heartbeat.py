@@ -1,27 +1,12 @@
-import datetime
-import pytz
 import logging
+import core.views
 
-from pprint import pprint as pp
-
-from django.http import JsonResponse, HttpResponse, HttpResponseBadRequest
-from django.shortcuts import render
-from django.urls import reverse
-from django.utils.decorators import method_decorator
-from django.views import View
-from django.views.decorators.csrf import csrf_exempt
-
-from django.views.generic.detail import DetailView, BaseDetailView
-from django.views.generic.list import ListView
-
-from stations.models import Station, Subnetwork, Heartbeat
-from meteors.models import Sighting
-from core.views import JSONDetailView, JSONListView, LoginDetailView
+from stations.models import Heartbeat
 
 log = logging.getLogger(__name__)
 
 
-class SingleView(LoginDetailView):
+class SingleView(core.views.LoginDetailView):
     model           = Heartbeat
     slug_field      = 'id'
     slug_url_kwarg  = 'id'

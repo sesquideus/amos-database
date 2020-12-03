@@ -33,6 +33,13 @@
             {% include 'meteors/sighting/sky-info.html' %}
             {% include 'meteors/sighting/video-frames.html' %}
 
+            <h3>XML file</h3>
+            {% if sighting.xml %}
+                <a href="{{ sighting.xml.url }}">XML</a>
+            {% else %}
+                <p>XML file not available.</p>
+            {% endif %}
+
             <h3>Light curve</h3>
             <img class="chart" src="{% url 'sighting-light-curve' id=sighting.id %}" alt="Light curve" />
 

@@ -70,7 +70,7 @@ def magnitude(value: float):
 @register.filter
 @graceful
 def gigabytes(value: float):
-    return f"{value:.1f} GB"
+    return f"{value:.0f} GB"
 
 
 @register.filter
@@ -80,9 +80,9 @@ def angle(value: float):
 
 
 @register.filter
-@graceful
-def boolean(value: bool):
-    return "yes" if value else "no"
+def boolean(value: bool, strings="yes,no"):
+    true, false = strings.split(",")
+    return true if value else false
 
 
 @register.filter
@@ -118,4 +118,3 @@ def multiply(value: float, factor: float):
 @empty_on_error(AttributeError)
 def safetime(time):
     return time.strftime("%H:%M:%S.%f")
-

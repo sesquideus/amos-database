@@ -119,7 +119,6 @@ class DetailView(core.views.LoginDetailView):
         }
 
 
-@method_decorator(login_required, name='dispatch')
 class DetailViewExtras(DetailView):
     queryset = Sighting.objects.with_frames().with_lightmax()
 
@@ -130,7 +129,6 @@ class DetailViewExtras(DetailView):
         return self.sighting
 
 
-@method_decorator(login_required, name='dispatch')
 class LightCurveView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
@@ -150,7 +148,6 @@ class LightCurveView(DetailViewExtras):
         return response
 
 
-@method_decorator(login_required, name='dispatch')
 class SkyView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
         def size_formatter(x):
@@ -177,7 +174,7 @@ class SkyView(DetailViewExtras):
         colours = np.array([frame.magnitude for frame in frames])
         sizes = size_formatter(colours)
 
-        scatter = axes.scatter(azimuths, altitudes, c=colours, s=sizes, cmap='hot', alpha=1, linewidths=0)
+        scatter = axes.scatter(azimuths, altitudes, c=colours, s=sizes, cmap='hot_r', alpha=1, linewidths=0)
         cb = figure.colorbar(scatter, extend='max', fraction=0.1, pad=0.06)
         cb.set_label('apparent magnitude', fontsize=16)
         cb.ax.tick_params(labelsize=15)

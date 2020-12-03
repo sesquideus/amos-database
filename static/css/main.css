@@ -131,7 +131,7 @@ span.arrow {
 
 
 div.page div.info {
-    width: 560px;
+    width: 40%;
     float: left;
 }
 
@@ -161,6 +161,7 @@ div.page div#map {
 div.page img.sighting {
     float: right;
     width: 100%;
+    max-width: 2048px;
 }
 
 img.sighting.empty {
