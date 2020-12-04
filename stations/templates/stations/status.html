@@ -42,11 +42,7 @@
                         </td>
 
                         <td class="status c">
-                            {% if station.on %}
-                                <span class="enabled">&#10004;</span>
-                            {% else %}
-                                <span class="disabled">&#10006;</span>
-                            {% endif %}
+                            {{ station.on|trivalue }}
                         </td>
                         <td class="status c">
                             <abbr class="{{ status.code }}" title="{{ status.get_description }}">

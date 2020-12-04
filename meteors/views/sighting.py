@@ -142,14 +142,7 @@ class LightCurveView(DetailViewExtras):
         ax.invert_yaxis()
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
 
-        canvas = FigureCanvasAgg(fig)
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        pyplot.close(fig)
-
-        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
-        response['Content-Length'] = str(len(response.content))
-        return response
+        return core.http.FigurePNGResponse(figure)
 
 
 class SkyView(DetailViewExtras):
@@ -159,7 +152,7 @@ class SkyView(DetailViewExtras):
 
         figure, axes = pyplot.subplots(subplot_kw={'projection': 'polar'})
         figure.tight_layout(rect=(0.0, 0.0, 1.0, 1.0))
-        figure.set_size_inches(5.38, 5.38)
+        figure.set_size_inches(6.4, 5)
 
         axes.tick_params(axis='x', which='major', labelsize=20)
         axes.tick_params(axis='x', which='minor', labelsize=5)
@@ -170,7 +163,7 @@ class SkyView(DetailViewExtras):
         axes.yaxis.set_ticks(np.linspace(0, 90, 7))
         axes.set_ylim(0, 90)
         axes.set_facecolor('black')
-        axes.grid(linewidth=0.2, color='white')
+        axes.grid(linewidth=1, color='white')
 
         frames = self.sighting.frames.all()
         azimuths = np.radians(90 + np.array([frame.azimuth for frame in frames]))
@@ -179,16 +172,10 @@ class SkyView(DetailViewExtras):
         sizes = size_formatter(colours)
 
         scatter = axes.scatter(azimuths, altitudes, c=colours, s=sizes, cmap='hot_r', alpha=1, linewidths=0)
-        cb = figure.colorbar(scatter, extend='max', fraction=0.1, pad=0.06)
-        cb.set_label('apparent magnitude', fontsize=16)
-        cb.ax.tick_params(labelsize=15)
+        cb = figure.colorbar(scatter, extend='max', fraction=0.2, pad=0.05)
+        scatter.set_clim(-10, 10)
+        cb.set_label('apparent magnitude', fontsize=12)
+        cb.ax.tick_params(labelsize=10)
+        cb.ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+5.1f}$^m$"))
 
-        canvas = FigureCanvasAgg(figure)
-        buf = io.BytesIO()
-        canvas.print_png(buf)
-        pyplot.close(figure)
-
-        response = django.http.HttpResponse(buf.getvalue(), content_type='image/png')
-        response['Content-Length'] = str(len(response.content))
-
-        return response
+        return core.http.FigurePNGResponse(figure)

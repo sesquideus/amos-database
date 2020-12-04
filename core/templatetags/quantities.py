@@ -86,6 +86,22 @@ def boolean(value: bool, strings="yes,no"):
 
 
 @register.filter
+def troolean(value, strings="yes,no,&mdash;"):
+    true, false, none = strings.split(",")
+    if value is None:
+        return mark_safe(none)
+    else:
+        return mark_safe(true) if value else mark_safe(false)
+
+@register.filter
+def trivalue(value):
+    if value is None:
+        return mark_safe('&mdash;')
+    else:
+        return mark_safe(f'<span class="{"en" if value else "dis"}abled">&#1000{4 if value else 6};</span>')
+
+
+@register.filter
 @graceful
 def solar_longitude(timestamp: datetime.datetime):
     n = Time(timestamp).jd - 2451545.0
@@ -95,7 +111,7 @@ def solar_longitude(timestamp: datetime.datetime):
 
 
 @register.filter
-def since_date_time(timestamp):
+def since_date_time(timestamp: datetime.datetime):
     delta = (datetime.datetime.now(tz=pytz.utc) - timestamp).total_seconds()
     if delta < 60:
         return f"{delta:.0f}s"

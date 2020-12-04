@@ -1,21 +1,16 @@
 table {
     padding: 10px;
     margin-bottom: 10px;
-    min-width: 540px;
+    min-width: 640px;
     background-color: white;
 }
 
 table.full-width {
     width: 100%;
-    table-layout: stretch;
 }
 
 table.alternating tr:nth-child(even) {
     background-color: hsla(0, 0%, 80%, 0.4);
-}
-
-table.heartbeats {
-    width: 100%;
 }
 
 tr {

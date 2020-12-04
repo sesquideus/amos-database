@@ -169,7 +169,7 @@ class ScatterView(DataFrameView):
             loc=(1.01, 0.4),
         )
 
-        ax_storage.set_ylim(0, 256)
+        ax_storage.set_ylim(0, None)
         ax_storage.set_ylabel('Storage')
         ax_storage.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} GB"))
         ax_storage.legend(['primary', 'permanent'])
@@ -202,7 +202,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
             ],
             ncol=1,
-            loc=(1.01, -0.5),
+            loc=(1.01, -0.33),
         )
 
         if (len(self.object.df_sightings) > 0):
