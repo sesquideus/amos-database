@@ -9,7 +9,7 @@ register = django.template.Library()
 def default_string(function, replacement="&mdash;"):
     @functools.wraps(function)
     def wrapper(arg):
-        return mark_safe(replacement) if arg is None else function(arg)
+        return mark_safe(replacement) if arg is None or arg == "" else function(arg)
 
     return wrapper
 

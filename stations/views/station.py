@@ -37,7 +37,7 @@ class DetailView(core.views.LoginDetailView):
     template_name   = 'stations/station/main.html'
 
     def get_queryset(self, **kwargs):
-        return self.model.objects.with_last_heartbeat().with_last_sighting().with_counts().with_log_entries()
+        return self.model.objects.with_last_heartbeat().with_last_sighting().with_log_entries()
 
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
@@ -101,6 +101,9 @@ class ScatterView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
         C_sighting = 'green'
 
+        C_manual = '#F0E000'
+        C_automatic = '#7F7F7F'
+
         C_T_env = '#00D040'
         C_T_lens = '#0030B0'
         C_T_CPU = '#E01040'
@@ -143,7 +146,7 @@ class ScatterView(DataFrameView):
             handles=[
                 Line2D([0], [0], color=C_sighting, lw=0, marker='*', label='sighting'),
             ],
-            loc=(1.01, 0.8),
+            loc=(1.02, 0.82),
         )
 
         ax_temp.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
@@ -154,7 +157,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_T_lens, lw=1, label='lens'),
                 Line2D([0], [0], color=C_T_CPU, lw=1, label='CPU'),
             ],
-            loc=(1.01, 0.0),
+            loc=(1.02, 0.0),
         )
 
         ax_humi.set_ylim(0, 100)
@@ -166,7 +169,7 @@ class ScatterView(DataFrameView):
             handles=[
                 Line2D([0], [0], color=C_H, lw=1, label='relative humidity'),
             ],
-            loc=(1.01, 0.4),
+            loc=(1.02, 0.42),
         )
 
         ax_storage.set_ylim(0, None)
@@ -179,15 +182,17 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_primary, lw=1, label='primary'),
                 Line2D([0], [0], color=C_permanent, lw=1, label='permanent'),
             ],
-            loc=(1.01, 0.3),
+            loc=(1.02, 0.35),
         )
 
-        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
-        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
-        ax_sensors.set_ylim(0.5, 11.5)
+        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12])
+        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover', 'control'])
+        ax_sensors.set_ylim(0.5, 12.5)
 
         ax_sensors.legend(
             handles=[
+                Line2D([0], [0], color=C_manual, lw=4, label='manual'),
+                Line2D([0], [0], color=C_automatic, lw=4, label='automatic'),
                 Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
                 Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
                 Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
@@ -202,7 +207,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
             ],
             ncol=1,
-            loc=(1.01, -0.33),
+            loc=(1.02, -0.5),
         )
 
         if (len(self.object.df_sightings) > 0):
@@ -232,6 +237,7 @@ class ScatterView(DataFrameView):
                 cov == 'o', C_cover_opening, np.where(
                 cov == 'O', C_cover_open, C_cover_problem,
             )))))
+            ax_sensors.scatter(xs, ones * 12, s=150, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
             ax_sensors.scatter(xs, ones * 11, s=150, c=cover, marker='|', vmin=0, vmax=5)
 
             ax_sensors.scatter(xs, ones * 9, s=150, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)

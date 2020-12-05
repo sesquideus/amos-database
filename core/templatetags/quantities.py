@@ -75,6 +75,12 @@ def gigabytes(value: float):
 
 @register.filter
 @graceful
+def seconds(value: float):
+    return f"{value:.3f} s"
+
+
+@register.filter
+@graceful
 def angle(value: float):
     return mark_safe(f"{value:.2f}°")
 

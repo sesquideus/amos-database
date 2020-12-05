@@ -17,12 +17,6 @@ from core.templatetags.quantities import since_date_time
 
 
 class StationQuerySet(models.QuerySet):
-    def with_counts(self):
-        return self.prefetch_related('sightings').prefetch_related('heartbeats').annotate(
-            sighting_count=Count('sightings'),
-            heartbeat_count=Count('heartbeats'),
-        )
-
     def with_last_sighting(self):
         latest = Sighting.objects.order_by('station__id', '-timestamp').distinct('station__id')
         return self.prefetch_related(

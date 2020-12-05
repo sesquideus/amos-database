@@ -1,6 +1,6 @@
 {% load quantities %}
 
-<h3>Latest sightings (out of {{ station.sighting_count }} total)</h3>
+<h3>Latest sightings</h3>
 <table class="full-width">
     <thead>
         <tr>
@@ -32,7 +32,7 @@
                 {{ sighting.azimuth|angle }}
             </td>
             <td class="data time">
-                {{ sighting.frames.last.flight_time.total_seconds|floatformat:3 }} s
+                {{ sighting.frames.last.flight_time.total_seconds|seconds }}
             </td>
             <td class="data">
                 {{ sighting.frame_count }}

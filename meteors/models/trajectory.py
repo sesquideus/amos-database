@@ -1,15 +1,12 @@
 from django.db import models
 
-    
+
 class Trajectory(models.Model):
     class Meta:
         verbose_name = "heliocentric trajectory"
 
-    semimajor_axis                  = models.FloatField(
-                                        null                = True,
-                                        blank               = True,
-                                        verbose_name        = "semi-major axis",
-                                    )
+    semimajor_axis                  = models.FloatField(null=True, blank=True, verbose_name="semi-major axis")
+    semimajor_axis_error            = models.FloatField(null=True, blank=True, verbose_name="semi-major axis error")
     eccentricity                    = models.FloatField(
                                         null                = True,
                                         blank               = True,

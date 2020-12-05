@@ -1,6 +1,6 @@
 {% load quantities %}
 
-<h3>Heartbeats ({{ station.heartbeat_count }} total)</h3>
+<h3>Latest heartbeats</h3>
 <table class="full-width heartbeats">
     {% include "stations/heartbeat/thead.html" %}
     {% for heartbeat in station.recent_heartbeats %}
