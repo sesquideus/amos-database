@@ -163,8 +163,6 @@ class ScatterView(DataFrameView):
         ax_humi.set_ylim(0, 100)
         ax_humi.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
         ax_humi.set_ylabel('Humidity')
-        ax_humi.legend(['relative humidity'])
-
         ax_humi.legend(
             handles=[
                 Line2D([0], [0], color=C_H, lw=1, label='relative humidity'),
@@ -172,7 +170,7 @@ class ScatterView(DataFrameView):
             loc=(1.02, 0.42),
         )
 
-        ax_storage.set_ylim(0, None)
+        ax_storage.set_ylim(ymin=0)
         ax_storage.set_ylabel('Storage')
         ax_storage.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} GB"))
         ax_storage.legend(['primary', 'permanent'])
@@ -226,6 +224,7 @@ class ScatterView(DataFrameView):
 
             ax_storage.scatter(xs, self.object.df_heartbeat.storage_primary_available, color=C_primary, marker='*')
             ax_storage.scatter(xs, self.object.df_heartbeat.storage_permanent_available, color=C_permanent, marker='*')
+            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)))
 
             ones = np.ones(len(self.object.df_heartbeat))
 
