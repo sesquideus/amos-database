@@ -19,17 +19,17 @@
             <td class="data timestamp c" id="{{ sighting.id }}-timestamp">
                 <a href="{% url 'sighting' id=sighting.id %}">{{ sighting.timestamp|date:"Y-m-d H:i:s.u" }}</a>
             </td>
-            <td class="data meteor {% if not sighting.meteor %}empty{% endif %}">
+            <td class="data c {% if not sighting.meteor %}empty{% endif %}">
                 {% if sighting.meteor %}
                     <a href="{% url 'meteor' name=sighting.meteor.name %}">{{ sighting.meteor }}</a>
                 {% else %}
                     (not identified)
                 {% endif %}
             </td>
-            <td class="data station">
+            <td class="data c">
                 <a href="{% url 'station' code=sighting.station.code %}">{{ sighting.station.code }}</a>
             </td>
-            <td class="data count">
+            <td class="data r">
                 {{ sighting.frame_count }}
             </td>
             <td class="r">

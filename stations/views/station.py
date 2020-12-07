@@ -80,23 +80,6 @@ class DataFrameView(core.views.LoginDetailView):
         return station
 
 
-class GraphView(DataFrameView):
-    def render_to_response(self, context, **response_kwargs):
-        fig, ax = pyplot.subplots()
-        fig.tight_layout(rect=(0.05, 0.05, 1.03, 1))
-        fig.set_size_inches(12, 3)
-        ax.set_xlim(self.start, self.end)
-        ax.xaxis.set_major_formatter(dates.DateFormatter('%H:%M'))
-        ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
-
-        if len(self.object.df_heartbeat) == 0:
-            pass
-        else:
-            fig, ax = self.format_axes(fig, ax)
-
-        return core.http.FigurePNGResponse(fig)
-
-
 class ScatterView(DataFrameView):
     def render_to_response(self, context, **response_kwargs):
         C_sighting = 'green'
@@ -220,9 +203,9 @@ class ScatterView(DataFrameView):
 
             ax_humi.scatter(xs, self.object.df_heartbeat.humidity, s=0.5, color=C_H, marker='.')
 
-            ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available, linefmt='C1-', markerfmt='C1.')
-            ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available, linefmt='C0-', markerfmt='C0.')
-            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)) * 1.05)
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available, linefmt='C1-', markerfmt=' ')
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available, linefmt='C0-', markerfmt=' ')
+            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_total), np.amax(self.object.df_heartbeat.storage_permanent_total)) * 1.05)
 
             ones = np.ones(len(self.object.df_heartbeat))
 
@@ -248,77 +231,6 @@ class ScatterView(DataFrameView):
             ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
 
         return core.http.FigurePNGResponse(fig)
-
-
-class TemperatureScatterView(GraphView):
-    def format_axes(self, fig, ax):
-        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.temperature, s=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.t_lens, s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.t_cpu, s=0.5, color=(1, 0, 0.2), marker='.')
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
-        return fig, ax
-
-
-class HumidityScatterView(GraphView):
-    def format_axes(self, fig, ax):
-        ax.scatter(self.object.df_heartbeat.timestamp, self.object.df_heartbeat.humidity, s=0.5, color=(0, 0.6, 1), marker='.')
-        ax.set_ylim(0, 100)
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
-        return fig, ax
-
-
-class SensorsScatterView(GraphView):
-    def format_axes(self, fig, ax):
-        ones = np.ones(len(self.object.df_heartbeat))
-        xs = self.object.df_heartbeat.timestamp.to_numpy()
-
-        def normalize(what, min, max):
-            return what.astype(float).to_numpy() * (max - min) + min
-
-        cover = self.object.df_heartbeat.cover_state.replace('C', 0).replace('c', 1).replace('S', 2).replace('o', 3).replace('O', 4).replace('P', 5)
-        ax.scatter(xs, ones * 11, s=100, c=cover.to_numpy(), cmap='viridis_r', marker='|', vmin=0, vmax=5)
-
-        ax.scatter(xs, ones * 9, s=100, c=normalize(self.object.df_heartbeat.light_sensor_active, 0.2, 0.5), cmap='plasma', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 8, s=100, c=self.object.df_heartbeat.rain_sensor_active.to_numpy(), cmap='winter_r', marker='|', vmin=0, vmax=1)
-
-        ax.scatter(xs, ones * 6, s=100, c=self.object.df_heartbeat.computer_power.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 5, s=100, c=self.object.df_heartbeat.intensifier_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 4, s=100, c=self.object.df_heartbeat.fan_active.to_numpy(), cmap='copper', marker='|', vmin=0, vmax=1)
-
-        ax.scatter(xs, ones * 2, s=100, c=normalize(self.object.df_heartbeat.camera_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
-        ax.scatter(xs, ones * 1, s=100, c=normalize(self.object.df_heartbeat.lens_heating, 0, 1), cmap='bwr', marker='|', vmin=0, vmax=1)
-
-        ax.set_yticks([1, 2, 4, 5, 6, 8, 9, 11])
-        ax.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover'])
-        ax.set_ylim(0.5, 11.5)
-        fig.set_size_inches(12, 2)
-        return fig, ax
-
-
-class TemperaturePandasGraphView(GraphView):
-    def format_axes(self, ax):
-        print(self.object.df_heartbeat)
-        ax.plot(self.object.df_heartbeat.index, self.object.df_heartbeat.t_env, linewidth=0.5, color=(0, 0.8, 0.3), marker='.')
-        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.t_len, s=0.5, color=(0, 0.2, 0.7), marker='.')
-        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.t_CPU, s=0.5, color=(1, 0, 0.2), marker='.')
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
-        return ax
-
-class HumidityGraphView(GraphView):
-    def format_axes(self, ax):
-        ax.scatter(self.object.df_heartbeat.index, self.object.df_heartbeat.h_env, s=0.5, color=(0, 0.6, 1), marker='.')
-        ax.set_ylim(0, 100)
-        ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} %"))
-        return ax
-
-class SensorsGraphView(GraphView):
-    def get_q(self):
-        return Heartbeat.objects.for_station(self.station.code).as_sensors_graph(self.start, self.end, self.interval)
-
-    def format_axes(self, ax):
-        print(self.object.df_heartbeat.to_numpy().transpose())
-        ax.imshow(self.object.df_heartbeat.values)
-        return ax
 
 
 class GraphViewJSON(core.views.JsonResponseMixin, DataFrameView):

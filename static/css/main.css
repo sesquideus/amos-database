@@ -142,7 +142,7 @@ div.page div.inner {
 }
 
 div.page div.preview {
-    flex: 1;
+    width: 60%;
     margin-left: 10px;
 }
 
@@ -161,7 +161,7 @@ div.page div#map {
 div.page img.sighting {
     float: right;
     width: 100%;
-    max-width: 2048px;
+    max-width: 100%;
 }
 
 img.sighting.empty {

@@ -107,6 +107,8 @@ class SightingManager(models.Manager):
             log.error("Invalid sighting")
             raise e
 
+        return sighting
+
 class SightingQuerySet(models.QuerySet):
     def with_neighbours(self):
         return self.annotate(
@@ -174,6 +176,12 @@ class Sighting(models.Model):
         verbose_name                = "meteor sighting"
         ordering                    = ['timestamp']
         get_latest_by               = 'timestamp'
+        indexes                     = [
+                                        models.Index(
+                                            fields          = ['station', 'timestamp'],
+                                            name            = 'by_station',
+                                        )
+                                    ]
 
     objects                         = SightingManager.from_queryset(SightingQuerySet)()
 

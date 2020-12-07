@@ -137,12 +137,15 @@ class LightCurveView(DetailViewExtras):
     def render_to_response(self, context, **response_kwargs):
         fig, ax = pyplot.subplots()
         fig.tight_layout(rect=(0.06, 0.08, 1.03, 1))
-        fig.set_size_inches(5.38, 1.5)
-        ax.plot(self.timestamps, self.magnitudes, marker='*')
+        fig.set_size_inches(6.4, 1.5)
         ax.invert_yaxis()
         ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.2f}"))
 
-        return core.http.FigurePNGResponse(figure)
+        ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
+        ax.plot(self.timestamps, self.magnitudes, marker='*')
+        ax.set_xlim(xmin=0)
+
+        return core.http.FigurePNGResponse(fig)
 
 
 class SkyView(DetailViewExtras):

@@ -49,7 +49,7 @@
                                 {{ status.short }}
                             </abbr>
                         </td>
-                        <td class="status c">
+                        <td class="status r">
                             {% if heartbeat %}
                                 <a href="{{ heartbeat.get_absolute_url }}">
                                     {{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}
@@ -83,7 +83,7 @@
                                 <span class="empty">no sightings</span>
                             {% endif %}
                         </td>
-                        <td class="time c">
+                        <td class="time r">
                             {% if last_sighting %}
                                 {{ last_sighting.timestamp|since_date_time }}
                             {% else %}
@@ -118,11 +118,11 @@
         </tr>
         <tr>
             <td>Solar longitude &#955;<sub>&#9737;</sub></td>
-            <td>{{ now|solar_longitude|angle }}</td>
+            <td class="data r">{{ now|solar_longitude|angle }}</td>
         </tr>
         <tr>
             <td>Solar declination &#948;<sub>&#9737;</sub></td>
-            <td></td>
+            <td class="data r"></td>
         </tr>
     </table>
 {% endblock page %}
