@@ -173,8 +173,6 @@ class ScatterView(DataFrameView):
         ax_storage.set_ylim(ymin=0)
         ax_storage.set_ylabel('Storage')
         ax_storage.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.0f} GB"))
-        ax_storage.legend(['primary', 'permanent'])
-
         ax_storage.legend(
             handles=[
                 Line2D([0], [0], color=C_primary, lw=1, label='primary'),
@@ -222,9 +220,9 @@ class ScatterView(DataFrameView):
 
             ax_humi.scatter(xs, self.object.df_heartbeat.humidity, s=0.5, color=C_H, marker='.')
 
-            ax_storage.scatter(xs, self.object.df_heartbeat.storage_primary_available, color=C_primary, marker='*')
-            ax_storage.scatter(xs, self.object.df_heartbeat.storage_permanent_available, color=C_permanent, marker='*')
-            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)))
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available, linefmt='C1-', markerfmt='C1.')
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available, linefmt='C0-', markerfmt='C0.')
+            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)) * 1.05)
 
             ones = np.ones(len(self.object.df_heartbeat))
 
@@ -236,18 +234,18 @@ class ScatterView(DataFrameView):
                 cov == 'o', C_cover_opening, np.where(
                 cov == 'O', C_cover_open, C_cover_problem,
             )))))
-            ax_sensors.scatter(xs, ones * 12, s=150, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 11, s=150, c=cover, marker='|', vmin=0, vmax=5)
+            ax_sensors.scatter(xs, ones * 12, s=100, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 11, s=100, c=cover, marker='|', vmin=0, vmax=5)
 
-            ax_sensors.scatter(xs, ones * 9, s=150, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 8, s=150, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 9, s=100, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 8, s=100, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
 
-            ax_sensors.scatter(xs, ones * 6, s=150, c=np.where(self.object.df_heartbeat.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 5, s=150, c=np.where(self.object.df_heartbeat.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 4, s=150, c=np.where(self.object.df_heartbeat.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 6, s=100, c=np.where(self.object.df_heartbeat.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 5, s=100, c=np.where(self.object.df_heartbeat.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 4, s=100, c=np.where(self.object.df_heartbeat.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
 
-            ax_sensors.scatter(xs, ones * 2, s=150, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 1, s=150, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 2, s=100, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
 
         return core.http.FigurePNGResponse(fig)
 
