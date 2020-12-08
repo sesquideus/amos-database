@@ -2,6 +2,7 @@ import datetime
 import django
 import math
 import pytz
+import astropy
 
 from astropy.time import Time
 from django.utils.safestring import mark_safe
@@ -114,6 +115,11 @@ def solar_longitude(timestamp: datetime.datetime):
     l = (280.460 + 0.9856474 * n) % 360
     g = math.radians(357.528 + 0.9856003 * n) % 360
     return l + 1.915 * math.sin(g) + 0.02 * math.sin(2 * g)
+
+
+@register.filter
+def solar_declination(timestamp: datetime.datetime):
+    return astropy.coordinates.get_sun(Time(timestamp)).dec.degree
 
 
 @register.filter

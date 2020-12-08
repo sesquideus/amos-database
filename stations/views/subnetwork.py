@@ -8,7 +8,7 @@ from django.views.decorators.cache import cache_page
 from stations.models import Subnetwork
 
 
-@method_decorator(cache_page(5), name='dispatch')
+#@method_decorator(cache_page(5), name='dispatch')
 class StatusView(LoginListView):
     model               = Subnetwork
     context_object_name = 'subnetworks'
