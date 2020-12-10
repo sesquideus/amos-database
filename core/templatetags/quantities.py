@@ -71,13 +71,13 @@ def magnitude(value: float):
 @register.filter
 @graceful
 def megabytes(value: float):
-    return f"{value:.0f MB}"
+    return f"{(float(value) / 1024**2):.0f} MB"
 
 
 @register.filter
 @graceful
 def gigabytes(value: float):
-    return f"{value:.0f} GB"
+    return f"{(float(value) / 1024**3):.0f} GB"
 
 
 @register.filter
