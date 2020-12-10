@@ -102,6 +102,7 @@ class SightingManager(models.Manager):
                 station             = Station.objects.get(code=station_code),
                 jpg                 = kwargs['files'].get('jpg', None),
                 xml                 = kwargs['files'].get('xml', None),
+                avi_size            = kwargs['meta'].get('avi_size', None),
             )
         except KeyError as e:
             log.error("Invalid sighting")
@@ -200,6 +201,10 @@ class Sighting(models.Model):
                                     )
     xml                             = models.FileField(
                                         upload_to           = 'sightings/%Y/%m/%d/',
+                                        null                = True,
+                                        blank               = True,
+                                    )
+    avi_size                        = models.BigIntegerField(
                                         null                = True,
                                         blank               = True,
                                     )

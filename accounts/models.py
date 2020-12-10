@@ -22,19 +22,24 @@ class Profile(models.Model):
     def format_location(self):
         try:
             return "{lat:.6f}° {ns}, {lon:.6f}° {ew}".format(
-                lat     = self.latitude,
-                lon     = self.longitude,
-                ns      = 'N' if self.latitude > 0 else 'S',
-                ew      = 'E' if self.longitude > 0 else 'W',
+                lat = self.latitude,
+                lon = self.longitude,
+                ns  = 'N' if self.latitude > 0 else 'S',
+                ew  = 'E' if self.longitude > 0 else 'W',
             )
         except TypeError:
             return "undefined"
 
-@receiver(post_save, sender = User)
-def createUserProfile(sender, instance, created, **kwargs):
-    if created:
-        Profile.objects.create(user = instance)
+    def __str__(self):
+        return f"Profile for {self.user.get_full_name()}"
 
-@receiver(post_save, sender = User)
-def saveUserProfile(sender, instance, **kwargs):
+
+@receiver(post_save, sender=User)
+def create_user_profile(sender, instance, created, **kwargs):
+    if created:
+        Profile.objects.create(user=instance)
+
+
+@receiver(post_save, sender=User)
+def save_user_profile(sender, instance, **kwargs):
     instance.profile.save()
