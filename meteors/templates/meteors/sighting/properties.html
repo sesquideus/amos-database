@@ -1,0 +1,26 @@
+{% load tz static quantities %}
+
+<table>
+    <thead>
+        <tr>
+            <th class="group" colspan="2">properties</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr>
+            <td>XML file</td>
+            <td class="data r">
+                {% if sighting.xml %}
+                    <a href="{{ sighting.xml.url }}">file</a>
+                {% else %}
+                    <span class="empty">not available</span>
+                {% endif %}
+            </td>
+        </tr>
+        <tr>
+            <td>AVI size</td>
+            <td class="data r">{{ sighting.avi_size|divide:1048576.0|megabytes }}</td>
+        </tr>
+    </tbody>
+</table>
+

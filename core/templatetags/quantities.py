@@ -70,6 +70,12 @@ def magnitude(value: float):
 
 @register.filter
 @graceful
+def megabytes(value: float):
+    return f"{value:.0f MB}"
+
+
+@register.filter
+@graceful
 def gigabytes(value: float):
     return f"{value:.0f} GB"
 
@@ -139,6 +145,11 @@ def since_date_time(timestamp: datetime.datetime):
 @register.filter
 def multiply(value: float, factor: float):
     return None if value is None else value * factor
+
+
+@register.filter
+def divide(value:float, factor: float):
+    return None if value is None else value / factor
 
 
 @register.filter

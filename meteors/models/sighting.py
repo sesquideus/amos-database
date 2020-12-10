@@ -198,15 +198,18 @@ class Sighting(models.Model):
                                         upload_to           = 'sightings/%Y/%m/%d/',
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "JPG composite",
                                     )
     xml                             = models.FileField(
                                         upload_to           = 'sightings/%Y/%m/%d/',
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "XML file",
                                     )
     avi_size                        = models.BigIntegerField(
                                         null                = True,
                                         blank               = True,
+                                        verbose_name        = "AVI file size",
                                     )
 
     meteor                          = models.ForeignKey(

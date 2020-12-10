@@ -84,9 +84,9 @@ class SightingAdmin(admin.ModelAdmin):
                 'fields': ('meteor', 'station', 'timestamp'),
             }
         ),
-        ('Images',
+        ('Files',
             {
-                'fields': ['jpg'],
+                'fields': ['jpg', 'xml', 'avi_size'],
             }
         ),
     )
