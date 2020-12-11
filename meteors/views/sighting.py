@@ -180,5 +180,6 @@ class SkyView(DetailViewExtras):
         cb.set_label('apparent magnitude', fontsize=12)
         cb.ax.tick_params(labelsize=10)
         cb.ax.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+5.1f}$^\\mathrm{{m}}$"))
+        cb.ax.invert_yaxis()
 
         return core.http.FigurePNGResponse(figure)

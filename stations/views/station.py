@@ -203,9 +203,9 @@ class ScatterView(DataFrameView):
 
             ax_humi.scatter(xs, self.object.df_heartbeat.humidity, s=0.5, color=C_H, marker='.')
 
-            ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available, linefmt='C1-', markerfmt=' ')
-            ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available, linefmt='C0-', markerfmt=' ')
-            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_total), np.amax(self.object.df_heartbeat.storage_permanent_total)) * 1.05)
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available / 1024**3, linefmt='C1-', markerfmt='')
+            ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available / 1024**3, linefmt='C0-', markerfmt='')
+            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)) * 1.05)
 
             ones = np.ones(len(self.object.df_heartbeat))
 
