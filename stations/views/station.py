@@ -205,7 +205,10 @@ class ScatterView(DataFrameView):
 
             ax_storage.stem(xs, self.object.df_heartbeat.storage_permanent_available / 1024**3, linefmt='C1-', markerfmt='')
             ax_storage.stem(xs, self.object.df_heartbeat.storage_primary_available / 1024**3, linefmt='C0-', markerfmt='')
-            ax_storage.set_ylim(ymin=0, ymax=max(np.amax(self.object.df_heartbeat.storage_primary_available), np.amax(self.object.df_heartbeat.storage_permanent_available)) * 1.05)
+            ax_storage.set_ylim(ymin=0, ymax=max(
+                np.amax(self.object.df_heartbeat.storage_primary_available),
+                np.amax(self.object.df_heartbeat.storage_permanent_available)
+            ) * 1.05 / 1024**3)
 
             ones = np.ones(len(self.object.df_heartbeat))
 
