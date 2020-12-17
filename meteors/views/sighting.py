@@ -95,7 +95,7 @@ class ListByStationView(ListDateView):
 
 class DetailView(core.views.LoginDetailView):
     model           = Sighting
-    queryset        = Sighting.objects.with_neighbours().with_everything()
+    queryset        = Sighting.objects.with_everything()
     slug_field      = 'id'
     slug_url_kwarg  = 'id'
     template_name   = 'meteors/sighting/main.html'
@@ -115,8 +115,20 @@ class DetailView(core.views.LoginDetailView):
         return sighting
 
     def get_context_data(self, **kwargs):
+        try:
+            previous_for_station = self.object.get_previous_by_timestamp(station__code=self.object.station.code)
+        except Sighting.DoesNotExist:
+            previous_for_station = None
+
+        try:
+            next_for_station = self.object.get_next_by_timestamp(station__code=self.object.station.code)
+        except Sighting.DoesNotExist:
+            next_for_station = None
+
         return {
             'sighting': self.object,
+            'previous_for_station': previous_for_station,
+            'next_for_station': next_for_station,
             #'moon':         maxLight.getMoonInfo() if maxLight else None,
             #'sun':          maxLight.getSunInfo() if maxLight else None,
             #'maxLight':     maxLight.order if maxLight else None,

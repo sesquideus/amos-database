@@ -45,18 +45,6 @@ class SightingManager(models.Manager):
         return sighting
 
 class SightingQuerySet(models.QuerySet):
-    def with_neighbours(self):
-        return self.annotate(
-            previous=Window(
-                expression=Lead('timestamp', offset=1, default=None),
-                order_by=F('timestamp').asc(),
-            ),
-            next=Window(
-                expression=Lead('timestamp', offset=1, default=None),
-                order_by=F('timestamp').desc(),
-            ),
-        )
-
     def with_station(self):
         return self.select_related('station')
 
@@ -163,7 +151,7 @@ class Sighting(models.Model):
 
     def __str__(self):
         meteor = 'unknown meteor' if self.meteor is None else self.meteor.name
-        return f"#{self.id}: {meteor} from {self.station}"
+        return f"#{self.id}: {meteor} from {self.station} at {self.timestamp}"
 
     def get_absolute_url(self):
         return reverse('sighting', kwargs={'id': self.id})

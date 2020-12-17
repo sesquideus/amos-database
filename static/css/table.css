@@ -115,7 +115,7 @@ td.boolean {
 
 /* station status colours */
 
-td abbr {
+td abbr.status {
     font-weight: bold;
 }
 

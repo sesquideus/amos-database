@@ -172,11 +172,13 @@ class Heartbeat(models.Model):
 
     STATE_OBSERVING = 'O'
     STATE_NOT_OBSERVING = 'N'
+    STATE_DAY = 'D'
     STATE_MALFUNCTION = 'M'
     STATE_UNKNOWN = 'U'
     STATES                          = [
                                         (STATE_OBSERVING, 'observing'),
                                         (STATE_NOT_OBSERVING, 'not observing'),
+                                        (STATE_DAY, 'day'),
                                         (STATE_MALFUNCTION, 'malfunction'),
                                         (STATE_UNKNOWN, 'unknown'),
                                     ]

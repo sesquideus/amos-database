@@ -143,7 +143,7 @@ class Station(core.models.NamedModel):
         return f"{self.name} ({self.subnetwork.name})"
 
     def get_absolute_url(self):
-        return reverse('station', kwargs = {'code': self.code})
+        return reverse('station', kwargs={'code': self.code})
 
     def as_dict(self):
         return {

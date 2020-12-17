@@ -33,11 +33,11 @@
                         </th>
                     {% endif %}
                     {% with sun=station.sun_position heartbeat=station.last_heartbeat.0 status=station.get_current_status last_sighting=station.last_sighting.0 %}
-                        <td class="data c">
+                        <td class="data r">
                             {{ station.code }}
                         </td>
 
-                        <td class="data c">
+                        <td class="data l">
                             <a href="{{ station.get_absolute_url }}">{{ station.name }}</a>
                         </td>
 
@@ -45,13 +45,17 @@
                             {{ station.on|trivalue }}
                         </td>
                         <td class="status c">
-                            <abbr class="{{ status.code }}" title="{{ status.get_description }}">
+                            <abbr class="status {{ status.code }}" title="{{ status.get_description }}">
                                 {{ status.short }}
                             </abbr>
                         </td>
                         <td class="status c">
                             {% if heartbeat %}
-                                {{ heartbeat.get_cover_state_display }}
+                                {% if status.code == 'ok' %}
+                                    {{ heartbeat.get_cover_state_display }}
+                                {% else %}
+                                    ?
+                                {% endif %}
                             {% else %}
                                 &mdash;
                             {% endif %}
@@ -59,7 +63,7 @@
                         <td class="status r">
                             {% if heartbeat %}
                                 <a href="{{ heartbeat.get_absolute_url }}">
-                                    {{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}
+                                    <abbr title="{{ heartbeat.timestamp }}">{{ heartbeat.timestamp|since_date_time|default:"&mdash;" }}</abbr>
                                 </a>
                             {% else %}
                                 &mdash;
@@ -96,10 +100,6 @@
                             {% else %}
                                 <span class="empty">never</span>
                             {% endif %}
-                        </td>
-
-                        <td class="c">
-                            <a href="{% url 'admin:stations_station_change' station.id %}">edit</a>
                         </td>
                     {% endwith %}
                 </tr>
