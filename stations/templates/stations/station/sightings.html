@@ -11,7 +11,8 @@
             <th>azimuth</th>
             <th>duration</th>
             <th>frames</th>
-            <th>arc length</th>
+            <th>arc length</th>
+            <th>AVI size</th>
         </tr>
     </thead>
     {% for sighting in station.recent_sightings %}
@@ -39,6 +40,9 @@
             </td>
             <td class="data">
                 {{ sighting.arc_length|angle }}
+            </td>
+            <td class="data r">
+                {{ sighting.avi_size|megabytes }}
             </td>
         </tr>
     {% empty %}

@@ -9,6 +9,9 @@ import pandas as pd
 import core.views
 import core.http
 
+from astropy.coordinates import get_sun, AltAz, EarthLocation
+from astropy.time import Time
+
 from django.contrib.auth.decorators import login_required
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.urls import reverse
@@ -19,6 +22,7 @@ from matplotlib import pyplot
 from matplotlib import ticker, dates
 from matplotlib.patches import Patch
 from matplotlib.lines import Line2D
+from matplotlib.colors import LinearSegmentedColormap
 
 from stations.models import Station, Subnetwork, Heartbeat, LogEntry
 from meteors.models import Sighting
@@ -81,6 +85,26 @@ class DataFrameView(core.views.LoginDetailView):
 
 
 class ScatterView(DataFrameView):
+    sunalt = LinearSegmentedColormap('sunalt', {
+        'red': [
+            (0, 0, 0),
+            (0.5, 0, 1),
+            (1, 0, 1),
+        ],
+        'green': [
+            (0, 0, 0),
+            (0.5, 0, 0.2),
+            (0.67, 1, 1),
+            (1, 1, 1),
+        ],
+        'blue': [
+            (0, 0, 0),
+            (0.5, 1, 0),
+            (0.67, 0, 0),
+            (1, 1, 0),
+        ],
+    }, N=256)
+
     def render_to_response(self, context, **response_kwargs):
         C_sighting = 'green'
 
@@ -112,7 +136,7 @@ class ScatterView(DataFrameView):
         C_heating_on = '#FF3000'
         C_heating_off = '#A0C0FF'
 
-        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1)
+        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1, gridspec_kw={'height_ratios': [2, 3, 2, 2, 2]})
         fig.set_size_inches(12.8, 10)
         fig.tight_layout(rect=(0.07, 0, 0.87, 1))
 
@@ -132,6 +156,27 @@ class ScatterView(DataFrameView):
             loc=(1.02, 0.82),
         )
 
+        ax_sensors.legend(
+            handles=[
+                Line2D([0], [0], color=C_manual, lw=4, label='manual'),
+                Line2D([0], [0], color=C_automatic, lw=4, label='automatic'),
+                Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
+                Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
+                Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
+                Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
+                Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
+                Line2D([0], [0], color=C_light_active, lw=4, label='light'),
+                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
+                Line2D([0], [0], color=C_raining, lw=4, label='raining'),
+                Line2D([0], [0], color=C_device_off, lw=4, label='device: off'),
+                Line2D([0], [0], color=C_device_on, lw=4, label='device: on'),
+                Line2D([0], [0], color=C_heating_off, lw=4, label='heating: off'),
+                Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
+            ],
+            ncol=1,
+            loc=(1.02, -0.22),
+        )
+
         ax_temp.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         ax_temp.set_ylabel('temperature')
         ax_temp.legend(
@@ -140,7 +185,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_T_lens, lw=1, label='lens'),
                 Line2D([0], [0], color=C_T_CPU, lw=1, label='CPU'),
             ],
-            loc=(1.02, 0.0),
+            loc=(1.02, 0.25),
         )
 
         ax_humi.set_ylim(0, 100)
@@ -161,33 +206,20 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=C_primary, lw=1, label='primary'),
                 Line2D([0], [0], color=C_permanent, lw=1, label='permanent'),
             ],
-            loc=(1.02, 0.35),
+            loc=(1.02, 0.33),
         )
 
-        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12])
-        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'cover', 'control'])
-        ax_sensors.set_ylim(0.5, 12.5)
+        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12, 13])
+        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'control', 'cover', 'sun'])
+        ax_sensors.set_ylim(0.5, 13.5)
 
-        ax_sensors.legend(
-            handles=[
-                Line2D([0], [0], color=C_manual, lw=4, label='manual'),
-                Line2D([0], [0], color=C_automatic, lw=4, label='automatic'),
-                Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
-                Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
-                Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
-                Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
-                Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
-                Line2D([0], [0], color=C_light_active, lw=4, label='light'),
-                Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
-                Line2D([0], [0], color=C_raining, lw=4, label='raining'),
-                Line2D([0], [0], color=C_device_off, lw=4, label='device: off'),
-                Line2D([0], [0], color=C_device_on, lw=4, label='device: on'),
-                Line2D([0], [0], color=C_heating_off, lw=4, label='heating: off'),
-                Line2D([0], [0], color=C_heating_on, lw=4, label='heating: on'),
-            ],
-            ncol=1,
-            loc=(1.02, -0.5),
-        )
+        start_floor = self.start.replace(second=0, microsecond=0)
+        end_floor = self.end.replace(second=0, microsecond=0)
+        full_xs = np.array([start_floor], dtype='datetime64[ns]') + np.arange(0, 86400000000000, 60000000000)
+        frames = AltAz(obstime=full_xs, location=self.object.earth_location())
+        alts = get_sun(Time(full_xs)).transform_to(frames).alt
+
+        ax_sensors.scatter(full_xs, np.ones(1440) * 13, s=100, c=alts, cmap=self.sunalt, marker='|', vmin=-90, vmax=90)
 
         if (len(self.object.df_sightings) > 0):
             xs = self.object.df_sightings.timestamp.to_numpy()
@@ -220,8 +252,8 @@ class ScatterView(DataFrameView):
                 cov == 'o', C_cover_opening, np.where(
                 cov == 'O', C_cover_open, C_cover_problem,
             )))))
-            ax_sensors.scatter(xs, ones * 12, s=100, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 11, s=100, c=cover, marker='|', vmin=0, vmax=5)
+            ax_sensors.scatter(xs, ones * 12, s=100, c=cover, marker='|', vmin=0, vmax=5)
+            ax_sensors.scatter(xs, ones * 11, s=100, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
 
             ax_sensors.scatter(xs, ones * 9, s=100, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
             ax_sensors.scatter(xs, ones * 8, s=100, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)

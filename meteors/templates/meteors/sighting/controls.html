@@ -4,39 +4,38 @@
     {% with previous=sighting.get_previous_by_timestamp next=sighting.get_next_by_timestamp %}
         {% if previous %}
             <a href="{% url 'sighting' id=previous.id %}">
-                <img src="{% static "pictures/previous.png" %}" alt="Previous sighting" />
+                <img src="{% static "pictures/previous.png" %}" title="Previous sighting" alt="Previous" />
             </a>
         {% else %}
-            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first sighting" />
+            <img src="{% static "pictures/previous-gray.png" %}" title="This is the first sighting" alt="No previous" />
         {% endif %}
 
         {% if previous_for_station %}
             <a href="{% url 'sighting' id=previous_for_station.id %}">
-                <img src="{% static "pictures/previous.png" %}" alt="Previous sighting of this station" />
+                <img src="{% static "pictures/previous.png" %}" title="Previous sighting from this station" alt="Previous for station" />
             </a>
         {% else %}
-            <img src="{% static "pictures/previous-gray.png" %}" alt="This is the first sighting of this station" />
+            <img src="{% static "pictures/previous-gray.png" %}" title="This is the first sighting from this station" alt="No previous for station" />
         {% endif %}
 
         <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
-            <img src="{% static "pictures/edit.png" %}" alt="Edit" />
+            <img src="{% static "pictures/edit.png" %}" title="Edit this sighting" alt="Edit" />
         </a>
 
         {% if next_for_station %}
             <a href="{% url 'sighting' id=next_for_station.id %}">
-                <img src="{% static "pictures/next.png" %}" alt="Next sighting of this station" />
+                <img src="{% static "pictures/next.png" %}" title="Next sighting from this station" alt="Next for station" />
             </a>
         {% else %}
-            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting of this station" />
+            <img src="{% static "pictures/next-gray.png" %}" title="This is the last sighting from this station" alt="No next for station" />
         {% endif %}
 
         {% if next %}
             <a href="{% url 'sighting' id=next.id %}">
-                <img src="{% static "pictures/next.png" %}" alt="Next sighting" />
+                <img src="{% static "pictures/next.png" %}" title="Next sighting" alt="Next" />
             </a>
         {% else %}
-            <img src="{% static "pictures/next-gray.png" %}" alt="This is the last sighting" />
+            <img src="{% static "pictures/next-gray.png" %}" title="This is the last sighting" alt="No next" />
         {% endif %}
     {% endwith %}
 </div>
-
