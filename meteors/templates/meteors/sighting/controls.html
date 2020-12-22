@@ -21,6 +21,9 @@
         <a href="{% url 'admin:meteors_sighting_change' sighting.id %}">
             <img src="{% static "pictures/edit.png" %}" title="Edit this sighting" alt="Edit" />
         </a>
+        <a href="{% url 'admin:meteors_sighting_delete' sighting.id %}">
+            <img src="{% static "pictures/delete.png" %}" title="Delete this sighting" alt="Delete" />
+        </a>
 
         {% if next_for_station %}
             <a href="{% url 'sighting' id=next_for_station.id %}">

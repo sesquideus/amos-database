@@ -91,7 +91,7 @@ class SightingAdmin(admin.ModelAdmin):
         ),
     )
 
-    list_display = ['timestamp', 'meteor_link', 'station_link']
+    list_display = ['timestamp', 'meteor_link', 'station_link', 'avi_size']
     list_filter = ['station']
     date_hierarchy = 'timestamp'
     save_as = True

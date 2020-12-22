@@ -88,22 +88,26 @@ class ScatterView(DataFrameView):
     sunalt = LinearSegmentedColormap('sunalt', {
         'red': [
             (0, 0, 0),
-            (0.5, 0, 1),
-            (1, 0, 1),
+            (0.4, 0, 0),
+            (0.5, 0.5, 1),
+            (0.6667, 1, 1),
+            (1, 1, 1),
         ],
         'green': [
             (0, 0, 0),
-            (0.5, 0, 0.2),
-            (0.67, 1, 1),
+            (0.4, 0, 0),
+            (0.5, 0.5, 0.2),
+            (0.6666, 1, 1),
             (1, 1, 1),
         ],
         'blue': [
             (0, 0, 0),
-            (0.5, 1, 0),
-            (0.67, 0, 0),
+            (0.4, 0.3, 0.3),
+            (0.5, 1, 0.2),
+            (0.6667, 0, 0),
             (1, 1, 0),
         ],
-    }, N=256)
+    }, N=1024)
 
     def render_to_response(self, context, **response_kwargs):
         C_sighting = 'green'
