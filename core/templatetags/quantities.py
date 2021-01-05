@@ -131,15 +131,16 @@ def solar_declination(timestamp: datetime.datetime):
 @register.filter
 def since_date_time(timestamp: datetime.datetime):
     delta = (datetime.datetime.now(tz=pytz.utc) - timestamp).total_seconds()
+    delta = int(math.floor(delta))
     if delta < 60:
-        return f"{delta:.0f}s"
+        return f"{delta:d}s"
     if delta < 3600:
-        return f"{delta // 60:.0f}m{delta % 60:02.0f}s"
+        return f"{delta // 60:d}m{delta % 60:02d}s"
     if delta < 86400:
-        return f"{delta // 3600:.0f}h{(delta % 3600) // 60:02.0f}m"
+        return f"{delta // 3600:d}h{(delta % 3600) // 60:02d}m"
     if delta < 30*36400:
-        return f"{delta // 86400:.0f}d{(delta % 86400) // 3600:02.0f}h"
-    return f"{delta // 86400:.0f}d"
+        return f"{delta // 86400:d}d{(delta % 86400) // 3600:02d}h"
+    return f"{delta // 86400:d}d"
 
 
 @register.filter

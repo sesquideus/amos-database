@@ -219,11 +219,11 @@ class ScatterView(DataFrameView):
 
         start_floor = self.start.replace(second=0, microsecond=0)
         end_floor = self.end.replace(second=0, microsecond=0)
-        full_xs = np.array([start_floor], dtype='datetime64[ns]') + np.arange(0, 86400000000000, 60000000000)
+        full_xs = np.array([start_floor], dtype='datetime64[ns]') + np.arange(0, 1441) * 60 * 1000**3
         frames = AltAz(obstime=full_xs, location=self.object.earth_location())
         alts = get_sun(Time(full_xs)).transform_to(frames).alt
 
-        ax_sensors.scatter(full_xs, np.ones(1440) * 13, s=100, c=alts, cmap=self.sunalt, marker='|', vmin=-90, vmax=90)
+        ax_sensors.scatter(full_xs, np.ones(1441) * 13, s=100, c=alts, cmap=self.sunalt, marker='|', vmin=-90, vmax=90)
 
         if (len(self.object.df_sightings) > 0):
             xs = self.object.df_sightings.timestamp.to_numpy()
