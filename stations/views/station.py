@@ -268,6 +268,9 @@ class ScatterView(DataFrameView):
 
             ax_sensors.scatter(xs, ones * 2, s=100, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
             ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+        else:
+            ax_temp.set_ylim(0, 20)
+            ax_storage_set_ylim(0, 256)
 
         return core.http.FigurePNGResponse(fig)
 
