@@ -14,13 +14,6 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 import core.models
 
 
-class BoolOr(Aggregate):
-    function = 'BOOL_OR'
-
-class BoolAnd(Aggregate):
-    function = 'BOOL_AND'
-
-
 class HeartbeatManager(models.Manager):
     def get_queryset(self):
         return HeartbeatQuerySet(
@@ -54,10 +47,15 @@ class HeartbeatManager(models.Manager):
                     else:
                         cover_state = Heartbeat.COVER_PROBLEM
 
+        try:
+            station = Station.objects.get(code=code)
+        except Station.DoesNotExist as e:
+            raise Station.DoesNotExist(f"Station {code} does not exist")
+
         heartbeat = self.create(
             automatic                   = data['auto'],
             timestamp                   = data['time'],
-            station                     = Station.objects.get(code=code),
+            station                     = station,
 
             status_string               = stateS,
             lens_heating                = None if stateS is None else (stateS[4] != '-'),
