@@ -57,6 +57,7 @@ class HeartbeatManager(models.Manager):
             timestamp                   = data['time'],
             station                     = station,
 
+            status                      = data['st'],
             status_string               = stateS,
             lens_heating                = None if stateS is None else (stateS[4] != '-'),
             camera_heating              = None if stateS is None else (stateS[5] != '-'),
@@ -168,16 +169,20 @@ class Heartbeat(models.Model):
                                         models.Index(fields=['timestamp', 'station']),
                                     ]
 
+    STATE_DAYLIGHT = 'D'
     STATE_OBSERVING = 'O'
     STATE_NOT_OBSERVING = 'N'
-    STATE_DAY = 'D'
-    STATE_MALFUNCTION = 'M'
-    STATE_UNKNOWN = 'U'
+    STATE_MANUAL = 'M'
+    STATE_DOME_UNREACHABLE = 'U'
+    STATE_RAIN_OR_HUMID = 'R'
+    STATE_UNKNOWN = '?'
     STATES                          = [
                                         (STATE_OBSERVING, 'observing'),
                                         (STATE_NOT_OBSERVING, 'not observing'),
-                                        (STATE_DAY, 'day'),
-                                        (STATE_MALFUNCTION, 'malfunction'),
+                                        (STATE_DAYLIGHT, 'day'),
+                                        (STATE_MANUAL, 'manual'),
+                                        (STATE_DOME_UNREACHABLE, 'dome unreachable'),
+                                        (STATE_RAIN_OR_HUMID, 'rain or humidity'),
                                         (STATE_UNKNOWN, 'unknown'),
                                     ]
 
@@ -213,12 +218,11 @@ class Heartbeat(models.Model):
                                         on_delete           = models.CASCADE,
                                         related_name        = 'heartbeats',
                                     )
-    status                          = models.CharField(
+    state                           = models.CharField(
                                         max_length          = 1,
                                         choices             = STATES,
                                         null                = True,
                                         blank               = True,
-                                        default             = STATE_UNKNOWN,
                                     )
     cover_state                     = models.CharField(
                                         max_length          = 1,

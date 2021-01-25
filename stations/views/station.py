@@ -1,4 +1,5 @@
 import datetime
+import http
 import pytz
 import json
 import logging
@@ -129,6 +130,14 @@ class ScatterView(DataFrameView):
         C_cover_safety = '#008080'
         C_cover_problem = '#FF0000'
 
+        C_state_daylight = '#F0E000'
+        C_state_observing = '#00C000'
+        C_state_not_observing = '#404040'
+        C_state_manual = '#A000A0'
+        C_state_rain_or_humid = '#0000FF'
+        C_state_dome_unreachable = '#FF0000'
+        C_state_unknown = '#000000'
+
         C_light_active = '#D0D0E0'
         C_light_not_active = '#000000'
         C_raining = '#0020FF'
@@ -140,7 +149,7 @@ class ScatterView(DataFrameView):
         C_heating_on = '#FF3000'
         C_heating_off = '#A0C0FF'
 
-        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1, gridspec_kw={'height_ratios': [2, 3, 2, 2, 2]})
+        fig, (ax_sightings, ax_sensors, ax_temp, ax_humi, ax_storage) = pyplot.subplots(5, 1, gridspec_kw={'height_ratios': [2, 4, 2, 2, 2]})
         fig.set_size_inches(12.8, 10)
         fig.tight_layout(rect=(0.07, 0, 0.87, 1))
 
@@ -162,12 +171,12 @@ class ScatterView(DataFrameView):
 
         ax_sensors.legend(
             handles=[
-                Line2D([0], [0], color=C_manual, lw=4, label='manual'),
-                Line2D([0], [0], color=C_automatic, lw=4, label='automatic'),
                 Line2D([0], [0], color=C_cover_closed, lw=4, label='cover: closed'),
                 Line2D([0], [0], color=C_cover_safety, lw=4, label='cover: safety'),
                 Line2D([0], [0], color=C_cover_open, lw=4, label='cover: open'),
                 Line2D([0], [0], color=C_cover_problem, lw=4, label='cover: problem'),
+                Line2D([0], [0], color=C_manual, lw=4, label='manual'),
+                Line2D([0], [0], color=C_automatic, lw=4, label='automatic'),
                 Line2D([0], [0], color=C_light_not_active, lw=4, label='no light'),
                 Line2D([0], [0], color=C_light_active, lw=4, label='light'),
                 Line2D([0], [0], color=C_not_raining, lw=4, label='not raining'),
@@ -213,9 +222,9 @@ class ScatterView(DataFrameView):
             loc=(1.02, 0.33),
         )
 
-        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12, 13])
-        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'control', 'cover', 'sun'])
-        ax_sensors.set_ylim(0.5, 13.5)
+        ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12, 13, 14])
+        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'control', 'cover', 'state', 'sun'])
+        ax_sensors.set_ylim(0.5, 14.5)
 
         start_floor = self.start.replace(second=0, microsecond=0)
         end_floor = self.end.replace(second=0, microsecond=0)
@@ -223,7 +232,7 @@ class ScatterView(DataFrameView):
         frames = AltAz(obstime=full_xs, location=self.object.earth_location())
         alts = get_sun(Time(full_xs)).transform_to(frames).alt
 
-        ax_sensors.scatter(full_xs, np.ones(1441) * 13, s=100, c=alts, cmap=self.sunalt, marker='|', vmin=-90, vmax=90)
+        ax_sensors.scatter(full_xs, np.ones(1441) * 14, s=100, c=alts, cmap=self.sunalt, marker='|', vmin=-90, vmax=90)
 
         if (len(self.object.df_sightings) > 0):
             xs = self.object.df_sightings.timestamp.to_numpy()
@@ -254,23 +263,37 @@ class ScatterView(DataFrameView):
                 cov == 'c', C_cover_closing, np.where(
                 cov == 'S', C_cover_safety, np.where(
                 cov == 'o', C_cover_opening, np.where(
-                cov == 'O', C_cover_open, C_cover_problem,
+                cov == 'O', C_cover_open, C_cover_problem
             )))))
-            ax_sensors.scatter(xs, ones * 12, s=100, c=cover, marker='|', vmin=0, vmax=5)
-            ax_sensors.scatter(xs, ones * 11, s=100, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
 
-            ax_sensors.scatter(xs, ones * 9, s=100, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 8, s=100, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
+            sta = self.object.df_heartbeat.state.to_numpy()
+            state = np.where(
+                sta == Heartbeat.STATE_DAYLIGHT,            C_state_daylight, np.where(
+                sta == Heartbeat.STATE_OBSERVING,           C_state_observing, np.where(
+                sta == Heartbeat.STATE_NOT_OBSERVING,       C_state_not_observing, np.where(
+                sta == Heartbeat.STATE_MANUAL,              C_state_manual, np.where(
+                sta == Heartbeat.STATE_DOME_UNREACHABLE,    C_state_dome_unreachable, np.where(
+                sta == Heartbeat.STATE_RAIN_OR_HUMID,       C_state_rain_or_humid, C_state_unknown
+            ))))))
 
-            ax_sensors.scatter(xs, ones * 6, s=100, c=np.where(self.object.df_heartbeat.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 5, s=100, c=np.where(self.object.df_heartbeat.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 4, s=100, c=np.where(self.object.df_heartbeat.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            size = 150
 
-            ax_sensors.scatter(xs, ones * 2, s=100, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 1, s=100, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 13, s=size, c=cover, marker='|', vmin=0, vmax=5)
+            ax_sensors.scatter(xs, ones * 12, s=size, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 11, s=size, c=state, marker='|', vmin=0, vmax=6)
+
+            ax_sensors.scatter(xs, ones * 9, s=size, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 8, s=size, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
+
+            ax_sensors.scatter(xs, ones * 6, s=size, c=np.where(self.object.df_heartbeat.computer_power.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 5, s=size, c=np.where(self.object.df_heartbeat.intensifier_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 4, s=size, c=np.where(self.object.df_heartbeat.fan_active.to_numpy(), C_device_on, C_device_off), marker='|', vmin=0, vmax=1)
+
+            ax_sensors.scatter(xs, ones * 2, s=size, c=np.where(self.object.df_heartbeat.camera_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
+            ax_sensors.scatter(xs, ones * 1, s=size, c=np.where(self.object.df_heartbeat.lens_heating.to_numpy(), C_heating_on, C_heating_off), marker='|', vmin=0, vmax=1)
         else:
             ax_temp.set_ylim(0, 20)
-            ax_storage_set_ylim(0, 256)
+            ax_storage.set_ylim(0, 256)
 
         return core.http.FigurePNGResponse(fig)
 
@@ -337,6 +360,8 @@ class APIViewHeartbeat(django.views.View):
         except json.JSONDecodeError:
             print("JSON decoding error")
             return HttpResponseBadRequest()
+        except Station.DoesNotExist as e:
+            return HttpResponse(e, status=http.HTTPStatus.UNPROCESSABLE_ENTITY)
 #        except Exception as e:
 #            print(e)
 #            return HttpResponseBadRequest()
