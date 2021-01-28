@@ -1,7 +1,7 @@
     <td class="data time">{{ heartbeat.timestamp|since_date_time }}</td>
 
     <td class="data boolean">{{ heartbeat.automatic|troolean:"automatic,manual,&mdash;" }}</td>
-    <td class="data status">{{ heartbeat.get_status_display }}</td>
+    <td class="data status">{{ heartbeat.get_state_display }}</td>
     <td class="data status verbatim">{{ heartbeat.status_string|default:'????????|????????|????????' }}</td>
 
     <td class="data c">{{ heartbeat.get_cover_state_display|default:"?" }}</td>

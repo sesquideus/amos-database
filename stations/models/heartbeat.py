@@ -57,7 +57,7 @@ class HeartbeatManager(models.Manager):
             timestamp                   = data['time'],
             station                     = station,
 
-            status                      = data['st'],
+            state                       = data['st'],
             status_string               = stateS,
             lens_heating                = None if stateS is None else (stateS[4] != '-'),
             camera_heating              = None if stateS is None else (stateS[5] != '-'),
@@ -240,7 +240,7 @@ class Heartbeat(models.Model):
     rain_sensor_active              = models.BooleanField(null=True, blank=True)
     light_sensor_active             = models.BooleanField(null=True, blank=True)
     computer_power                  = models.BooleanField(null=True, blank=True)
-    cover_position                  = models.PositiveSmallIntegerField(null=True, blank=True)
+    cover_position                  = models.SmallIntegerField(null=True, blank=True)
 
     # Environmental data
     temperature                     = models.FloatField(null=True, blank=True)

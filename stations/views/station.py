@@ -223,7 +223,7 @@ class ScatterView(DataFrameView):
         )
 
         ax_sensors.set_yticks([1, 2, 4, 5, 6, 8, 9, 11, 12, 13, 14])
-        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'control', 'cover', 'state', 'sun'])
+        ax_sensors.set_yticklabels(['lens heating', 'camera heating', 'fan', 'intensifier', 'computer power', 'rain sensor', 'light sensor', 'control', 'state', 'cover', 'sun'])
         ax_sensors.set_ylim(0.5, 14.5)
 
         start_floor = self.start.replace(second=0, microsecond=0)
@@ -279,8 +279,8 @@ class ScatterView(DataFrameView):
             size = 150
 
             ax_sensors.scatter(xs, ones * 13, s=size, c=cover, marker='|', vmin=0, vmax=5)
-            ax_sensors.scatter(xs, ones * 12, s=size, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
-            ax_sensors.scatter(xs, ones * 11, s=size, c=state, marker='|', vmin=0, vmax=6)
+            ax_sensors.scatter(xs, ones * 12, s=size, c=state, marker='|', vmin=0, vmax=6)
+            ax_sensors.scatter(xs, ones * 11, s=size, c=np.where(self.object.df_heartbeat.automatic.to_numpy(), C_automatic, C_manual), marker='|', vmin=0, vmax=1)
 
             ax_sensors.scatter(xs, ones * 9, s=size, c=np.where(self.object.df_heartbeat.light_sensor_active.to_numpy(), C_light_active, C_light_not_active), marker='|', vmin=0, vmax=1)
             ax_sensors.scatter(xs, ones * 8, s=size, c=np.where(self.object.df_heartbeat.rain_sensor_active.to_numpy(), C_raining, C_not_raining), marker='|', vmin=0, vmax=1)
