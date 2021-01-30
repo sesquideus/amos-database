@@ -173,7 +173,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=self.C_manual, lw=4, label='control: manual'),
                 Line2D([0], [0], color=self.C_automatic, lw=4, label='control: automatic'),
             ],
-            loc=(1.01, 0.98), fontsize='x-small', labelspacing=0.2,
+            loc=(1.01, 1.09), fontsize='small', labelspacing=0.2,
         )
         legend_state = self.ax_sensors.legend(
             handles=[
@@ -185,7 +185,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=self.C_state_dome_unreachable, lw=4, label='state: dome unreachable'),
                 Line2D([0], [0], color=self.C_state_unknown, lw=4, label='state: unknown'),
             ],
-            loc=(1.01, 0.61), fontsize='x-small', labelspacing=0.2,
+            loc=(1.01, 0.63), fontsize='small', labelspacing=0.2,
         )
         legend_cover = self.ax_sensors.legend(
             handles=[
@@ -195,7 +195,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=self.C_cover_open, lw=4, label='cover: open'),
                 Line2D([0], [0], color=self.C_cover_problem, lw=4, label='cover: problem'),
             ],
-            loc=(1.01, 0.33), fontsize='x-small', labelspacing=0.2,
+            loc=(1.01, 0.29), fontsize='small', labelspacing=0.2,
         )
         self.ax_sensors.legend(
             handles=[
@@ -208,7 +208,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=self.C_heating_off, lw=4, label='heating: off'),
                 Line2D([0], [0], color=self.C_heating_on, lw=4, label='heating: on'),
             ],
-            loc=(1.01, -0.09), fontsize='x-small', labelspacing=0.2,
+            loc=(1.01, -0.23), fontsize='small', labelspacing=0.2,
         )
 
         self.ax_sensors.add_artist(legend_mode)
@@ -223,14 +223,13 @@ class ScatterView(DataFrameView):
     def format_temperature(self):
         self.ax_temp.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:.1f} °C"))
         self.ax_temp.set_ylabel('temperature')
-        self.ax_temp.set_ylim(0, 20)
         self.ax_temp.legend(
             handles=[
                 Line2D([0], [0], color=self.C_T_env, lw=1, label='environment'),
                 Line2D([0], [0], color=self.C_T_lens, lw=1, label='lens'),
                 Line2D([0], [0], color=self.C_T_CPU, lw=1, label='CPU'),
             ],
-            loc=(1.02, 0.25),
+            loc=(1.01, 0.29), fontsize='small', labelspacing=0.2,
         )
 
     def format_humidity(self):
@@ -241,7 +240,7 @@ class ScatterView(DataFrameView):
             handles=[
                 Line2D([0], [0], color=self.C_H, lw=1, label='relative humidity'),
             ],
-            loc=(1.02, 0.42),
+            loc=(1.01, 0.41), fontsize='small', labelspacing=0.2,
         )
 
     def format_storage(self):
@@ -253,7 +252,7 @@ class ScatterView(DataFrameView):
                 Line2D([0], [0], color=self.C_primary, lw=1, label='primary'),
                 Line2D([0], [0], color=self.C_permanent, lw=1, label='permanent'),
             ],
-            loc=(1.02, 0.33),
+            loc=(1.01, 0.38), fontsize='small', labelspacing=0.2,
         )
 
     def render_sightings(self):
@@ -313,9 +312,18 @@ class ScatterView(DataFrameView):
         self.ax_sensors.scatter(self.xs, self.ones * ypos, s=self.S_sensor, c=colour, marker='|', *args)
 
     def render_temperature(self):
-        self.ax_temp.scatter(self.xs, self.object.df_heartbeat.temperature, s=0.5, color=self.C_T_env, marker='.')
-        self.ax_temp.scatter(self.xs, self.object.df_heartbeat.t_lens, s=0.5, color=self.C_T_lens, marker='.')
-        self.ax_temp.scatter(self.xs, self.object.df_heartbeat.t_cpu, s=0.5, color=self.C_T_CPU, marker='.')
+        temperature = self.object.df_heartbeat.temperature.to_numpy(na_value=np.nan)
+        t_lens = self.object.df_heartbeat.t_lens.to_numpy(na_value=np.nan)
+        t_cpu = self.object.df_heartbeat.t_cpu.to_numpy(na_value=np.nan)
+        minimum = min([np.nanmin(temperature), np.nanmin(t_lens), np.nanmin(t_cpu)])
+        maximum = max([np.nanmax(temperature), np.nanmax(t_lens), np.nanmin(t_cpu)])
+
+        if minimum is np.nan:
+            self.ax_temp.set_ylim(0, 20)
+
+        self.ax_temp.scatter(self.xs, temperature, s=0.5, color=self.C_T_env, marker='.')
+        self.ax_temp.scatter(self.xs, t_lens, s=0.5, color=self.C_T_lens, marker='.')
+        self.ax_temp.scatter(self.xs, t_cpu, s=0.5, color=self.C_T_CPU, marker='.')
 
     def render_humidity(self):
         self.ax_humi.scatter(self.xs, self.object.df_heartbeat.humidity, s=0.5, color=self.C_H, marker='.')
@@ -333,7 +341,7 @@ class ScatterView(DataFrameView):
         (self.ax_sightings, self.ax_sensors, self.ax_temp, self.ax_humi, self.ax_storage) = self.axes
 
         self.fig.set_size_inches(12.8, 10)
-        self.fig.tight_layout(rect=(0.07, 0, 0.87, 1))
+        self.fig.tight_layout(rect=(0.07, 0, 0.86, 1))
 
         for ax in self.axes:
             ax.grid('major', 'both', color='black', linestyle=':', linewidth=0.5, alpha=0.5)
