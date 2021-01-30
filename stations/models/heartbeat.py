@@ -11,6 +11,8 @@ from django.urls import reverse
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.validators import MinValueValidator, MaxValueValidator
 
+from pprint import pprint as pp
+
 import core.models
 
 
@@ -28,6 +30,7 @@ class HeartbeatManager(models.Manager):
         stateS = data['dome']['s']
         stateT = data['dome']['t']
 
+        #pp(data)
         if stateS is None:
             cover_state = None
         else:
@@ -59,14 +62,16 @@ class HeartbeatManager(models.Manager):
 
             state                       = data['st'],
             status_string               = stateS,
-            lens_heating                = None if stateS is None else (stateS[4] != '-'),
-            camera_heating              = None if stateS is None else (stateS[5] != '-'),
-            intensifier_active          = None if stateS is None else (stateS[6] != '-'),
-            fan_active                  = None if stateS is None else (stateS[7] != '-'),
+            lens_heating                = (stateS[4] != '-') if stateS else None,
+            camera_heating              = (stateS[5] != '-') if stateS else None,
+            intensifier_active          = (stateS[6] != '-') if stateS else None,
+            fan_active                  = (stateS[7] != '-') if stateS else None,
 
-            rain_sensor_active          = None if stateS is None else (stateS[9] != '-'),
-            light_sensor_active         = None if stateS is None else (stateS[10] != '-'),
-            computer_power              = None if stateS is None else (stateS[11] != '-'),
+            rain_sensor_active          = (stateS[9] != '-') if stateS else None,
+            light_sensor_active         = (stateS[10] != '-') if stateS else None,
+            computer_power              = (stateS[11] != '-') if stateS else None,
+
+            rain_emergency_closing      = (stateS[25] != '-') if stateS else None,
 
             temperature                 = None if stateT is None else stateT['t_sht'],
             t_lens                      = None if stateT is None else stateT['t_lens'],
@@ -240,6 +245,7 @@ class Heartbeat(models.Model):
     rain_sensor_active              = models.BooleanField(null=True, blank=True)
     light_sensor_active             = models.BooleanField(null=True, blank=True)
     computer_power                  = models.BooleanField(null=True, blank=True)
+    rain_emergency_closing          = models.BooleanField(null=True, blank=True)
     cover_position                  = models.SmallIntegerField(null=True, blank=True)
 
     # Environmental data
@@ -249,17 +255,13 @@ class Heartbeat(models.Model):
     humidity                        = models.FloatField(null=True, blank=True)
 
     # Storage
-    storage_primary_available       = models.FloatField(null=True, blank=True)
-    storage_primary_total           = models.FloatField(null=True, blank=True)
-    storage_permanent_available     = models.FloatField(null=True, blank=True)
-    storage_permanent_total         = models.FloatField(null=True, blank=True)
+    storage_primary_available       = models.BigIntegerField(null=True, blank=True)
+    storage_primary_total           = models.BigIntegerField(null=True, blank=True)
+    storage_permanent_available     = models.BigIntegerField(null=True, blank=True)
+    storage_permanent_total         = models.BigIntegerField(null=True, blank=True)
 
     # Management
-    automatic                       = models.BooleanField(
-                                        null                = False,
-                                        blank               = False,
-                                        default             = False,
-                                    )
+    automatic                       = models.BooleanField(null=False, blank=False, default=False)
 
     def __str__(self):
         return f"[{self.station.code}] at {self.timestamp.strftime('%Y-%m-%d %H:%M:%S.%f')}: {self.status_string}"
