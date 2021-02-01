@@ -80,8 +80,8 @@ class DataFrameView(core.views.LoginDetailView):
         heartbeats = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
         station.df_heartbeat = pd.DataFrame(list(heartbeats.values()))
 
-        sightings = Sighting.objects.for_station(station.code).with_everything().as_scatter(self.start, self.end).values('timestamp', 'magnitude')
-        station.df_sightings = pd.DataFrame(list(sightings.values())).fillna(value=np.nan)
+        sightings = Sighting.objects.for_station(station.code).with_everything().as_scatter(self.start, self.end).values('timestamp', 'magnitude', 'avi_size')
+        station.df_sightings = pd.DataFrame(list(sightings.values()))
         return station
 
 
@@ -157,9 +157,12 @@ class ScatterView(DataFrameView):
     S_sensor = 160
 
     def format_sightings(self):
-        self.ax_sightings.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.1f}"))
-        self.ax_sightings.set_ylabel('apparent magnitude')
-        self.ax_sightings.invert_yaxis()
+        #self.ax_sightings.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x:+.1f}"))
+        self.ax_sightings.yaxis.set_major_formatter(ticker.FuncFormatter(lambda x, pos: f"{x // (2**20):.0f}"))
+        #self.ax_sightings.set_ylabel('apparent magnitude')
+        self.ax_sightings.set_ylabel('AVI size / MB')
+        self.ax_sightings.set_ylim(ymin=0)
+        #self.ax_sightings.invert_yaxis()
         self.ax_sightings.legend(
             handles=[
                 Line2D([0], [0], color=self.C_sighting, lw=0, marker='*', label='sighting'),
@@ -257,8 +260,10 @@ class ScatterView(DataFrameView):
 
     def render_sightings(self):
         xs = self.object.df_sightings.timestamp.to_numpy()
-        ys = self.object.df_sightings.magnitude.to_numpy()
-        self.ax_sightings.scatter(xs, ys, s=np.exp(-ys / 2) * 3, color=self.C_sighting, marker='*')
+        ys = self.object.df_sightings.avi_size.to_numpy()
+#        self.ax_sightings.scatter(xs, ys, s=np.exp(-ys / 2) * 3, color=self.C_sighting, marker='*')
+        self.ax_sightings.scatter(xs, ys, s=30, color=self.C_sighting, marker='*')
+        self.ax_sightings.set_ylim(ymin=0, ymax=np.amax(ys) * 1.1)
 
     def render_sensors(self):
         start_floor = self.start.replace(second=0, microsecond=0)
@@ -312,13 +317,11 @@ class ScatterView(DataFrameView):
         self.ax_sensors.scatter(self.xs, self.ones * ypos, s=self.S_sensor, c=colour, marker='|', *args)
 
     def render_temperature(self):
-        temperature = self.object.df_heartbeat.temperature.to_numpy(na_value=np.nan)
-        t_lens = self.object.df_heartbeat.t_lens.to_numpy(na_value=np.nan)
-        t_cpu = self.object.df_heartbeat.t_cpu.to_numpy(na_value=np.nan)
-        minimum = min([np.nanmin(temperature), np.nanmin(t_lens), np.nanmin(t_cpu)])
-        maximum = max([np.nanmax(temperature), np.nanmax(t_lens), np.nanmin(t_cpu)])
+        temperature = self.object.df_heartbeat.temperature.to_numpy(na_value=np.nan, dtype=float)
+        t_lens = self.object.df_heartbeat.t_lens.to_numpy(na_value=np.nan, dtype=float)
+        t_cpu = self.object.df_heartbeat.t_cpu.to_numpy(na_value=np.nan, dtype=float)
 
-        if minimum is np.nan:
+        if np.nanmin(temperature) is np.nan and np.nanmin(t_lens) is np.nan and np.nanmin(t_cpu) is np.nan:
             self.ax_temp.set_ylim(0, 20)
 
         self.ax_temp.scatter(self.xs, temperature, s=0.5, color=self.C_T_env, marker='.')

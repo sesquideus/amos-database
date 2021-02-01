@@ -29,7 +29,7 @@ DEBUG = False
 
 ALLOWED_HOSTS = ['*', 'localhost', '127.0.0.1']
 
-INTERNAL_IPS = ['localhost', '127.0.0.1', '192.168.153.128']
+INTERNAL_IPS = ['localhost', '127.0.0.1', '192.168.153.128', '192.168.248.128']
 
 # Application definition
 
