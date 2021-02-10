@@ -76,12 +76,12 @@ class DataFrameView(core.views.LoginDetailView):
 
         try:
             self.start = datetime.datetime.strptime(self.request.GET.get('start', None), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=pytz.utc)
-        except ValueError as e:
+        except ValueError, TypeError:
             self.start = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
 
         try:
             self.end = datetime.datetime.strptime(self.request.GET.get('end', None), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=pytz.utc)
-        except ValueError:
+        except ValueError, TypeError:
             self.end = datetime.datetime.now(tz=pytz.utc)
 
         heartbeats = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
