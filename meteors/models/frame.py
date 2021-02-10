@@ -96,7 +96,7 @@ class Frame(models.Model):
     def get_absolute_url(self):
         return reverse('frame', kwargs = {'sighting': self.sighting.id, 'order': self.order})
 
-    def earthLocation(self):
+    def earth_location(self):
         try:
             result = EarthLocation.from_geodetic(self.longitude * units.deg, self.latitude * units.deg, self.altitude * units.m)
         except TypeError:

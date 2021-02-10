@@ -74,8 +74,15 @@ class DataFrameView(core.views.LoginDetailView):
     def get_object(self, **kwargs):
         station = super().get_object(**kwargs)
 
-        self.start = kwargs.get('start', datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1))
-        self.end = kwargs.get('end', datetime.datetime.now(tz=pytz.utc))
+        try:
+            self.start = datetime.datetime.strptime(self.request.GET.get('start', None), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=pytz.utc)
+        except ValueError as e:
+            self.start = datetime.datetime.now(tz=pytz.utc) - datetime.timedelta(days=1)
+
+        try:
+            self.end = datetime.datetime.strptime(self.request.GET.get('end', None), "%Y-%m-%dT%H:%M:%S").replace(tzinfo=pytz.utc)
+        except ValueError:
+            self.end = datetime.datetime.now(tz=pytz.utc)
 
         heartbeats = Heartbeat.objects.for_station(station.code).as_scatter(self.start, self.end)
         station.df_heartbeat = pd.DataFrame(list(heartbeats.values()))

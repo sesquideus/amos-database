@@ -8,7 +8,7 @@ from django.db import models
 from django.apps import apps
 from django.core.exceptions import ObjectDoesNotExist
 from django.db.models import Prefetch, F, Q, Value, Window, Min, Count, Subquery, OuterRef
-from django.db.models.functions import Coalesce, Lead
+from django.db.models.functions import Coalesce, Lead, Sin, Cos, Degrees, Radians, ACos
 from django.urls import reverse
 from django.utils.decorators import method_decorator
 
@@ -52,12 +52,26 @@ class SightingQuerySet(models.QuerySet):
         return self.select_related('meteor')
 
     def with_frames(self):
+        frames_asc = Frame.objects.filter(sighting=OuterRef('id')).order_by('timestamp')
+        frames_desc = Frame.objects.filter(sighting=OuterRef('id')).order_by('-timestamp')
         return self.prefetch_related(
             Prefetch(
                 'frames',
                 queryset=Frame.objects.with_flight_time(),
             )
-        ).annotate(frame_count=Count('frames'))
+        ).annotate(
+            frame_count=Count('frames'),
+            fa=Subquery(frames_asc.values('altitude')[:1]),
+            la=Subquery(frames_desc.values('altitude')[:1]),
+            fz=Subquery(frames_asc.values('azimuth')[:1]),
+            lz=Subquery(frames_desc.values('azimuth')[:1]),
+            arc_length=Degrees(
+                ACos(
+                    Sin(Radians(F('fa'))) * Sin(Radians(F('la'))) +
+                    Cos(Radians(F('fa'))) * Cos(Radians(F('la'))) * Cos(Radians(F('fz') - F('lz')))
+                )
+            ),
+        )
 
     def with_lightmax(self):
         frames = Frame.objects.filter(sighting=OuterRef('id')).order_by('magnitude')
